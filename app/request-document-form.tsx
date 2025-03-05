@@ -1,4 +1,5 @@
 // app/profile.js
+import apiRequest from '@/plugins/axios';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -16,15 +17,35 @@ const RequestDocumentForm = () => {
     const [natureOfBusiness, setNatureOfBusiness] = useState('');
     const [contactNumber, setContactNumber] = useState('');
 
-    const submit = () => {
+    const submit = async () => {
         if (firstName == '' || middleName == '' || lastName == '' || businessName == '' || businessAddress == '' || civilStatus == '' || natureOfBusiness == '' || contactNumber == '') {
             Alert.alert('Form Error', 'You have empty fields in your form');
             return;
         }
 
-        Alert.alert('Success', 'You have successfully submitted your form');
 
-        router.push('/doc-status/1');
+        const response = await apiRequest('POST', '/api/business', {
+            firstname: firstName,
+            middlename: middleName,
+            lastname: lastName,
+            business_name: businessName,
+            business_address: businessAddress,
+            nature_of_business: natureOfBusiness,
+            contact: contactNumber
+          });
+      
+          console.log(response);
+          
+          // save response to local storage
+      
+          if (!response) {
+            Alert.alert('Error', response.error || 'Something went wrong');
+            return;
+          }
+
+            Alert.alert('Success', 'You have successfully submitted your form');
+
+            router.push(`/doc-status/${response.id || 0}`);
     }
 
     return (

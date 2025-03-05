@@ -1,12 +1,33 @@
 // import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
 
   const [gender, setGender] = useState('');
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('userData');
+        if (userData) {
+          setUser(JSON.parse(userData));
+          console.log(userData);
+        }
+      } catch (error) {
+        console.error('Error getting user data from AsyncStorage:', error);
+        Alert.alert('Error', 'Something went wrong 👀');
+      }
+    };
+
+    getUserData();
+  }, [])
+  
 
   const comingSoon = () => {
     Alert.alert(
@@ -55,11 +76,11 @@ export default function Index() {
           fontWeight: 'bold',
           color: '#0F00D7',
           marginBottom: 5,
-        }}>Welcome, Juan Luna</Text>
+        }}>Welcome, { user?.firstname || 'Loading ...' } { user?.lastname || '' }</Text>
         <Text style={{
           fontSize: 17,
           color: '#7F7F7F',
-        }}>juanluna@gmail.com</Text>
+        }}>{ user?.email || '...' }</Text>
       </View>
       
 

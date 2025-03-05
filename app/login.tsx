@@ -1,4 +1,6 @@
 // import { Picker } from '@react-native-picker/picker';
+import apiRequest from '@/plugins/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -10,7 +12,7 @@ export default function Index() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const login = () => {
+  const login = async () => {
     
     if (email == '' || password == '') {
       Alert.alert('Form Error', 'You have empty fields in your form');
@@ -29,15 +31,29 @@ export default function Index() {
       return;
     }
 
-    // validate email if juanluna@gmail.com and password juan123
-    if (email != 'juanluna@gmail.com' && password != 'juan123') {
-      Alert.alert('Form Error', 'Invalid email or password');
+    const response = await apiRequest('POST', '/api/login', {
+      email, password
+    });
+
+    console.log(response);
+    
+    // save response to local storage
+
+    if (!response) {
+      Alert.alert('Error', 'Something went wrong');
       return;
     }
 
-    Alert.alert('Success', 'You have successfully logged in');
+    
+    if (!response?.userData) {
+      Alert.alert('Error', 'Something went wrong');
+      return;
+    }
 
-    router.push('/portal');
+    // save data to asyncstorage
+    await AsyncStorage.setItem('userData', JSON.stringify(response.userData));
+    Alert.alert('Success', 'You have successfully logged in');
+    router.push('/portal'); 
 
   }
 

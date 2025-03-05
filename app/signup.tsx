@@ -1,4 +1,5 @@
 import apiRequest from '@/plugins/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -20,6 +21,9 @@ export default function Index() {
   const [voters, setVoters] = useState('');
   const [contactNo, setContactNo] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+
 
   const signUp = async () => {
     if (!firstName || !lastName || !gender || !dob || !email || !contactNo) {
@@ -36,16 +40,39 @@ export default function Index() {
     }
  
 
-    const response = await apiRequest('POST', '/register', {
-      first_name: firstName,
-      last_name: lastName,
+    const response = await apiRequest('POST', '/api/register', {
+      firstname: firstName,
+      middlename: middleName,
+      lastname: lastName,
+      gender,
+      date_of_birth: dob,
+      civil_status: civilStatus,
+      subdivision,
+      block,
+      lot,
+      year_lived: yearLived,
+      occupation,
+      voters,
+      contact: contactNo,
       email,
+      password,
+      profile: 'N/A',
     });
 
     console.log(response);
     
+    // save response to local storage
+
+    if (!response) {
+      Alert.alert('Error', 'Something went wrong');
+      return;
+    }
+
+    // save data to asyncstorage
+    await AsyncStorage.setItem('userData', JSON.stringify(response.newUserData));
+
     Alert.alert('Success', 'Account created successfully!');
-    router.push('/home');
+    router.push('/portal');
   };
 
   return (
@@ -70,10 +97,12 @@ export default function Index() {
             { label: 'Voters', state: voters, setState: setVoters },
             { label: 'Contact No.', state: contactNo, setState: setContactNo },
             { label: 'Email Address', state: email, setState: setEmail },
+            { label: 'Password', state: password, setState: setPassword, isPassword: true },
           ].map(({ label, state, setState }, index) => (
             <View key={index} style={{ width: '50%', padding: 10 }}>
               <Text style={{ color: 'black', fontSize: 16, marginBottom: 10 }}>{label}</Text>
               <TextInput
+                secureTextEntry={label === 'Password'}
                 placeholder={label}
                 value={state}
                 onChangeText={setState}

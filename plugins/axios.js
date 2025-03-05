@@ -4,7 +4,8 @@ import { Alert } from 'react-native';
 
 // Axios instance with base URL
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000', // Update with your actual API URL
+  baseURL: 'https://bmis-backend.vercel.app', // Update with your actual API URL
+//   baseURL: 'http://localhost:5000', // Update with your actual API URL
 });
 
 export default async function apiRequest(method, path, data) {
@@ -26,9 +27,9 @@ export default async function apiRequest(method, path, data) {
       const { status, data } = error.response;
       if (status === 401) {
         await AsyncStorage.removeItem('userData');
-        Alert.alert('Unauthorized', data.message || 'Session expired, please log in again.');
+        Alert.alert('Unauthorized', data.error || 'Session expired, please log in again.');
       } else {
-        Alert.alert('Error', data.message || 'Something went wrong');
+        Alert.alert('Error', data.error || 'Something went wrong');
       }
     } else {
       Alert.alert('Network Error', 'Please check your internet connection.');

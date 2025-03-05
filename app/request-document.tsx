@@ -1,7 +1,7 @@
 // app/profile.js
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 
 const Profile = () => {
@@ -32,16 +32,16 @@ const Profile = () => {
           <TouchableOpacity onPress={() => router.push('/request-document-form')}>
               <Text style={{ fontSize: 16, fontFamily: 'Poppins-Regular', fontWeight: 'bold', textAlign: 'center', color: '#151515', backgroundColor: '#D8E9FC', padding: 20, margin: 20, marginTop: 0, marginBottom: 10, borderRadius: 15 }}>Barangay Clearance</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={ () => { Alert.alert('Under maintenance', 'This document is under development') } }>
               <Text style={{ fontSize: 16, fontFamily: 'Poppins-Regular', fontWeight: 'bold', textAlign: 'center', color: '#151515', backgroundColor: '#D8E9FC', padding: 20, margin: 20, marginTop: 0, marginBottom: 10, borderRadius: 15 }}>Certificate of Residency</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={ () => { Alert.alert('Under maintenance', 'This document is under development') } }>
               <Text style={{ fontSize: 16, fontFamily: 'Poppins-Regular', fontWeight: 'bold', textAlign: 'center', color: '#151515', backgroundColor: '#D8E9FC', padding: 20, margin: 20, marginTop: 0, marginBottom: 10, borderRadius: 15 }}>Business Permit</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={ () => { Alert.alert('Under maintenance', 'This document is under development') } }>
               <Text style={{ fontSize: 16, fontFamily: 'Poppins-Regular', fontWeight: 'bold', textAlign: 'center', color: '#151515', backgroundColor: '#D8E9FC', padding: 20, margin: 20, marginTop: 0, marginBottom: 10, borderRadius: 15 }}>Certificate of Indigency</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={ () => { Alert.alert('Under maintenance', 'This document is under development') } }>
               <Text style={{ fontSize: 16, fontFamily: 'Poppins-Regular', fontWeight: 'bold', textAlign: 'center', color: '#151515', backgroundColor: '#D8E9FC', padding: 20, margin: 20, marginTop: 0, marginBottom: 10, borderRadius: 15 }}>Certificate of Good Moral</Text>
           </TouchableOpacity>
         </ScrollView>
