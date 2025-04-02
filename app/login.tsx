@@ -61,14 +61,24 @@ export default function Index() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
     <View style={{
       padding: 60,
+      paddingLeft: 20,
+      paddingRight: 20,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       backgroundColor: '#0F00D7',
     }}>
+      <TouchableOpacity onPress={() => router.back()}>
+        <Image source={require('@/assets/images/back-white.png')} style={{ width: 20, height: 20, objectFit: 'contain' }} />
+      </TouchableOpacity>
       <Text style={{
         color: 'white',
         textAlign: 'center',
         fontSize: 20,
         fontWeight: 'bold'
       }}>Login</Text>
+      <Image source={require('@/assets/images/back-white.png')} style={{ width: 20, height: 20, opacity: 0, objectFit: 'contain', borderWidth: 1 }} />
     </View>
     <ScrollView style={{
       backgroundColor: 'white',

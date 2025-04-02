@@ -10,14 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.raldincasidar.bbud"
+      "bundleIdentifier": "com.bbud.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.raldincasidar.bbud"
+      "package": "com.bbud.app"
     },
     "web": {
       "bundler": "metro",
@@ -59,7 +59,7 @@
         "projectId": "35009995-0f19-4b12-bcb7-06ed38ca419c"
       }
     },
-    "owner": "raldincasidar",
+    "owner": "team-bbud",
     "updates": {
       "url": "https://u.expo.dev/35009995-0f19-4b12-bcb7-06ed38ca419c"
     },

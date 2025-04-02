@@ -2,7 +2,7 @@ import apiRequest from '@/plugins/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
@@ -77,8 +77,21 @@ export default function Index() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <View style={{ padding: 60, backgroundColor: '#0F00D7' }}>
+      <View style={{ 
+        padding: 60,
+        paddingLeft: 20,
+        paddingRight: 20,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: '#0F00D7' 
+      }}>
+        <TouchableOpacity onPress={() => router.back()}>
+            <Image source={require('@/assets/images/back-white.png')} style={{ width: 20, height: 20, objectFit: 'contain' }} />
+        </TouchableOpacity>
         <Text style={{ color: 'white', textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}>Signup</Text>
+        <Image source={require('@/assets/images/back-white.png')} style={{ width: 20, height: 20, opacity: 0, objectFit: 'contain' }} />
       </View>
       <ScrollView style={{ backgroundColor: 'white', borderRadius: 20, marginTop: -40, paddingTop: 40, height: '100%' }}>
         <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
