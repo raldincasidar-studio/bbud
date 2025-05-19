@@ -285,7 +285,7 @@ export default function Index() {
     { key: 'proofOfResidency', label: 'Proof of Residency', value: proofOfResidencyName, setter: pickDocument, type: 'filePicker' },
     { key: 'isHouseholdHead', label: 'Are you the Household Head?', value: isHouseholdHead, setter: setIsHouseholdHead, type: 'picker', options: [{label: 'Select an option', value: ''}, {label:'Yes', value:'Yes'}, {label:'No', value:'No'}] },
     // Added householdList to formFields to be rendered conditionally
-    { key: 'searchQuery', label: 'Household Members (if not head)', value: searchQuery, setter: setSearchQuery, type: 'textInput', multiline: true, numberOfLines: 3, placeholder: 'Enter names, separated by comma', fullWidth: true, conditionalRender: () => isHouseholdHead === 'Yes',
+    { key: 'searchQuery', label: 'Household Members (if you are head)', value: searchQuery, setter: setSearchQuery, type: 'textInput', multiline: true, numberOfLines: 3, placeholder: 'Enter names, separated by comma', fullWidth: true, conditionalRender: () => isHouseholdHead === 'Yes',
       onKeyPress: (event) => {
         triggerSearch()
       } 
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     borderColor: '#CCC',
     borderRadius: 8,
     fontSize: 16,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     color: 'black',
     backgroundColor: '#F8F8F8'

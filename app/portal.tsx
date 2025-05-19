@@ -86,7 +86,7 @@ export default function Index() {
         <Text style={{
           fontSize: 17,
           color: '#7F7F7F',
-        }}>{ user?.email || '...' }</Text>
+        }}>{ user?.emailAddress || '...' }</Text>
       </View>
       
 
@@ -103,7 +103,7 @@ export default function Index() {
       }}>
         {/* Request Document */}
         <TouchableOpacity onPress={() => router.push('/request-document')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/request-document.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/request-document.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -113,7 +113,7 @@ export default function Index() {
 
         {/* File a complaint */}
         <TouchableOpacity onPress={() => router.push('/complaint-form')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/file-a-complaint.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/file-a-complaint.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -123,7 +123,7 @@ export default function Index() {
 
         {/* Event Calendar */}
         <TouchableOpacity onPress={() => router.push('/event-calendar')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/event-calendar.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/event-calendar.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -133,7 +133,7 @@ export default function Index() {
 
         {/* Borrow Assets */}
         <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/borrow-assets.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/borrow-assets.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -143,7 +143,7 @@ export default function Index() {
 
         {/* Feedback and Suggestion */}
         <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/feedback-and-suggestion.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/feedback-and-suggestion.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -153,7 +153,7 @@ export default function Index() {
 
         {/* Emergency Hotlines */}
         <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/emergency-hotlines.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/emergency-hotlines.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -163,7 +163,7 @@ export default function Index() {
 
         {/* Household */}
         <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/household.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/household.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -173,7 +173,7 @@ export default function Index() {
 
         {/* Budget */}
         <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 70, height: 70, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/budget.png')} />
+            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/budget.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
@@ -192,7 +192,7 @@ export default function Index() {
 
       <View style={{ padding: 30, paddingTop: 0, paddingBottom: 20 }}>
         <TouchableOpacity
-            onPress={() => logoutshi()}
+            onPress={() => router.replace('/')}
             style={{
               width: '100%',
               backgroundColor: '#4C67FF',

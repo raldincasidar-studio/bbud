@@ -33,10 +33,10 @@ export default async function apiRequest(method, path, data) {
         Alert.alert('Error', data.error || 'Something went wrong');
       }
     } else {
+      console.error('AXIOS ERROR ON:', path, error);
       Alert.alert('Network Error', 'Please check your internet connection.');
     }
 
-    console.error('AXIOS ERROR ON:', path, error);
     return false;
   }
 }
