@@ -14,11 +14,12 @@ export default async function apiRequest(method, path, data) {
     const userData = await AsyncStorage.getItem('userData');
     const parsedUserData = userData ? JSON.parse(userData) : {};
 
+    console.log(data, typeof data);
     // Make API request
     const response = await apiClient({
       method,
       url: path,
-      data,
+      data: data,
     });
 
     return response.data;

@@ -17,6 +17,7 @@ export default function Index() {
         const userData = await AsyncStorage.getItem('userData');
         if (userData) {
           setUser(JSON.parse(userData));
+          console.log(user);
           console.log(userData);
         }
       } catch (error) {
@@ -27,6 +28,11 @@ export default function Index() {
 
     getUserData();
   }, [])
+
+  const logoutshi = async () => {
+    const userData = await AsyncStorage.getItem('userData');
+    console.log(userData);
+  }
   
 
   const comingSoon = () => {
@@ -76,7 +82,7 @@ export default function Index() {
           fontWeight: 'bold',
           color: '#0F00D7',
           marginBottom: 5,
-        }}>Welcome, { user?.firstname || 'Loading ...' } { user?.lastname || '' }</Text>
+        }}>Welcome, { user?.firstName || 'Loading ...' } { user?.lastName || '' }</Text>
         <Text style={{
           fontSize: 17,
           color: '#7F7F7F',
@@ -186,7 +192,7 @@ export default function Index() {
 
       <View style={{ padding: 30, paddingTop: 0, paddingBottom: 20 }}>
         <TouchableOpacity
-            onPress={() => router.replace('/')}
+            onPress={() => logoutshi()}
             style={{
               width: '100%',
               backgroundColor: '#4C67FF',
