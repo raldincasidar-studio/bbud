@@ -82,11 +82,11 @@ export default function Index() {
           fontWeight: 'bold',
           color: '#0F00D7',
           marginBottom: 5,
-        }}>Welcome, { user?.firstName || 'Loading ...' } { user?.lastName || '' }</Text>
+        }}>Welcome, { user?.first_name || 'Loading ...' } { user?.last_name || '' }</Text>
         <Text style={{
           fontSize: 17,
           color: '#7F7F7F',
-        }}>{ user?.emailAddress || '...' }</Text>
+        }}>{ user?.email || '...' }</Text>
       </View>
       
 
@@ -112,7 +112,7 @@ export default function Index() {
         </TouchableOpacity>
 
         {/* File a complaint */}
-        <TouchableOpacity onPress={() => router.push('/complaint-form')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        <TouchableOpacity onPress={() => router.push('/complaints')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/file-a-complaint.png')} />
             <Text style={{
               fontSize: 12,
