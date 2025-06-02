@@ -39,14 +39,8 @@
         "expo-font",
         {
           "fonts": [
-            {
-              "src": "./assets/fonts/Poppins-Regular.ttf",
-              "fontFamily": "Poppins-Regular"
-            },
-            {
-              "src": "./assets/fonts/Poppins-Bold.ttf",
-              "fontFamily": "Poppins-Bold"
-            }
+            "./assets/fonts/Poppins-Regular.ttf",
+            "./assets/fonts/Poppins-Bold.ttf"
           ]
         }
       ]
@@ -59,7 +53,7 @@
         "projectId": "35009995-0f19-4b12-bcb7-06ed38ca419c"
       }
     },
-    "owner": "team-bbud",
+    "owner": "raldincasidar",
     "updates": {
       "url": "https://u.expo.dev/35009995-0f19-4b12-bcb7-06ed38ca419c"
     },
