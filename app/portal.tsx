@@ -66,7 +66,7 @@ export default function Index() {
         paddingTop: 40
       }}>
         <Image style={{ height: 50, width: 130, objectFit: 'contain' }} source={require('@/assets/images/logo-name.png')} />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/notification')}>
           <Image style={{ height: 30, objectFit: 'contain', width: 30 }} source={require('@/assets/images/notification.png')} />
         </TouchableOpacity>
       </View>
@@ -102,7 +102,7 @@ export default function Index() {
         width: '100%',
       }}>
         {/* Request Document */}
-        <TouchableOpacity onPress={() => router.push('/request-document')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        <TouchableOpacity onPress={() => router.push('/request-document')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/request-document.png')} />
             <Text style={{
               fontSize: 12,
@@ -112,7 +112,7 @@ export default function Index() {
         </TouchableOpacity>
 
         {/* File a complaint */}
-        <TouchableOpacity onPress={() => router.push('/complaints')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        <TouchableOpacity onPress={() => router.push('/complaints')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/file-a-complaint.png')} />
             <Text style={{
               fontSize: 12,
@@ -121,18 +121,8 @@ export default function Index() {
             }}>File a complaint</Text>
         </TouchableOpacity>
 
-        {/* Event Calendar */}
-        <TouchableOpacity onPress={() => router.push('/event-calendar')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/event-calendar.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>Event Calendar</Text>
-        </TouchableOpacity>
-
         {/* Borrow Assets */}
-        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        <TouchableOpacity onPress={ () => router.push('/borrowed-assets') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/borrow-assets.png')} />
             <Text style={{
               fontSize: 12,
@@ -142,17 +132,17 @@ export default function Index() {
         </TouchableOpacity>
 
         {/* Feedback and Suggestion */}
-        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        {/* <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/feedback-and-suggestion.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
               color: 'black',
             }}>Feedback and Suggestion</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Emergency Hotlines */}
-        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        <TouchableOpacity onPress={ () => router.push('/emergency-hotlines') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/emergency-hotlines.png')} />
             <Text style={{
               fontSize: 12,
@@ -162,7 +152,7 @@ export default function Index() {
         </TouchableOpacity>
 
         {/* Household */}
-        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        <TouchableOpacity onPress={ () => router.push('/my-household') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/household.png')} />
             <Text style={{
               fontSize: 12,
@@ -172,7 +162,7 @@ export default function Index() {
         </TouchableOpacity>
 
         {/* Budget */}
-        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '25%'}}>
+        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/budget.png')} />
             <Text style={{
               fontSize: 12,

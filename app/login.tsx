@@ -136,9 +136,11 @@ export default function Index() {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.footerText}>
-          Can't Login? Contact Administrator
-        </Text>
+        <TouchableOpacity onPress={() => router.push('/forgot-password/request')}>
+          <Text style={styles.footerText}>
+            Can't Login? Contact Administrator
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );

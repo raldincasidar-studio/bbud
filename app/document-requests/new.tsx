@@ -172,11 +172,11 @@ const NewDocumentRequestScreen = () => {
                 document_status: "Pending", // Always Pending on creation
             };
 
-            const response = await apiRequest('POST', '/api/request-document', payload);
+            const response = await apiRequest('POST', '/api/document-requests', payload);
 
             if (response && (response.message || response.request?._id)) {
                 Alert.alert("Success", response.message || "Document request submitted successfully!");
-                router.push('/document-requests');
+                router.push('/request-document');
             } else {
                 Alert.alert("Error", response?.error || response?.message || "Could not submit document request.");
             }
