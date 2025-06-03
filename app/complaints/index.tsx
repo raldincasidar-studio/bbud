@@ -1,6 +1,7 @@
 // app/complaints/index.jsx
 import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { Link, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -21,7 +22,10 @@ const AllComplaintsScreen = () => {
         else setRefreshing(true);
 
         try {
-            const response = await apiRequest('GET', '/api/complaints', null, {
+            
+            const storedUserData: any = await AsyncStorage.getItem('userData');
+            const parsedUserData = JSON.parse(storedUserData);
+            const response = await apiRequest('GET', '/api/complaints/by-resident/' +  parsedUserData._id || '' , null, {
                 search: searchTerm,
                 page: page,
                 itemsPerPage: itemsPerPage,
@@ -78,12 +82,12 @@ const AllComplaintsScreen = () => {
         <TouchableOpacity style={styles.itemContainer} onPress={() => router.push(`/complaints/${item._id}`)}>
             <View style={styles.itemHeader}>
                  <MaterialCommunityIcons name="comment-alert-outline" size={22} color="#424242" style={{marginRight: 8}}/>
-                <Text style={styles.itemTitle} numberOfLines={1}>{item.complainant_name || 'N/A'}</Text>
+                <Text style={styles.itemTitle} numberOfLines={1}>{item.complainant_display_name || 'N/A'}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
                     <Text style={styles.statusText}>{item.status}</Text>
                 </View>
             </View>
-            <Text style={styles.itemSubtitle}>Against: {item.person_complained_against || 'N/A'}</Text>
+            <Text style={styles.itemSubtitle}>Against: {item.person_complained_against_name || 'N/A'}</Text>
             <Text style={styles.itemDetail}>Date: {formatDate(item.date_of_complaint)} at {item.time_of_complaint}</Text>
             <Text style={styles.itemDescription} numberOfLines={2}>
                 Details: {item.notes_description || 'No description provided.'}

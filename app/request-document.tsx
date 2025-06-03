@@ -25,7 +25,7 @@ const MyRequestedDocumentsScreen = () => {
                 setUserData(parsedUserData);
 
                 if (parsedUserData && parsedUserData._id) {
-                    const response = await apiRequest('GET', `/api/document-requests?requestor_resident_id=${parsedUserData._id}&sortBy=date_of_request&sortOrder=desc`);
+                    const response = await apiRequest('GET', `/api/document-requests/by-resident/${parsedUserData._id}?sortBy=date_of_request&sortOrder=desc`);
                     if (response && response.requests) {
                         setRequestedDocuments(response.requests);
                     } else {

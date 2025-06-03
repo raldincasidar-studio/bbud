@@ -5,7 +5,7 @@ import { Alert } from 'react-native';
 // Axios instance with base URL
 const apiClient = axios.create({
   baseURL: 'https://b-bud-new.vercel.app', // Update with your actual API URL
-//   baseURL: 'http://localhost:5000', // Update with your actual API URL
+  // baseURL: 'https://5344-2001-4455-58e-a00-787f-e673-7e4e-62c2.ngrok-free.app', // Update with your actual API URL
 });
 
 export default async function apiRequest(method, path, data) {

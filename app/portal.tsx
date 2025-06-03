@@ -1,4 +1,5 @@
 // import { Picker } from '@react-native-picker/picker';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -73,20 +74,32 @@ export default function Index() {
 
       {/* Content */}
       <View style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         padding: 30,
         paddingTop: 0,
         paddingBottom: 10,
+        width: '100%',
       }}>
-        <Text style={{
-          fontSize: 20,
-          fontWeight: 'bold',
-          color: '#0F00D7',
-          marginBottom: 5,
-        }}>Welcome, { user?.first_name || 'Loading ...' } { user?.last_name || '' }</Text>
-        <Text style={{
-          fontSize: 17,
-          color: '#7F7F7F',
-        }}>{ user?.email || '...' }</Text>
+        <View>
+          <Text style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#0F00D7',
+            marginBottom: 5,
+          }}>Welcome, { user?.first_name || 'Loading ...' } { user?.last_name || '' }</Text>
+          <Text style={{
+            fontSize: 17,
+            color: '#7F7F7F',
+          }}>{ user?.email || '...' }</Text>
+        </View>
+        <TouchableOpacity onPress={() => router.push('/settings')} style={{
+          padding: 10,
+        }}>
+          <MaterialCommunityIcons name="cog" size={30} color="#0F00D7" />
+        </TouchableOpacity>
       </View>
       
 
@@ -181,7 +194,7 @@ export default function Index() {
           
 
       <View style={{ padding: 30, paddingTop: 0, paddingBottom: 20 }}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
             onPress={() => router.replace('/')}
             style={{
               width: '100%',
@@ -202,7 +215,7 @@ export default function Index() {
             >
               Logout
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
       </View>
 
       <ImageBackground source={require('@/assets/images/banner.webp')} style={{

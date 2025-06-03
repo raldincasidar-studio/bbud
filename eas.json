@@ -8,7 +8,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "image": "latest"
+        "buildType": "apk", 
+        "image": "latest",
+        "withoutCredentials": true 
       },
       "ios": {
         "image": "latest"
@@ -28,6 +30,14 @@
       },
       "ios": {
         "image": "latest"
+      }
+    },
+    "internal_testing_apk": { 
+      "developmentClient": false,  
+      "distribution": "internal", 
+      "android": {
+        "buildType": "apk",       
+        "withoutCredentials": true 
       }
     },
     "production": {

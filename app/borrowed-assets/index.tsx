@@ -10,7 +10,7 @@ import { ActivityIndicator, Alert, FlatList, Platform, RefreshControl, SafeAreaV
 // Debounce utility
 function debounce(func, delay) { /* ... same as before ... */ }
 
-const MyBorrowedItemsScreen = () => {
+const MyBorrowedItemsScreen = async () => {
     const router = useRouter();
     const [userData, setUserData] = useState(null);
     const [borrowedItems, setBorrowedItems] = useState([]);
@@ -21,6 +21,8 @@ const MyBorrowedItemsScreen = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 15;
 
+    
+
     const fetchMyBorrowedItems = async (page = 1, searchTerm = searchKey, userId = userData?._id) => {
         if (!userId) {
             setIsLoading(false); setRefreshing(false);
@@ -29,8 +31,11 @@ const MyBorrowedItemsScreen = () => {
         if (page === 1 && !refreshing) setIsLoading(true);
         else if (page > 1) setRefreshing(false); // Don't show main loader for load more
 
+        const storedUserData: any = await AsyncStorage.getItem('userData');
+        const parsedUserData = JSON.parse(storedUserData);
+
         try {
-            const response = await apiRequest('GET', '/api/borrowed-assets', null, {
+            const response = await apiRequest('GET', `/api/borrowed-assets/by-resident/${parsedUserData._id}`, null, {
                 borrower_resident_id: userId, // Filter by logged-in user's ID
                 search: searchTerm,
                 page: page,

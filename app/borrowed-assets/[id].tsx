@@ -247,9 +247,9 @@ const ViewBorrowAssetScreen = () => {
             <View style={styles.navbar}>
                 <TouchableOpacity onPress={() => router.back()}><MaterialCommunityIcons name="arrow-left" size={28} color="white" /></TouchableOpacity>
                 <Text style={styles.navbarTitle} numberOfLines={1}>{editMode ? "Edit Transaction" : "Borrowing Details"}</Text>
-                <TouchableOpacity onPress={showDeleteConfirmation} disabled={editMode || isDeleting}>
+                {/* <TouchableOpacity onPress={showDeleteConfirmation} disabled={editMode || isDeleting}>
                     <MaterialCommunityIcons name="delete-outline" size={26} color={editMode ? "grey" : "white"} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#0F00D7"]}/>}>
                 <View style={styles.actionButtonsContainer}>

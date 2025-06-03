@@ -30,7 +30,12 @@ const MyBorrowedItemsScreen = () => {
         else if (page > 1) setRefreshing(false); // Don't show main loader for load more
 
         try {
-            const response = await apiRequest('GET', '/api/borrowed-assets', null, {
+            const storedUserData: any = await AsyncStorage.getItem('userData');
+            const parsedUserData = JSON.parse(storedUserData);
+            setUserData(parsedUserData);
+
+
+            const response = await apiRequest('GET', `/api/borrowed-assets/by-resident/${parsedUserData._id}`, null, {
                 borrower_resident_id: userId, // Filter by logged-in user's ID
                 search: searchTerm,
                 page: page,
