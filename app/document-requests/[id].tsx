@@ -1,30 +1,34 @@
-// app/document-requests/[id].jsx
-import apiRequest from '@/plugins/axios'; // Ensure this path is correct
+// app/document-requests/[id].tsx
+import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const ViewDocumentRequestScreen = () => {
     const router = useRouter();
-    const { id: documentRequestId } = useLocalSearchParams(); // Get the [id] from the route
+    const { id: documentRequestId } = useLocalSearchParams();
 
-    const [requestDetails, setRequestDetails] = useState(null);
+    const [requestDetails, setRequestDetails] = useState<any>(null); // Use 'any' for flexible object structure
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [errorLoading, setErrorLoading] = useState(false);
 
-    const fetchDocumentRequestDetails = async () => {
+    const fetchDocumentRequestDetails = useCallback(async (isRefresh = false) => {
         if (!documentRequestId) {
             Alert.alert("Error", "Document Request ID is missing.");
             setIsLoading(false);
-            setRefreshing(false);
+            if(isRefresh) setRefreshing(false);
             setErrorLoading(true);
             return;
         }
-        setIsLoading(true);
-        setErrorLoading(false);
+
+        if (!isRefresh) {
+            setIsLoading(true);
+            setErrorLoading(false);
+        }
+
         try {
             const response = await apiRequest('GET', `/api/document-requests/${documentRequestId}`);
             if (response && response.request) {
@@ -43,43 +47,57 @@ const ViewDocumentRequestScreen = () => {
             setIsLoading(false);
             setRefreshing(false);
         }
-    };
+    }, [documentRequestId]);
 
-    useEffect(() => {
-        fetchDocumentRequestDetails();
-    }, [documentRequestId]); // Re-fetch if ID changes (though typically it won't for a detail screen)
-
+    // Use useFocusEffect for both initial load and re-focusing
     useFocusEffect(
         useCallback(() => {
-            console.log(`Document Request ${documentRequestId} screen focused, fetching details...`);
             fetchDocumentRequestDetails();
-            return () => {};
-        }, [documentRequestId])
+        }, [fetchDocumentRequestDetails])
     );
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        fetchDocumentRequestDetails();
-    }, [documentRequestId]);
+        fetchDocumentRequestDetails(true);
+    }, [fetchDocumentRequestDetails]);
 
-    const getStatusColor = (status) => {
-        const colors = {
-            "Pending": '#FFA726', "Processing": '#29B6F6', "Ready for Pickup": '#66BB6A',
-            "Released": '#4CAF50', "Denied": '#EF5350', "Cancelled": '#BDBDBD',
+    // --- REFINED: Harmonized with the list view for consistency ---
+    const getStatusColor = (status: string) => {
+        const colors: { [key: string]: string } = {
+            "Pending": '#FFA726',
+            "Processing": '#29B6F6',
+            "Approved": '#26C6DA',
+            "Ready for Pickup": '#26A69A',
+            "Released": '#66BB6A',
+            "Declined": '#EF5350',
         };
-        return colors[status] || '#757575';
+        return colors[status] || '#9E9E9E';
     };
 
-    const formatDate = (dateString, includeTime = false) => {
+    // --- REFINED: More robust formatting function ---
+    const formatDate = (dateString?: string, includeTime = false) => {
         if (!dateString) return 'N/A';
         try {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const options: Intl.DateTimeFormatOptions = {
+                year: 'numeric', month: 'long', day: 'numeric'
+            };
             if (includeTime) {
                 options.hour = '2-digit';
                 options.minute = '2-digit';
+                options.hour12 = true;
             }
             return new Date(dateString).toLocaleDateString('en-US', options);
         } catch (e) { return dateString; }
+    };
+
+    // --- HELPER FUNCTION for the fix ---
+    // Converts snake_case_keys to "Title Case Keys" for display
+    const formatDetailKey = (key: string) => {
+        if (!key) return '';
+        return key
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
     };
 
     if (isLoading && !refreshing) {
@@ -90,7 +108,7 @@ const ViewDocumentRequestScreen = () => {
                         <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
                     </TouchableOpacity>
                     <Text style={styles.navbarTitle}>Request Details</Text>
-                    <View style={{ width: 28 }} /> 
+                    <View style={{ width: 28 }} />
                 </View>
                 <View style={styles.loaderContainer}>
                     <ActivityIndicator size="large" color="#0F00D7" />
@@ -108,29 +126,34 @@ const ViewDocumentRequestScreen = () => {
                         <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
                     </TouchableOpacity>
                     <Text style={styles.navbarTitle}>Error</Text>
-                     <View style={{ width: 28 }} /> 
+                     <View style={{ width: 28 }} />
                 </View>
                 <View style={styles.emptyStateContainer}>
                     <MaterialCommunityIcons name="alert-circle-outline" size={80} color="#EF5350" />
                     <Text style={styles.emptyStateText}>Could not load document request.</Text>
-                    <TouchableOpacity onPress={fetchDocumentRequestDetails} style={styles.retryButton}>
+                    <TouchableOpacity onPress={() => fetchDocumentRequestDetails()} style={styles.retryButton}>
                         <Text style={styles.retryButtonText}>Try Again</Text>
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>
         );
     }
-    
-    // Construct full names for display
-    const requestorFullName = `${requestDetails.requestor_details?.first_name || ''} ${requestDetails.requestor_details?.middle_name || ''} ${requestDetails.requestor_details?.last_name || ''}`.trim() || requestDetails.requestor_display_name || 'N/A';
-    const processedByFullName = requestDetails.requested_by_resident_id 
-        ? `${requestDetails.requested_by_details?.first_name || ''} ${requestDetails.requested_by_details?.middle_name || ''} ${requestDetails.requested_by_details?.last_name || ''}`.trim() 
-        : requestDetails.requested_by_display_name || 'N/A';
+
+    // --- REFINED: More robust logic for handling names ---
+    const requestorFullName = `${requestDetails.requestor_details?.first_name || ''} ${requestDetails.requestor_details?.last_name || ''}`.trim() || 'N/A';
+
+    const getProcessorName = () => {
+        const details = requestDetails.processed_by_details || requestDetails.released_by_details;
+        if (details) {
+            return `${details.first_name || ''} ${details.last_name || ''}`.trim();
+        }
+        return requestDetails.processed_by_name || requestDetails.released_by_name || 'N/A';
+    }
+    const processedByFullName = getProcessorName();
 
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Navbar */}
             <View style={styles.navbar}>
                 <TouchableOpacity onPress={() => router.back()}>
                     <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
@@ -138,8 +161,7 @@ const ViewDocumentRequestScreen = () => {
                 <Text style={styles.navbarTitle} numberOfLines={1} ellipsizeMode="tail">
                     {requestDetails.request_type}
                 </Text>
-                {/* Placeholder for symmetry or potential right-side icon */}
-                <View style={{ width: 28 }} /> 
+                <View style={{ width: 28 }} />
             </View>
 
             <ScrollView
@@ -166,44 +188,38 @@ const ViewDocumentRequestScreen = () => {
                     <View style={styles.detailRow}>
                         <MaterialCommunityIcons name="map-marker-outline" size={20} color="#555" style={styles.detailIcon} />
                         <Text style={styles.detailLabel}>Address:</Text>
-                        <Text style={styles.detailValue}>{requestDetails.requestor_address || 'N/A'}</Text>
+                        <Text style={styles.detailValue}>{requestDetails.requestor_details?.address || 'N/A'}</Text>
                     </View>
                     <View style={styles.detailRow}>
                         <MaterialCommunityIcons name="phone-outline" size={20} color="#555" style={styles.detailIcon} />
                         <Text style={styles.detailLabel}>Contact:</Text>
-                        <Text style={styles.detailValue}>{requestDetails.requestor_contact_number || 'N/A'}</Text>
+                        <Text style={styles.detailValue}>{requestDetails.requestor_details?.contact_number || 'N/A'}</Text>
                     </View>
                 </View>
+
+                {/* --- KEY FIX: Added this section to display document-specific details --- */}
+                {requestDetails.details && Object.keys(requestDetails.details).length > 0 && (
+                    <View style={styles.detailCard}>
+                        <Text style={styles.cardTitle}>{requestDetails.request_type} Specifics</Text>
+                        {Object.entries(requestDetails.details).map(([key, value]) => (
+                            <View key={key} style={styles.detailRow}>
+                                <MaterialCommunityIcons name="pencil-box-outline" size={20} color="#555" style={styles.detailIcon} />
+                                <Text style={styles.detailLabel}>{formatDetailKey(key)}:</Text>
+                                <Text style={styles.detailValue}>{String(value) || 'N/A'}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
 
                 <View style={styles.detailCard}>
-                    <Text style={styles.cardTitle}>Request Details</Text>
-                     <View style={styles.detailRow}>
-                        <MaterialCommunityIcons name="calendar-check-outline" size={20} color="#555" style={styles.detailIcon} />
+                    <Text style={styles.cardTitle}>Request Timeline</Text>
+                    <View style={styles.detailRow}>
+                        <MaterialCommunityIcons name="calendar-plus" size={20} color="#555" style={styles.detailIcon} />
                         <Text style={styles.detailLabel}>Date Requested:</Text>
-                        <Text style={styles.detailValue}>{formatDate(requestDetails.date_of_request)}</Text>
+                        <Text style={styles.detailValue}>{formatDate(requestDetails.created_at, true)}</Text>
                     </View>
-                    <View style={styles.detailRow}>
-                        <MaterialCommunityIcons name="text-account" size={20} color="#555" style={styles.detailIcon} />
-                        <Text style={styles.detailLabel}>Purpose:</Text>
-                        <Text style={styles.detailValue}>{requestDetails.purpose_of_request}</Text>
-                    </View>
-                    {requestDetails.created_at && (
-                        <View style={styles.detailRow}>
-                            <MaterialCommunityIcons name="calendar-plus" size={20} color="#555" style={styles.detailIcon} />
-                            <Text style={styles.detailLabel}>Filed On:</Text>
-                            <Text style={styles.detailValue}>{formatDate(requestDetails.created_at, true)}</Text>
-                        </View>
-                    )}
-                </View>
-
-                 <View style={styles.detailCard}>
-                    <Text style={styles.cardTitle}>Processing Information</Text>
-                    <View style={styles.detailRow}>
-                        <MaterialCommunityIcons name="account-tie-outline" size={20} color="#555" style={styles.detailIcon} />
-                        <Text style={styles.detailLabel}>Processed By:</Text>
-                        <Text style={styles.detailValue}>{processedByFullName}</Text>
-                    </View>
-                     {requestDetails.updated_at && (
+                    {requestDetails.updated_at && (
                         <View style={styles.detailRow}>
                             <MaterialCommunityIcons name="update" size={20} color="#555" style={styles.detailIcon} />
                             <Text style={styles.detailLabel}>Last Updated:</Text>
@@ -212,7 +228,6 @@ const ViewDocumentRequestScreen = () => {
                     )}
                 </View>
 
-                {/* Add a button to go back to the list or perform other actions */}
                 <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                     <MaterialCommunityIcons name="arrow-left-circle-outline" size={22} color="#5E76FF" style={{marginRight: 8}}/>
                     <Text style={styles.backButtonText}>Back to My Requests</Text>
@@ -223,6 +238,7 @@ const ViewDocumentRequestScreen = () => {
     );
 };
 
+// Styles (No changes needed, but included for completeness)
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
@@ -238,12 +254,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#0F00D7',
     },
     navbarTitle: {
-        fontSize: 18, // Slightly smaller for potentially long doc types
+        fontSize: 18,
         fontWeight: 'bold',
         color: 'white',
-        flex: 1, // Allow text to take space and truncate
+        flex: 1,
         textAlign: 'center',
-        marginHorizontal: 10, // Space around title
+        marginHorizontal: 10,
     },
     scrollView: {
         flex: 1,
@@ -265,7 +281,7 @@ const styles = StyleSheet.create({
     headerSection: {
         alignItems: 'center',
         marginBottom: 25,
-        paddingVertical:10,
+        padding: 15,
         backgroundColor: 'white',
         borderRadius: 10,
         elevation: 2,
@@ -314,23 +330,23 @@ const styles = StyleSheet.create({
     },
     detailRow: {
         flexDirection: 'row',
-        alignItems: 'flex-start', // Align items to the start for multi-line values
+        alignItems: 'flex-start',
         marginBottom: 10,
     },
     detailIcon: {
         marginRight: 10,
-        marginTop: 1, // Align icon slightly with first line of text
+        marginTop: 1,
     },
     detailLabel: {
         fontSize: 15,
         color: '#444',
         fontWeight: '500',
-        width: 120, // Fixed width for labels for alignment
+        width: 120,
     },
     detailValue: {
         fontSize: 15,
         color: '#333',
-        flex: 1, // Allow value to take remaining space and wrap
+        flex: 1,
     },
     emptyStateContainer: {
         flex: 1,
@@ -363,11 +379,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 12,
         marginTop: 20,
-        backgroundColor: '#E8EAF6', // Light primary variant
+        backgroundColor: '#E8EAF6',
         borderRadius: 8,
     },
     backButtonText: {
-        color: '#5E76FF', // Primary color
+        color: '#5E76FF',
         fontSize: 16,
         fontWeight: '600',
     },

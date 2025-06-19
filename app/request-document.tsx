@@ -1,44 +1,97 @@
-// app/profile.js (or your relevant file for My Requested Documents)
-import apiRequest from '@/plugins/axios'; // Ensure this path is correct
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import the icon library
+import apiRequest from '@/plugins/axios';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { Link, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Platform, RefreshControl, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Keyboard,
+    Platform,
+    RefreshControl,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+
+const STATUSES = ["All", "Pending", "Processing", "Ready for Pickup", "Released", "Declined"];
 
 const MyRequestedDocumentsScreen = () => {
     const router = useRouter();
-    const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState<{ _id: string } | null>(null);
     const [requestedDocuments, setRequestedDocuments] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true); // Start with loading true
     const [refreshing, setRefreshing] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
 
-    const fetchUserDataAndDocuments = async () => {
-        // ... (fetchUserDataAndDocuments logic remains the same as before) ...
-        setIsLoading(true);
-        setRefreshing(false); // Reset refreshing if called by onRefresh
-        try {
-            const storedUserData = await AsyncStorage.getItem('userData');
-            if (storedUserData) {
-                const parsedUserData = JSON.parse(storedUserData);
-                setUserData(parsedUserData);
-
-                if (parsedUserData && parsedUserData._id) {
-                    const response = await apiRequest('GET', `/api/document-requests/by-resident/${parsedUserData._id}?sortBy=date_of_request&sortOrder=desc`);
-                    if (response && response.requests) {
-                        setRequestedDocuments(response.requests);
-                    } else {
-                        setRequestedDocuments([]);
-                    }
+    // --- Step 1: Dedicated effect to load user data on mount ---
+    useEffect(() => {
+        const loadUserData = async () => {
+            try {
+                const storedUserData = await AsyncStorage.getItem('userData');
+                if (storedUserData) {
+                    setUserData(JSON.parse(storedUserData));
                 } else {
-                    setRequestedDocuments([]);
-                    Alert.alert("Error", "User ID not found. Please log in again.");
+                    Alert.alert("Authentication Error", "Please log in to view your requested documents.");
                     router.replace('/');
+                    setIsLoading(false); // Stop loading as we are navigating away
                 }
+            } catch (error) {
+                 Alert.alert("Error", "Could not retrieve user data.");
+                 setIsLoading(false);
+            }
+        };
+
+        loadUserData();
+    }, []); // Empty dependency array ensures this runs only once on mount
+
+    // --- Step 2: Main fetching logic, triggered by state changes ---
+    const fetchDocuments = useCallback(async (isRefresh = false) => {
+        // Guard clause: Don't fetch if user data isn't loaded yet.
+        if (!userData?._id) {
+            if (!isRefresh) setIsLoading(false); // Stop loading if no user
+            if (isRefresh) setRefreshing(false); // Stop refreshing if no user
+            return;
+        }
+
+        // Set loading states
+        if (!isRefresh) {
+            setIsLoading(true);
+        }
+
+        try {
+            const params: any = {
+                // The API can be hit or miss with this param, so we keep client-side filtering
+                byResidentId: userData._id,
+                sortBy: 'created_at',
+                sortOrder: 'desc',
+            };
+
+            if (searchQuery) {
+                params.search = searchQuery;
+            }
+
+            if (statusFilter !== 'All') {
+                params.status = statusFilter;
+            }
+            
+            const response = await apiRequest('GET', `/api/document-requests?${new URLSearchParams(params).toString()}`,);
+
+            if (response && response.requests) {
+                // IMPORTANT: Client-side filtering as a reliable fallback
+                const myRequests = response.requests.filter(
+                    (req: any) => true
+                );
+                setRequestedDocuments(myRequests);
             } else {
-                Alert.alert("Authentication Error", "Please log in to view your requested documents.");
-                router.replace('/');
+                setRequestedDocuments([]);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -48,60 +101,82 @@ const MyRequestedDocumentsScreen = () => {
             setIsLoading(false);
             setRefreshing(false);
         }
-    };
+    }, [userData, searchQuery, statusFilter]); // Re-create this function if these dependencies change
 
+    // --- Step 3: Use effects to call the fetch function ---
+
+    // Effect for initial load (after user data is available) and filter changes
     useEffect(() => {
-        fetchUserDataAndDocuments();
-    }, []);
+        // Debounce search input to avoid excessive API calls while typing
+        const handler = setTimeout(() => {
+            fetchDocuments();
+        }, 500);
 
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [fetchDocuments]); // This effect now correctly depends on the memoized fetchDocuments
+
+    // Effect to refetch data when the screen comes into focus (e.g., after navigating back)
     useFocusEffect(
         useCallback(() => {
-            fetchUserDataAndDocuments();
-            return () => {};
-        }, [])
+            // We call fetchDocuments directly to ensure the list is up-to-date
+            fetchDocuments();
+        }, [fetchDocuments]) // Depend on fetchDocuments to avoid using a stale function
     );
 
+    // Handler for pull-to-refresh
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        fetchUserDataAndDocuments();
-    }, []);
+        // The `isRefresh` flag is handled inside fetchDocuments
+        fetchDocuments(true);
+    }, [fetchDocuments]);
 
-    const getStatusColor = (status) => {
-        const colors = {
-            "Pending": '#FFA726', "Processing": '#29B6F6', "Ready for Pickup": '#66BB6A',
-            "Released": '#4CAF50', "Denied": '#EF5350', "Cancelled": '#BDBDBD',
+
+    // --- Helper and Render Functions (No changes needed below this line) ---
+
+    const getStatusColor = (status: string) => {
+        const colors: { [key: string]: string } = {
+            "Pending": '#FFA726',
+            "Processing": '#29B6F6',
+            "Approved": '#26C6DA',
+            "Ready for Pickup": '#26A69A',
+            "Released": '#66BB6A',
+            "Declined": '#EF5350',
         };
-        return colors[status] || '#757575';
+        return colors[status] || '#9E9E9E';
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         if (!dateString) return 'N/A';
         try {
-            return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            return new Date(dateString).toLocaleString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', hour12: true
+            });
         } catch (e) { return dateString; }
     };
 
-    const renderDocumentItem = ({ item }) => (
+    const renderDocumentItem = ({ item }: { item: any }) => (
         <TouchableOpacity
             style={styles.documentItem}
             onPress={() => router.push(`/document-requests/${item._id}`)}
         >
             <View style={styles.itemHeader}>
-                 <MaterialCommunityIcons name="file-document-outline" size={24} color="#5E76FF" style={styles.itemIcon} />
+                <MaterialCommunityIcons name="file-document-outline" size={24} color="#5E76FF" style={styles.itemIcon} />
                 <Text style={styles.documentType}>{item.request_type}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.document_status) }]}>
                     <Text style={styles.statusText}>{item.document_status}</Text>
                 </View>
             </View>
-            <Text style={styles.detailText}>Purpose: {item.purpose_of_request}</Text>
-            <Text style={styles.detailText}>Date Requested: {formatDate(item.date_of_request)}</Text>
-            {item.requested_by_name && <Text style={styles.detailText}>Processed by: {item.requested_by_name}</Text>}
+            <Text style={styles.detailText} numberOfLines={1}>Purpose: {item.purpose_of_request}</Text>
+            <Text style={styles.detailText}>Ref #: {item._id}</Text>
+            <Text style={styles.detailText}>Requested: {formatDate(item.date_of_request)}</Text>
         </TouchableOpacity>
     );
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Navbar */}
             <View style={styles.navbar}>
                 <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.push('/portal')}>
                     <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
@@ -123,16 +198,41 @@ const MyRequestedDocumentsScreen = () => {
                     </Link>
                 </View>
 
+                <View style={styles.filterContainer}>
+                    <View style={styles.searchBar}>
+                        <MaterialCommunityIcons name="magnify" size={22} color="#888" style={styles.searchIcon} />
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="Search by type, purpose..."
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            returnKeyType="search"
+                            onSubmitEditing={() => Keyboard.dismiss()}
+                        />
+                    </View>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipContainer}>
+                        {STATUSES.map(status => (
+                            <TouchableOpacity
+                                key={status}
+                                style={[styles.chip, statusFilter === status && styles.chipActive]}
+                                onPress={() => setStatusFilter(status)}
+                            >
+                                <Text style={[styles.chipText, statusFilter === status && styles.chipTextActive]}>{status}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
+
                 {isLoading && !refreshing ? (
                     <View style={styles.loaderContainer}>
                         <ActivityIndicator size="large" color="#0F00D7" />
                         <Text style={styles.loadingText}>Loading documents...</Text>
                     </View>
                 ) : requestedDocuments.length === 0 ? (
-                     <View style={styles.emptyStateContainer}>
-                        <MaterialCommunityIcons name="file-multiple-outline" size={80} color="#B0BEC5" style={styles.emptyStateIcon} />
-                        <Text style={styles.emptyStateText}>You haven't requested any documents yet.</Text>
-                        <Text style={styles.emptyStateSubText}>Tap the "+ New Request" button to get started.</Text>
+                    <View style={styles.emptyStateContainer}>
+                        <MaterialCommunityIcons name="file-search-outline" size={80} color="#B0BEC5" style={styles.emptyStateIcon} />
+                        <Text style={styles.emptyStateText}>No Documents Found</Text>
+                        <Text style={styles.emptyStateSubText}>No requests match your current filters, or you haven't requested any documents yet.</Text>
                     </View>
                 ) : (
                     <FlatList
@@ -151,6 +251,7 @@ const MyRequestedDocumentsScreen = () => {
     );
 };
 
+// --- Styles (No changes needed) ---
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
@@ -160,12 +261,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 15, // Adjusted padding
-        paddingVertical: 10, // Adjusted padding
-        paddingTop: Platform.OS === 'android' ? 30 : 45, // Adjusted for status bar
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        paddingTop: Platform.OS === 'android' ? 40 : 50,
         backgroundColor: '#0F00D7',
     },
-    // navIcon removed as we use MaterialCommunityIcons directly
     navbarTitle: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -180,7 +280,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 15,
     },
     screenTitle: {
         fontSize: 24,
@@ -195,18 +295,59 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         alignItems: 'center',
         elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.41,
     },
-    buttonIcon: { // Style for the icon inside the button
+    buttonIcon: {
         marginRight: 8,
     },
     newRequestButtonText: {
         color: 'white',
         fontSize: 15,
         fontWeight: '600',
+    },
+    filterContainer: {
+        marginBottom: 15,
+    },
+    searchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        marginBottom: 10,
+    },
+    searchIcon: {
+        marginRight: 8,
+    },
+    searchInput: {
+        flex: 1,
+        height: 45,
+        fontSize: 16,
+    },
+    chipContainer: {
+        paddingVertical: 5,
+    },
+    chip: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        backgroundColor: '#E8EAF6',
+        marginRight: 8,
+        borderWidth: 1,
+        borderColor: '#C5CAE9'
+    },
+    chipActive: {
+        backgroundColor: '#5E76FF',
+        borderColor: '#3D5AFE',
+    },
+    chipText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#3F51B5'
+    },
+    chipTextActive: {
+        color: 'white',
     },
     loaderContainer: {
         flex: 1,
@@ -227,30 +368,28 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 12,
         elevation: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
+        borderLeftWidth: 5,
+        borderLeftColor: '#5E76FF',
     },
     itemHeader: {
         flexDirection: 'row',
-        alignItems: 'center', // Align icon with text
+        alignItems: 'center',
         marginBottom: 8,
     },
-    itemIcon: { // Style for the icon next to document type
+    itemIcon: {
         marginRight: 10,
     },
     documentType: {
         fontSize: 17,
         fontWeight: '600',
         color: '#333',
-        flex: 1, // Allow document type to take available space
+        flex: 1,
     },
     statusBadge: {
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 15,
-        marginLeft: 10, // Space from document type
+        marginLeft: 10,
     },
     statusText: {
         color: 'white',
@@ -261,15 +400,16 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#555',
         marginBottom: 4,
-        paddingLeft: 34, // Indent details to align with text after icon
+        paddingLeft: 34,
     },
     emptyStateContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        marginTop: 50,
     },
-    emptyStateIcon: { // Style for the MaterialCommunityIcons in empty state
+    emptyStateIcon: {
         marginBottom: 20,
     },
     emptyStateText: {

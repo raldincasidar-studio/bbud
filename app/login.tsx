@@ -12,6 +12,7 @@ export default function LoginScreen() { // Renamed component
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState(''); // New state for OTP input
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpStep, setIsOtpStep] = useState(false); // To switch between password and OTP input views
@@ -56,7 +57,7 @@ export default function LoginScreen() { // Renamed component
         // Should not happen if API is correctly implemented to require OTP
         Alert.alert('Login Failed', 'An unexpected response was received from the server.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Initial Login API error:', error);
       let errorMessage = 'An unexpected error occurred.';
       if (error.response && error.response.data) {
@@ -106,7 +107,7 @@ export default function LoginScreen() { // Renamed component
         // Optionally, allow resending OTP or going back to password step
         // For simplicity, here we just show an error. User can try logging in again.
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Verify OTP API error:', error);
       Alert.alert('OTP Error', error.response?.data?.message || error.response?.data?.error || 'An error occurred during OTP verification.');
     } finally {
@@ -148,7 +149,18 @@ export default function LoginScreen() { // Renamed component
             </View>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Password</Text>
-              <TextInput placeholder='Enter your password' value={password} onChangeText={setPassword} secureTextEntry={true} style={styles.textInput} />
+              <View style={styles.passwordContainer}>
+                <TextInput 
+                  placeholder='Enter your password' 
+                  value={password} 
+                  onChangeText={setPassword} 
+                  secureTextEntry={!showPassword} 
+                  style={styles.passwordInput} 
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                    <MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
             </View>
 
             {loginAttemptsMessage && <Text style={styles.errorMessage}>{loginAttemptsMessage}</Text>}
@@ -214,6 +226,24 @@ const styles = StyleSheet.create({
   inputContainer: { width: '100%', marginBottom: 20 },
   label: { color: '#333', fontSize: 15, marginBottom: 8, fontWeight: '500' },
   textInput: { borderWidth: 1, borderColor: '#CCD1D9', borderRadius: 10, fontSize: 16, paddingHorizontal: 15, paddingVertical: Platform.OS === 'ios' ? 14 : 12, color: '#333', backgroundColor: '#F7F8FC' },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#CCD1D9',
+    borderRadius: 10,
+    backgroundColor: '#F7F8FC',
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: Platform.OS === 'ios' ? 14 : 12,
+    paddingLeft: 15,
+    color: '#333',
+  },
+  eyeIcon: {
+    paddingHorizontal: 15,
+  },
   buttonContainer: { width: '100%', marginTop: 15 },
   loginButton: { width: '100%', backgroundColor: '#0F00D7', paddingVertical: 15, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minHeight: 52 },
   buttonDisabled: { backgroundColor: '#7986CB' }, // Lighter blue for disabled

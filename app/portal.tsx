@@ -3,14 +3,25 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+// Import the custom API request handler
+import apiRequest from '../plugins/axios'; // Adjusted path assuming /app/portal.tsx and /plugins/axios.js
+
+// Type definition for a barangay official based on your API
+interface Official {
+  _id: string; // Assuming MongoDB _id from the API response
+  position: string;
+  first_name: string;
+  last_name: string;
+  photo_url: string | null; // Based on your API and Vue component
+}
 
 export default function Index() {
   const router = useRouter();
 
-  const [gender, setGender] = useState('');
-
   const [user, setUser] = useState(null);
+  const [officials, setOfficials] = useState<Official[]>([]);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -18,22 +29,28 @@ export default function Index() {
         const userData = await AsyncStorage.getItem('userData');
         if (userData) {
           setUser(JSON.parse(userData));
-          console.log(user);
-          console.log(userData);
         }
       } catch (error) {
         console.error('Error getting user data from AsyncStorage:', error);
-        Alert.alert('Error', 'Something went wrong 👀');
+        Alert.alert('Error', 'Something went wrong while loading your data 👀');
+      }
+    };
+
+    const fetchOfficials = async () => {
+      // The path includes query params to limit the results for the slider
+      const path = '/api/barangay-officials?itemsPerPage=15';
+      const data = await apiRequest('get', path, null);
+
+      // The apiRequest function returns false on failure
+      if (data && data.officials) {
+        // The API returns an object { officials: [...] }, so we extract the array
+        setOfficials(data.officials);
       }
     };
 
     getUserData();
+    fetchOfficials();
   }, [])
-
-  const logoutshi = async () => {
-    const userData = await AsyncStorage.getItem('userData');
-    console.log(userData);
-  }
   
 
   const comingSoon = () => {
@@ -46,6 +63,24 @@ export default function Index() {
       { cancelable: false }
     );
   }
+
+  const renderOfficialCard = ({ item }: { item: Official }) => (
+    <View style={styles.officialCard}>
+      <Image
+        style={styles.officialImage}
+        source={
+          item.photo_url
+            ? { uri: item.photo_url }
+            // Ensure you have a default placeholder image at this path
+            : require('@/assets/images/logo.png')
+        }
+      />
+      <Text style={styles.officialName} numberOfLines={2}>
+        {item.first_name} {item.last_name}
+      </Text>
+      <Text style={styles.officialPosition}>{item.position}</Text>
+    </View>
+  );
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -107,7 +142,7 @@ export default function Index() {
       <View style={{
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         flexWrap: 'wrap',
         padding: 20,
@@ -144,16 +179,6 @@ export default function Index() {
             }}>Borrow Assets</Text>
         </TouchableOpacity>
 
-        {/* Feedback and Suggestion */}
-        {/* <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/feedback-and-suggestion.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>Feedback and Suggestion</Text>
-        </TouchableOpacity> */}
-
         {/* Emergency Hotlines */}
         <TouchableOpacity onPress={ () => router.push('/emergency-hotlines') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/emergency-hotlines.png')} />
@@ -175,60 +200,91 @@ export default function Index() {
         </TouchableOpacity>
 
         {/* Budget */}
-        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
+        {/* <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/budget.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
               color: 'black',
             }}>Budget</Text>
-        </TouchableOpacity>
-
-
-
-
-
-
-
+        </TouchableOpacity> */}
       </View>
           
+      {/* --- START: BARANGAY OFFICIALS SLIDER --- */}
+      {officials.length > 0 && (
+        <View style={{ marginTop: 25 }}>
+          <Text style={styles.sliderTitle}>Barangay Officials</Text>
+          <FlatList
+            data={officials}
+            renderItem={renderOfficialCard}
+            keyExtractor={(item) => item._id}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.sliderContainer}
+          />
+        </View>
+      )}
+      {/* --- END: BARANGAY OFFICIALS SLIDER --- */}
 
       <View style={{ padding: 30, paddingTop: 0, paddingBottom: 20 }}>
-        {/* <TouchableOpacity
-            onPress={() => router.replace('/')}
-            style={{
-              width: '100%',
-              backgroundColor: '#4C67FF',
-              padding: 15,
-              borderRadius: 12,
-              marginTop: 30,
-              marginBottom: 5,
-            }}
-          >
-            <Text
-              style={{
-                color: 'white',
-                textAlign: 'center',
-                fontSize: 18,
-                fontWeight: 'bold',
-              }}
-            >
-              Logout
-            </Text>
-          </TouchableOpacity> */}
+        {/* This view provides bottom spacing */}
       </View>
 
-      <ImageBackground source={require('@/assets/images/banner.webp')} style={{
-        padding: 90,
-        backgroundColor: '#D8E9FC',
-        margin: 30,
-        marginTop: 5,
-        borderRadius: 15,
-      }}>
-
-      </ImageBackground>
 
     </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  sliderTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 15,
+    paddingHorizontal: 30,
+  },
+  sliderContainer: {
+    paddingHorizontal: 22, // Page padding (30) - Card margin (8) = 22
+    paddingBottom: 10,
+  },
+  officialCard: {
+    width: 150,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 10,
+    marginHorizontal: 8,
+    alignItems: 'center',
+    // Shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    // Elevation for Android
+    elevation: 5,
+  },
+  officialImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40, // Half of width/height for a circle
+    marginBottom: 12,
+    backgroundColor: '#F0F0F0', // Placeholder background color
+    objectFit: 'cover',
+  },
+  officialName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#212121',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  officialPosition: {
+    fontSize: 13,
+    color: '#757575',
+    textAlign: 'center',
+  },
+});

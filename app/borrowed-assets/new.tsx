@@ -1,186 +1,241 @@
-// app/borrowed-assets/new.jsx
 import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-// DateTimePicker is not strictly needed if we auto-set current date/time and make it read-only,
-// but could be kept if you want to show it, or for consistency if other forms use it.
-// For simplicity and your requirement, we'll auto-set it.
+import {
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
+interface InventoryItem {
+    name: string;
+    total: number;
+    borrowed: number;
+    available: number;
+}
+
+interface LoggedInUser {
+    _id: string;
+    name: string;
+}
 
 const NewBorrowAssetScreen = () => {
     const router = useRouter();
 
-    // Borrower (Logged-in User) - Auto-filled
-    const [borrowerResidentId, setBorrowerResidentId] = useState(null);
-    const [borrowerDisplayName, setBorrowerDisplayName] = useState('');
-    // No need for borrower address/contact here unless you want to display it read-only
+    // State for the form
+    const [transaction, setTransaction] = useState({
+        item_borrowed: '',
+        quantity_borrowed: '1',
+        expected_return_date: '',
+        notes: '',
+    });
 
-    // Borrowing Details
-    const [borrowDatetime, setBorrowDatetime] = useState(new Date()); // Auto-set to current
-    const [borrowedFromPersonnel, setBorrowedFromPersonnel] = useState(''); // Admin/Official name processing it
-    const [itemBorrowed, setItemBorrowed] = useState(''); // Will be selected from Picker
-    const [status, setStatus] = useState('Borrowed'); // Initial status - ReadOnly
-    const [notes, setNotes] = useState('');
-
+    // State for user and inventory data
+    const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(null);
+    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+    
+    // State for UI and async operations
     const [isSaving, setIsSaving] = useState(false);
-    const [isLoadingInitialData, setIsLoadingInitialData] = useState(true);
+    const [isLoadingData, setIsLoadingData] = useState(true);
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-    const assetItems = [
-        { label: 'Select Item Borrowed', value: '' },
-        { label: 'Chairs', value: 'Chairs' },
-        { label: 'Tables', value: 'Tables' },
-        { label: 'Tents', value: 'Tents' },
-        { label: 'Oxygen Tank', value: 'Oxygen Tank' },
-        { label: 'Blood Pressure Monitor (BP Monitor)', value: 'Blood Pressure Monitor (BP Monitor)' },
-        { label: 'First Aid Kit', value: 'First Aid Kit' },
-        { label: 'Wheelchair', value: 'Wheelchair' },
-        { label: 'Nebulizer', value: 'Nebulizer' },
-        { label: 'Walking Stick', value: 'Walking Stick' },
-    ];
-
+    // Fetch initial data (user info and inventory)
     useEffect(() => {
-        const loadUserData = async () => {
-            setIsLoadingInitialData(true);
+        const loadInitialData = async () => {
+            setIsLoadingData(true);
             try {
+                // Fetch logged-in user data
                 const storedUserDataString = await AsyncStorage.getItem('userData');
                 if (storedUserDataString) {
                     const parsed = JSON.parse(storedUserDataString);
-                    setBorrowerResidentId(parsed._id);
-                    setBorrowerDisplayName(`${parsed.first_name||''} ${parsed.middle_name||''} ${parsed.last_name||''}`.trim());
+                    setLoggedInUser({
+                        _id: parsed._id,
+                        name: `${parsed.first_name || ''} ${parsed.last_name || ''}`.trim(),
+                    });
                 } else {
-                    Alert.alert("Authentication Error", "User data not found. Please log in again.", [{ text: "OK", onPress: () => router.replace('/') }]);
+                    Alert.alert("Authentication Error", "User data not found. Please log in again.", [{ text: "OK", onPress: () => router.replace('/login') }]);
+                    return;
+                }
+
+                // Fetch inventory status
+                const inventoryResponse = await apiRequest('GET', '/api/assets/inventory-status');
+                if (inventoryResponse && inventoryResponse.inventory) {
+                    setInventoryItems(inventoryResponse.inventory);
+                } else {
+                    Alert.alert("Error", "Could not load available items from inventory.");
                 }
             } catch (e) {
-                console.error("Failed to load user data from AsyncStorage", e);
-                Alert.alert("Error", "Failed to load your information.");
+                console.error("Failed to load initial data:", e);
+                Alert.alert("Error", "Failed to load required information to make a request.");
             } finally {
-                setIsLoadingInitialData(false);
+                setIsLoadingData(false);
             }
         };
-        loadUserData();
+        loadInitialData();
     }, []);
 
-    const formatDateForDisplay = (date, includeTime = true) => {
-        if (!date) return 'N/A';
-        try {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            if (includeTime) {
-                options.hour = '2-digit';
-                options.minute = '2-digit';
-            }
-            return new Date(date).toLocaleString('en-US', options);
-        } catch (e) { return String(date); }
+    const handleInputChange = (field: keyof typeof transaction, value: string) => {
+        setTransaction(prev => ({ ...prev, [field]: value }));
     };
 
-    const formatDateForAPI = (date) => {
-        if (!date) return null;
-        return date.toISOString(); // Send full ISO string for datetime
+    const handleDateConfirm = (date: Date) => {
+        handleInputChange('expected_return_date', date.toISOString().split('T')[0]);
+        setDatePickerVisibility(false);
     };
 
     const validateForm = () => {
-        if (!borrowerResidentId) { Alert.alert("Error", "Borrower information missing. Please re-login."); return false; }
-        if (!itemBorrowed) { Alert.alert("Validation Error", "Please select the item borrowed."); return false; }
-        if (!borrowedFromPersonnel.trim()) { Alert.alert("Validation Error", "Please enter the name of the personnel borrowed from."); return false; }
-        // Status and borrow_datetime are auto-set/readonly
+        if (!loggedInUser?._id) {
+            Alert.alert("Error", "Your user information is missing. Please re-login.");
+            return false;
+        }
+        if (!transaction.item_borrowed) {
+            Alert.alert("Validation Error", "Please select an item to borrow.");
+            return false;
+        }
+        const selectedItem = inventoryItems.find(i => i.name === transaction.item_borrowed);
+        if (!selectedItem) {
+            Alert.alert("Error", "Selected item not found in inventory. Please refresh.");
+            return false;
+        }
+        const quantity = parseInt(transaction.quantity_borrowed, 10);
+        if (isNaN(quantity) || quantity <= 0) {
+            Alert.alert("Validation Error", "Quantity must be a number greater than 0.");
+            return false;
+        }
+        if (quantity > selectedItem.available) {
+            Alert.alert("Insufficient Stock", `You cannot borrow ${quantity} ${selectedItem.name}(s). Only ${selectedItem.available} available.`);
+            return false;
+        }
+        if (!transaction.expected_return_date) {
+            Alert.alert("Validation Error", "Please select an expected return date.");
+            return false;
+        }
+        if (new Date(transaction.expected_return_date) < new Date(new Date().toDateString())) {
+            Alert.alert("Validation Error", "Expected return date cannot be in the past.");
+            return false;
+        }
         return true;
     };
 
     const saveTransaction = async () => {
         if (!validateForm()) return;
+
         setIsSaving(true);
         try {
             const payload = {
-                borrower_resident_id: borrowerResidentId,
-                borrower_display_name: borrowerDisplayName,
-                borrow_datetime: formatDateForAPI(new Date()), // Always current date and time
-                borrowed_from_personnel: borrowedFromPersonnel.trim(),
-                item_borrowed: itemBorrowed,
-                status: "Borrowed", // Always this initial status
-                notes: notes.trim() || null,
-                // date_returned and return_condition will be null initially
+                borrower_resident_id: loggedInUser!._id,
+                borrower_display_name: loggedInUser!.name,
+                borrow_datetime: new Date().toISOString(), // Current timestamp
+                item_borrowed: transaction.item_borrowed,
+                quantity_borrowed: parseInt(transaction.quantity_borrowed, 10),
+                expected_return_date: new Date(transaction.expected_return_date).toISOString(),
+                notes: transaction.notes.trim() || null,
+                // The backend will handle setting the initial 'Pending' status and personnel upon approval
             };
 
             const response = await apiRequest('POST', '/api/borrowed-assets', payload);
 
             if (response && (response.message || response.transaction?._id)) {
-                Alert.alert("Success", response.message || "Borrowing transaction logged successfully!");
-                router.push('/borrowed-assets'); // Or to a general list if preferred
+                Alert.alert("Success", "Your borrowing request has been submitted successfully!");
+                router.push('/borrowed-assets');
             } else {
-                Alert.alert("Error", response?.error || response?.message || "Could not log transaction.");
+                Alert.alert("Error", response?.error || response?.message || "Could not submit your request.");
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error saving transaction:", error);
-            Alert.alert("Error", error.response?.data?.message || error.message || "An unexpected error occurred.");
+            const errorMessage = error.response?.data?.message || error.response?.data?.error || "An unexpected error occurred.";
+            Alert.alert("Error", errorMessage);
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (isLoadingInitialData) {
-        return <View style={styles.loaderContainerFullPage}><ActivityIndicator size="large" color="#0F00D7" /><Text style={styles.loadingText}>Loading...</Text></View>;
+    if (isLoadingData) {
+        return <View style={styles.loaderContainerFullPage}><ActivityIndicator size="large" color="#0F00D7" /><Text style={styles.loadingText}>Loading Form...</Text></View>;
     }
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}><MaterialCommunityIcons name="arrow-left" size={28} color="white" /></TouchableOpacity>
-                <Text style={styles.headerTitle}>Log New Borrowing</Text>
-                <View style={{width:28}}/>
+                <Text style={styles.headerTitle}>New Borrow Request</Text>
+                <View style={{ width: 28 }} />
             </View>
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} keyboardShouldPersistTaps="handled">
-                <Text style={styles.sectionTitle}>Borrower Information (You)</Text>
+                <Text style={styles.sectionTitle}>Borrower Information</Text>
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Name of Borrower:</Text>
-                    <TextInput value={borrowerDisplayName} style={[styles.textInput, styles.readOnlyInput]} editable={false} />
+                    <Text style={styles.label}>Your Name:</Text>
+                    <TextInput value={loggedInUser?.name || 'Loading...'} style={[styles.textInput, styles.readOnlyInput]} editable={false} />
                 </View>
 
-                <Text style={styles.sectionTitle}>Borrowing Details</Text>
+                <Text style={styles.sectionTitle}>Request Details</Text>
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Date and Time of Borrowing:</Text>
-                    <TextInput value={formatDateForDisplay(borrowDatetime, true)} style={[styles.textInput, styles.readOnlyInput]} editable={false} />
-                </View>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Item Borrowed <Text style={styles.requiredStar}>*</Text></Text>
+                    <Text style={styles.label}>Item to Borrow <Text style={styles.requiredStar}>*</Text></Text>
                     <View style={styles.pickerWrapper}>
                         <Picker
-                            selectedValue={itemBorrowed}
-                            onValueChange={(itemValue) => setItemBorrowed(itemValue)}
-                            style={styles.picker}
-                            prompt="Select Item Borrowed"
+                            selectedValue={transaction.item_borrowed}
+                            onValueChange={(itemValue) => handleInputChange('item_borrowed', itemValue)}
+                            enabled={inventoryItems.length > 0}
                         >
-                            {assetItems.map((opt) => (
-                                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                            <Picker.Item label="Select an available item..." value="" />
+                            {inventoryItems.map((item) => (
+                                <Picker.Item 
+                                    key={item.name}
+                                    label={`${item.name} (Available: ${item.available})`} 
+                                    value={item.name}
+                                    enabled={item.available > 0}
+                                />
                             ))}
                         </Picker>
                     </View>
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Borrowed From (Personnel Name) <Text style={styles.requiredStar}>*</Text></Text>
+                    <Text style={styles.label}>Quantity <Text style={styles.requiredStar}>*</Text></Text>
                     <TextInput
-                        placeholder="Enter name of personnel"
-                        value={borrowedFromPersonnel}
-                        onChangeText={setBorrowedFromPersonnel}
                         style={styles.textInput}
+                        value={transaction.quantity_borrowed}
+                        onChangeText={(val) => handleInputChange('quantity_borrowed', val.replace(/[^0-9]/g, ''))}
+                        keyboardType="numeric"
+                        placeholder="1"
+                        editable={!!transaction.item_borrowed}
                     />
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Status:</Text>
-                    <TextInput value={status} style={[styles.textInput, styles.readOnlyInput]} editable={false} />
+                    <Text style={styles.label}>Expected Return Date <Text style={styles.requiredStar}>*</Text></Text>
+                    <TouchableOpacity style={styles.datePickerButton} onPress={() => setDatePickerVisibility(true)}>
+                        <Text style={transaction.expected_return_date ? styles.datePickerText : styles.datePickerPlaceholder}>
+                            {transaction.expected_return_date || 'Select a date'}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
+                <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={handleDateConfirm}
+                    onCancel={() => setDatePickerVisibility(false)}
+                    minimumDate={new Date()}
+                />
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Notes (Optional):</Text>
+                    <Text style={styles.label}>Notes / Reason for Borrowing (Optional)</Text>
                     <TextInput
-                        placeholder="Any additional notes..."
-                        value={notes}
-                        onChangeText={setNotes}
-                        style={[styles.textInput, {height: 100}]}
+                        placeholder="e.g., 'For a community event'"
+                        value={transaction.notes}
+                        onChangeText={(val) => handleInputChange('notes', val)}
+                        style={[styles.textInput, { height: 100 }]}
                         multiline
                         textAlignVertical="top"
                     />
@@ -188,7 +243,7 @@ const NewBorrowAssetScreen = () => {
 
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity onPress={saveTransaction} style={[styles.submitButton, isSaving && styles.buttonDisabled]} disabled={isSaving}>
-                        {isSaving ? <ActivityIndicator color="white"/> : <Text style={styles.submitButtonText}>Save Transaction</Text>}
+                        {isSaving ? <ActivityIndicator color="white" /> : <Text style={styles.submitButtonText}>Submit Request</Text>}
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -197,14 +252,12 @@ const NewBorrowAssetScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    // ... (Copy relevant styles from NewComplaintScreen or NewDocumentRequestScreen)
-    // Ensure styles for readOnlyInput, sectionTitle, etc., are present.
     container: { flex: 1, backgroundColor: '#0F00D7' },
-    header: { paddingTop: Platform.OS === 'android' ? 35 : 60, paddingBottom: 20, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0F00D7' },
+    header: { paddingTop: Platform.OS === 'android' ? 40 : 50, paddingBottom: 20, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0F00D7' },
     headerTitle: { color: 'white', fontSize: 20, fontWeight: 'bold' },
-    scrollView: { flex: 1, backgroundColor: 'white', borderTopLeftRadius: 25, borderTopRightRadius: 25, marginTop: -20 },
+    scrollView: { flex: 1, backgroundColor: 'white', borderTopLeftRadius: 25, borderTopRightRadius: 25, marginTop: Platform.OS === 'ios' ? -20 : 0 },
     scrollViewContent: { paddingTop: 30, paddingHorizontal: 20, paddingBottom: 40 },
-    sectionTitle: { fontSize: 18, fontWeight: '600', color: '#333', marginTop: 20, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 5},
+    sectionTitle: { fontSize: 18, fontWeight: '600', color: '#333', marginTop: 15, marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 8 },
     inputContainer: { marginBottom: 15 },
     label: { color: '#444', fontSize: 15, marginBottom: 7, fontWeight: '500' },
     requiredStar: { color: 'red' },
@@ -212,12 +265,15 @@ const styles = StyleSheet.create({
     readOnlyInput: { backgroundColor: '#ECEFF1', color: '#546E7A' },
     pickerWrapper: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, backgroundColor: '#F9F9F9' },
     picker: { height: 50, width: '100%', color: '#333' },
+    datePickerButton: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, padding: 12, justifyContent: 'center' },
+    datePickerText: { fontSize: 16, color: '#333' },
+    datePickerPlaceholder: { fontSize: 16, color: '#999' },
     buttonContainer: { marginTop: 25 },
     submitButton: { backgroundColor: '#5E76FF', paddingVertical: 15, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minHeight: 50 },
     buttonDisabled: { backgroundColor: '#A9B4FF' },
     submitButtonText: { color: 'white', fontSize: 17, fontWeight: 'bold' },
-    loaderContainerFullPage: {flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'},
-    loadingText: { marginTop: 10, fontSize: 16, color: '#555'},
+    loaderContainerFullPage: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' },
+    loadingText: { marginTop: 10, fontSize: 16, color: '#555' },
 });
 
 export default NewBorrowAssetScreen;
