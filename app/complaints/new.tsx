@@ -19,6 +19,21 @@ function debounce(func, delay) {
   };
 }
 
+// Reusable component for displaying validation errors
+const ErrorMessage = ({ error }) => {
+    if (!error) return null;
+    return <Text style={styles.errorText}>{error}</Text>;
+};
+
+const categoryOptions = [
+    'Theft / Robbery', 'Scam / Fraud', 'Physical Assault / Violence',
+    'Verbal Abuse / Threats', 'Sexual Harassment / Abuse', 'Vandalism',
+    'Noise Disturbance', 'Illegal Parking / Obstruction', 'Drunk and Disorderly Behavior',
+    'Curfew Violation / Minor Offenses', 'Illegal Gambling', 'Animal Nuisance / Stray Animal Concern',
+    'Garbage / Sanitation Complaints', 'Boundary Disputes / Trespassing',
+    'Barangay Staff / Official Misconduct', 'Others',
+];
+
 const NewComplaintScreen = () => {
     const router = useRouter();
 
@@ -34,6 +49,8 @@ const NewComplaintScreen = () => {
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [status, setStatus] = useState('New');
     const [notesDescription, setNotesDescription] = useState('');
+    const [category, setCategory] = useState('');
+    const [isCategoryPickerVisible, setCategoryPickerVisible] = useState(false);
 
     const [personComplainedSearchQuery, setPersonComplainedSearchQuery] = useState('');
     const [personComplainedSearchResults, setPersonComplainedSearchResults] = useState([]);
@@ -41,14 +58,43 @@ const NewComplaintScreen = () => {
     const [selectedPersonComplainedId, setSelectedPersonComplainedId] = useState(null);
     const [selectedPersonComplainedName, setSelectedPersonComplainedName] = useState('');
     const [selectedPersonComplainedIsResident, setSelectedPersonComplainedIsResident] = useState(false);
-
+    
+    const [errors, setErrors] = useState({});
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingInitialData, setIsLoadingInitialData] = useState(true);
 
-    const statusOptions = [
-        { label: 'New', value: 'New' }, { label: 'Under Investigation', value: 'Under Investigation' },
-        { label: 'Resolved', value: 'Resolved' }, { label: 'Closed', value: 'Closed' }, { label: 'Dismissed', value: 'Dismissed' }
-    ];
+    // Central validation logic
+    const validateField = (fieldName, value) => {
+        let error = '';
+        switch (fieldName) {
+            case 'personComplainedSearchQuery':
+                if (!value.trim()) error = 'Person complained against is required.';
+                break;
+            case 'category':
+                if (!value) error = 'Category is required.';
+                break;
+            case 'notesDescription':
+                if (!value.trim()) error = 'A description of the complaint is required.';
+                break;
+            case 'dateOfComplaint':
+                if (!value) error = 'Date of complaint is required.';
+                break;
+            case 'timeOfComplaint':
+                if (!value) error = 'Time of complaint is required.';
+                break;
+        }
+
+        setErrors(prev => {
+            const newErrors = { ...prev };
+            if (error) {
+                newErrors[fieldName] = error;
+            } else {
+                delete newErrors[fieldName];
+            }
+            return newErrors;
+        });
+        return error;
+    };
 
     useEffect(() => {
         const loadUserData = async () => {
@@ -60,7 +106,7 @@ const NewComplaintScreen = () => {
                     setLoggedInUserData(parsed);
                     setComplainantResidentId(parsed._id);
                     setComplainantDisplayName(`${parsed.first_name||''} ${parsed.middle_name||''} ${parsed.last_name||''}`.trim());
-                    setComplainantAddress(`${parsed.address_house_number||''} ${parsed.address_street||''}, ${parsed.address_subdivision_zone||''}, ${parsed.address_city_municipality||''}`.replace(/ ,/g,',').replace(/^,|,$/g,'').trim() || 'N/A');
+                    setComplainantAddress(`${parsed.address_house_number||''} ${parsed.address_street||''}, ${parsed.address_subdivision_zone||''}`.trim() || 'N/A');
                     setComplainantContactNumber(parsed.contact_number || 'N/A');
                 } else {
                     Alert.alert("Auth Error", "Please log in.", [{ text: "OK", onPress: () => router.replace('/') }]);
@@ -71,38 +117,37 @@ const NewComplaintScreen = () => {
         loadUserData();
     }, []);
 
-    const onDateChange = (event, selectedDate) => { setShowDatePicker(Platform.OS === 'ios'); if (event.type === 'set' && selectedDate) setDateOfComplaint(selectedDate); };
-    const onTimeChange = (event, selectedTime) => { setShowTimePicker(Platform.OS === 'ios'); if (event.type === 'set' && selectedTime) setTimeOfComplaint(selectedTime); };
+    const onDateChange = (event, selectedDate) => {
+        setShowDatePicker(Platform.OS === 'ios');
+        if (event.type === 'set' && selectedDate) {
+            setDateOfComplaint(selectedDate);
+            validateField('dateOfComplaint', selectedDate);
+        }
+    };
+
+    const onTimeChange = (event, selectedTime) => {
+        setShowTimePicker(Platform.OS === 'ios');
+        if (event.type === 'set' && selectedTime) {
+            setTimeOfComplaint(selectedTime);
+            validateField('timeOfComplaint', selectedTime);
+        }
+    };
+    
     const formatDateForAPI = (date) => date ? date.toISOString().split('T')[0] : null;
     const formatTimeForAPI = (time) => time ? time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : null;
 
-    // Generic resident search API call function
-    const searchResidentsAPI = async (query, type) => {
+    const searchResidentsAPI = async (query) => {
         const trimmedQuery = typeof query === 'string' ? query.trim() : '';
-        // For this form, 'type' will always be 'personComplained'
-        const setIsLoading = setIsLoadingPersonComplained;
-        const setSearchResults = setPersonComplainedSearchResults;
-
-        if (trimmedQuery.length < 2) { setSearchResults([]); setIsLoading(false); return; }
-        setIsLoading(true); setSearchResults([]);
+        if (trimmedQuery.length < 2) { setPersonComplainedSearchResults([]); setIsLoadingPersonComplained(false); return; }
+        setIsLoadingPersonComplained(true); setPersonComplainedSearchResults([]);
         try {
-            // Assuming apiRequest handles GET params correctly
-            const response = await apiRequest('GET', '/api/residents/search?q=' + trimmedQuery, null, { q: trimmedQuery });
-            if (response && response.residents) {
-                setSearchResults(response.residents || []);
-            } else {
-                 setSearchResults([]);
-            }
-        } catch (e) {
-            console.error(`Exception searching ${type}:`, e);
-            setSearchResults([]);
-        } finally {
-            setIsLoading(false);
-        }
-     };
-
-    // --- Person Complained Against Search Logic ---
-    const debouncedPersonComplainedSearch = useCallback(debounce((query) => searchResidentsAPI(query, 'personComplained'), 500), []); // Pass type here
+            const response = await apiRequest('GET', '/api/residents/search?q=' + trimmedQuery);
+            setPersonComplainedSearchResults(response.residents || []);
+        } catch (e) { console.error(`Exception searching:`, e); setPersonComplainedSearchResults([]); }
+        finally { setIsLoadingPersonComplained(false); }
+    };
+    
+    const debouncedPersonComplainedSearch = useCallback(debounce(searchResidentsAPI, 500), []);
 
     useEffect(() => {
         if (personComplainedSearchQuery !== selectedPersonComplainedName && selectedPersonComplainedId) {
@@ -113,43 +158,53 @@ const NewComplaintScreen = () => {
             setPersonComplainedSearchResults([]);
             return;
         }
-        // Only trigger search if the query is not just confirming a previous selection or if it's a new manual entry
         if (!selectedPersonComplainedIsResident || personComplainedSearchQuery !== selectedPersonComplainedName) {
             debouncedPersonComplainedSearch(personComplainedSearchQuery);
         } else if (selectedPersonComplainedIsResident && personComplainedSearchQuery === selectedPersonComplainedName) {
-            // If query matches selected resident name, clear search results list but keep selection
             setPersonComplainedSearchResults([]);
         }
-    }, [personComplainedSearchQuery, selectedPersonComplainedName, selectedPersonComplainedIsResident, debouncedPersonComplainedSearch]); // Added debouncedPersonComplainedSearch to deps
+    }, [personComplainedSearchQuery, selectedPersonComplainedName, selectedPersonComplainedIsResident, debouncedPersonComplainedSearch]);
 
     const selectPersonComplained = (resident) => {
-        setSelectedPersonComplainedId(resident._id);
         const name = `${resident.first_name || ''} ${resident.middle_name || ''} ${resident.last_name || ''}`.trim();
+        setSelectedPersonComplainedId(resident._id);
         setSelectedPersonComplainedName(name);
-        setPersonComplainedSearchQuery(name); // Fill input with selected name
+        setPersonComplainedSearchQuery(name);
         setSelectedPersonComplainedIsResident(true);
         setPersonComplainedSearchResults([]);
-    };
-    const clearPersonComplainedSelection = () => {
-        setPersonComplainedSearchQuery('');
-        setSelectedPersonComplainedId(null);
-        setSelectedPersonComplainedName('');
-        setSelectedPersonComplainedIsResident(false);
-        setPersonComplainedSearchResults([]);
+        validateField('personComplainedSearchQuery', name);
     };
 
-    const validateForm = () => { /* ... same validation logic ... */
-        if (!complainantResidentId) { Alert.alert("Error", "Complainant information missing. Please re-login."); return false; }
-        if (!dateOfComplaint) { Alert.alert("Validation Error", "Date of Complaint is required."); return false; }
-        if (!timeOfComplaint) { Alert.alert("Validation Error", "Time of Complaint is required."); return false; }
-        if (!personComplainedSearchQuery.trim()) { Alert.alert("Validation Error", "Person Complained Against is required."); return false; }
-        if (!status) { Alert.alert("Validation Error", "Status is required."); return false; }
-        if (!notesDescription.trim()) { Alert.alert("Validation Error", "Notes/Description of complaint is required."); return false; }
-        return true;
+    const handlePersonComplainedChange = (text) => {
+        setPersonComplainedSearchQuery(text);
+        validateField('personComplainedSearchQuery', text);
     };
 
+    const handleCategorySelect = (cat) => {
+        setCategory(cat);
+        validateField('category', cat);
+        setCategoryPickerVisible(false);
+    };
+
+    const handleDescriptionChange = (text) => {
+        setNotesDescription(text);
+        validateField('notesDescription', text);
+    };
+    
     const saveComplaint = async () => {
-        if (!validateForm()) return;
+        // Run validation on all fields before submitting
+        const validationErrors = {};
+        if (validateField('personComplainedSearchQuery', personComplainedSearchQuery)) validationErrors.personComplainedSearchQuery = true;
+        if (validateField('category', category)) validationErrors.category = true;
+        if (validateField('notesDescription', notesDescription)) validationErrors.notesDescription = true;
+        if (validateField('dateOfComplaint', dateOfComplaint)) validationErrors.dateOfComplaint = true;
+        if (validateField('timeOfComplaint', timeOfComplaint)) validationErrors.timeOfComplaint = true;
+        
+        if (Object.keys(validationErrors).length > 0) {
+            Alert.alert("Validation Error", "Please fill in all required fields.");
+            return;
+        }
+
         setIsSaving(true);
         try {
             const payload = {
@@ -159,16 +214,16 @@ const NewComplaintScreen = () => {
                 contact_number: complainantContactNumber,
                 date_of_complaint: formatDateForAPI(dateOfComplaint),
                 time_of_complaint: formatTimeForAPI(timeOfComplaint),
-                person_complained_against_name: personComplainedSearchQuery.trim(), // Name always comes from this input
+                person_complained_against_name: personComplainedSearchQuery.trim(),
                 person_complained_against_resident_id: selectedPersonComplainedIsResident ? selectedPersonComplainedId : null,
+                category: category,
                 status: status,
                 notes_description: notesDescription.trim(),
             };
             const response = await apiRequest('POST', '/api/complaints', payload);
             if (response && (response.message || response.complaint?._id)) {
                 Alert.alert("Success", response.message || "Complaint submitted successfully!");
-                // Navigate to a relevant screen, e.g., a list of user's complaints or all complaints
-                router.push(loggedInUserData?.isAdmin ? '/complaints' : '/complaints/my-complaints'); // Example conditional navigation
+                router.replace('/complaints');
             } else {
                 Alert.alert("Error", response?.error || response?.message || "Could not submit complaint.");
             }
@@ -196,17 +251,19 @@ const NewComplaintScreen = () => {
                 <Text style={styles.sectionTitle}>Complaint Details</Text>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Date of Complaint <Text style={styles.requiredStar}>*</Text></Text>
-                    <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
+                    <TouchableOpacity onPress={() => setShowDatePicker(true)} style={[styles.datePickerButton, !!errors.dateOfComplaint && styles.inputError]}>
                         <Text style={styles.datePickerButtonText}>{dateOfComplaint.toLocaleDateString('en-CA')}</Text>
                     </TouchableOpacity>
                     {showDatePicker && <DateTimePicker testID="datePicker" value={dateOfComplaint} mode="date" display="default" onChange={onDateChange} />}
+                    <ErrorMessage error={errors.dateOfComplaint} />
                 </View>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Time of Complaint <Text style={styles.requiredStar}>*</Text></Text>
-                     <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.datePickerButton}>
+                     <TouchableOpacity onPress={() => setShowTimePicker(true)} style={[styles.datePickerButton, !!errors.timeOfComplaint && styles.inputError]}>
                         <Text style={styles.datePickerButtonText}>{timeOfComplaint.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit'})}</Text>
                     </TouchableOpacity>
                     {showTimePicker && <DateTimePicker testID="timePicker" value={timeOfComplaint} mode="time" display="default" onChange={onTimeChange} is24Hour={false} />}
+                    <ErrorMessage error={errors.timeOfComplaint} />
                 </View>
 
                 <View style={styles.inputContainer}>
@@ -214,10 +271,11 @@ const NewComplaintScreen = () => {
                     <TextInput
                         placeholder="Search Resident or Enter Name..."
                         value={personComplainedSearchQuery}
-                        onChangeText={setPersonComplainedSearchQuery}
-                        style={styles.textInput}
+                        onChangeText={handlePersonComplainedChange}
+                        style={[styles.textInput, !!errors.personComplainedSearchQuery && styles.inputError]}
                         onBlur={() => { if(personComplainedSearchResults.length > 0) setTimeout(() => setPersonComplainedSearchResults([]), 200) }}
                     />
+                    <ErrorMessage error={errors.personComplainedSearchQuery} />
                     {isLoadingPersonComplained && <ActivityIndicator style={styles.searchLoader}/>}
                     {personComplainedSearchQuery.trim().length >=2 && !isLoadingPersonComplained && !selectedPersonComplainedIsResident && (
                         <View style={styles.searchResultsContainer}>
@@ -232,19 +290,37 @@ const NewComplaintScreen = () => {
                 </View>
 
                 <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Category <Text style={styles.requiredStar}>*</Text></Text>
+                    <TouchableOpacity
+                        style={[styles.datePickerButton, !!errors.category && styles.inputError]}
+                        onPress={() => setCategoryPickerVisible(!isCategoryPickerVisible)}>
+                        <Text style={styles.datePickerButtonText}>{category || 'Select a Category...'}</Text>
+                    </TouchableOpacity>
+                    <ErrorMessage error={errors.category} />
+                    {isCategoryPickerVisible && (
+                        <View style={styles.searchResultsContainer}>
+                            <ScrollView nestedScrollEnabled={true} style={{maxHeight: 200}}>
+                                {categoryOptions.map((cat, index) => (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={styles.searchResultItem}
+                                        onPress={() => handleCategorySelect(cat)}>
+                                        <Text>{cat}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    )}
+                </View>
+
+                <View style={styles.inputContainer}>
                     <Text style={styles.label}>Notes / Description <Text style={styles.requiredStar}>*</Text></Text>
-                    <TextInput placeholder="Describe the complaint..." value={notesDescription} onChangeText={setNotesDescription} style={[styles.textInput, {height: 120}]} multiline textAlignVertical="top"/>
+                    <TextInput placeholder="Describe the complaint..." value={notesDescription} onChangeText={handleDescriptionChange} style={[styles.textInput, {height: 120}, !!errors.notesDescription && styles.inputError]} multiline textAlignVertical="top"/>
+                    <ErrorMessage error={errors.notesDescription} />
                 </View>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Status</Text>
                     <TextInput value={status} style={[styles.textInput, styles.readOnlyInput]} editable={false} />
-                    {/* If status needs to be editable by admin on new form, use Picker:
-                    <View style={styles.pickerWrapper}>
-                        <Picker selectedValue={status} onValueChange={setStatus} style={styles.picker}>
-                            {statusOptions.map(opt => <Picker.Item key={opt.value} label={opt.label} value={opt.value} />)}
-                        </Picker>
-                    </View>
-                    */}
                 </View>
 
                 <View style={styles.buttonContainer}>
@@ -256,7 +332,7 @@ const NewComplaintScreen = () => {
         </KeyboardAvoidingView>
     );
 };
-// Styles (Keep consistent with previous New screen styles)
+// Styles
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#0F00D7' },
     header: { paddingTop: Platform.OS === 'android' ? 35 : 60, paddingBottom: 20, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0F00D7' },
@@ -271,7 +347,7 @@ const styles = StyleSheet.create({
     readOnlyInput: { backgroundColor: '#ECEFF1', color: '#546E7A' },
     pickerWrapper: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, backgroundColor: '#F9F9F9' },
     picker: { height: 50, width: '100%', color: '#333' },
-    datePickerButton: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, paddingVertical: 12, backgroundColor: '#F9F9F9', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 12, height: 48 },
+    datePickerButton: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, paddingVertical: 12, backgroundColor: '#F9F9F9', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 12, minHeight: 48 },
     datePickerButtonText: { fontSize: 16, color: '#333' },
     searchResultsContainer: { marginTop: 5, borderColor: '#DDD', borderWidth: 1, borderRadius: 8, maxHeight: 150, backgroundColor: 'white', zIndex: 1, position: 'relative' },
     searchResultItem: { padding: 12, borderBottomWidth: 1, borderColor: '#EEE' },
@@ -283,6 +359,15 @@ const styles = StyleSheet.create({
     buttonDisabled: { backgroundColor: '#A9B4FF' },
     submitButtonText: { color: 'white', fontSize: 17, fontWeight: 'bold' },
     loaderContainerFullPage: {flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'},
+    // Styles for validation
+    inputError: {
+        borderColor: '#D32F2F',
+    },
+    errorText: {
+        color: '#D32F2F',
+        fontSize: 12,
+        marginTop: 4,
+    },
 });
 
 export default NewComplaintScreen;

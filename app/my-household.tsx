@@ -97,7 +97,7 @@ const MyHouseholdScreen = () => {
                     {`${member.first_name || ''} ${member.middle_name || ''} ${member.last_name || ''}`.trim()}
                     {isCurrentUser && " (You)"}
                 </Text>
-                <Text style={styles.memberDetail}>Sex: {member.sex || 'N/A'}</Text>
+                <Text style={styles.memberDetail}>{member.relationship_to_head || 'N/A'}</Text>
                 {/* Add other member details you want to show, e.g., age */}
             </View>
         </View>

@@ -87,7 +87,7 @@ export default function Index() {
             fontWeight: 'bold',
           }}
         >
-          Register as Resident
+          Register
         </Text>
       </TouchableOpacity>
     </ImageBackground>

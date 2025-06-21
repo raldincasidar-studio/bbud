@@ -4,7 +4,7 @@
     "slug": "bbud",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -57,8 +57,6 @@
     "updates": {
       "url": "https://u.expo.dev/35009995-0f19-4b12-bcb7-06ed38ca419c"
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    }
+    "runtimeVersion": "1.0.0"
   }
 }
