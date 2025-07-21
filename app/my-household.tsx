@@ -14,6 +14,31 @@ const MyHouseholdScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [newMember, setNewMember] = useState({
+        first_name: '',
+        last_name: '',
+        middle_name: '',
+        sex: '',
+        date_of_birth: '',
+        relationship_to_head: '',
+        email: '',
+        password: '',
+    });
+
+    const handleAddMember = async () => {
+        if (!loggedInUserId) return;
+
+        try {
+            await apiRequest('POST', `/api/residents/${loggedInUserId}/members`, newMember);
+            Alert.alert("Success", "Household member added successfully.");
+            setModalVisible(false);
+            fetchHouseholdData(loggedInUserId);
+        } catch (error) {
+            console.error("Error adding household member:", error);
+            Alert.alert("Error", error.response?.data?.message || "Could not add household member.");
+        }
+    };
 
     const fetchHouseholdData = useCallback(async (userId) => {
         if (!userId) {
@@ -145,10 +170,9 @@ const MyHouseholdScreen = () => {
                         ) : (
                             <Text style={styles.noMembersText}>No members listed in your household yet.</Text>
                         )}
-                        {/* Optionally, add a button to manage members if they are the head */}
-                        {/* <TouchableOpacity style={styles.manageButton} onPress={() => router.push(`/residents/${loggedInUserId}`)}>
-                             <MaterialCommunityIcons name="account-edit-outline" size={20} color="white" style={{marginRight: 8}}/>
-                            <Text style={styles.manageButtonText}>Manage My Household</Text>
+                        {/* <TouchableOpacity style={styles.manageButton} onPress={() => {}}>
+                            <MaterialCommunityIcons name="account-plus-outline" size={20} color="white" style={{marginRight: 8}}/>
+                            <Text style={styles.manageButtonText}>Add Household Member</Text>
                         </TouchableOpacity> */}
                     </View>
                 )}
@@ -310,7 +334,43 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    button: {
+        backgroundColor: '#0F00D7',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    cancelButton: {
+        backgroundColor: '#757575',
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
 });
 
 export default MyHouseholdScreen;

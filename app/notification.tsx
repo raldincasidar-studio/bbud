@@ -16,6 +16,7 @@ interface ResidentNotification {
   read_status: 'pending' | 'sent' | 'delivered' | 'read' | 'failed'; // From API
   read_at?: string | null;
   created_at: string;
+  read_by?: { resident_id: string; read_at: string }[];
 }
 
 const NotificationsScreen = () => {
@@ -45,7 +46,7 @@ const NotificationsScreen = () => {
 
     const fetchNotifications = useCallback(async (page = 1, isRefreshing = false) => {
         if (!residentId) {
-            if (!isRefreshing) setIsLoading(false); // Stop loading if no residentId yet
+            if (!isRefreshing) setIsLoading(false);
             if (isRefreshing) setRefreshing(false);
             return;
         }
@@ -60,7 +61,17 @@ const NotificationsScreen = () => {
             });
 
             if (response && response.notifications) {
-                setNotifications(page === 1 ? response.notifications : [...notifications, ...response.notifications]);
+                const notificationsWithReadStatus = response.notifications.map((n: ResidentNotification) => ({
+                    ...n,
+                    read_status: n.read_by?.some(reader => reader.resident_id === residentId) ? 'read' : 'pending',
+                }));
+
+                if (page === 1) {
+                    setNotifications(notificationsWithReadStatus);
+                } else {
+                    setNotifications(prev => [...prev, ...notificationsWithReadStatus]);
+                }
+                
                 setTotalItems(response.total || 0);
                 setCurrentPage(page);
             } else {
@@ -74,23 +85,23 @@ const NotificationsScreen = () => {
             setIsLoading(false);
             setRefreshing(false);
         }
-    }, [residentId, notifications]); // Add notifications to dep array for load more
+    }, [residentId]);
 
     useFocusEffect(
         useCallback(() => {
-            if (residentId) { // Only fetch if residentId is available
-                fetchNotifications(1, false); // Fetch page 1 on focus
+            if (residentId) {
+                fetchNotifications(1, false);
             }
-        }, [residentId]) // Re-run if residentId changes (e.g., after initial load)
+        }, [residentId, fetchNotifications])
     );
 
     const onRefresh = useCallback(() => {
         if (residentId) {
             fetchNotifications(1, true);
         } else {
-            setRefreshing(false); // Can't refresh without residentId
+            setRefreshing(false);
         }
-    }, [residentId]);
+    }, [residentId, fetchNotifications]);
 
     const handleLoadMore = () => {
         if (!isLoading && !refreshing && notifications.length < totalItems && residentId) {
@@ -108,16 +119,14 @@ const NotificationsScreen = () => {
                 )
             );
 
-            await apiRequest('PATCH', `/api/residents/${residentId}/notifications/mark-read`, {
-                notification_ids: [notificationIdToMark],
-                read: true,
+            await apiRequest('PATCH', `/api/notifications/${notificationIdToMark}/mark-as-read`, {
+                resident_id: residentId,
             });
-            // Optionally refetch or rely on optimistic update.
-            // For simplicity, optimistic update is often enough for read status.
         } catch (error) {
             console.error("Error marking notification as read:", error);
             // Optionally revert optimistic update here
             Alert.alert("Error", "Could not update notification status.");
+            fetchNotifications(1, true);
         }
     };
 

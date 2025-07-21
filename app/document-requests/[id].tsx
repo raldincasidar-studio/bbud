@@ -14,6 +14,41 @@ const ViewDocumentRequestScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [errorLoading, setErrorLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleFollowUp = async () => {
+        if (!documentRequestId) return;
+
+        Alert.alert(
+            "Confirm Follow-up",
+            "Are you sure you want to follow up on this request? You can only do this once every 24 hours.",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel"
+                },
+                {
+                    text: "Yes, Follow up",
+                    onPress: async () => {
+                        setIsSubmitting(true);
+                        try {
+                            await apiRequest('PATCH', `/api/document-requests/${documentRequestId}/follow-up`);
+                            Alert.alert("Success", "You have successfully followed up on this request.");
+                            fetchDocumentRequestDetails(); // Refresh details
+                        } catch (error: any) {
+                            if (error.response && error.response.status === 429) {
+                                Alert.alert("Follow-up Failed", "You have already followed up on this request within the last 24 hours.");
+                            } else {
+                                Alert.alert("Error", "An error occurred while trying to follow up.");
+                            }
+                        } finally {
+                            setIsSubmitting(false);
+                        }
+                    }
+                }
+            ]
+        );
+    };
 
     const fetchDocumentRequestDetails = useCallback(async (isRefresh = false) => {
         if (!documentRequestId) {
@@ -178,6 +213,23 @@ const ViewDocumentRequestScreen = () => {
                     </View>
                 </View>
 
+                {/* {['Pending', 'Processing'].includes(requestDetails.document_status) && (
+                    <TouchableOpacity 
+                        style={[styles.followUpButton, isSubmitting && styles.disabledButton, { marginBottom: 16 }]} 
+                        onPress={handleFollowUp}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <>
+                                <MaterialCommunityIcons name="phone-outgoing-outline" size={22} color="white" style={{marginRight: 8}}/>
+                                <Text style={styles.followUpButtonText}>Follow up</Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+                )} */}
+
                 <View style={styles.detailCard}>
                     <Text style={styles.cardTitle}>Requestor Information</Text>
                     <View style={styles.detailRow}>
@@ -188,7 +240,12 @@ const ViewDocumentRequestScreen = () => {
                     <View style={styles.detailRow}>
                         <MaterialCommunityIcons name="map-marker-outline" size={20} color="#555" style={styles.detailIcon} />
                         <Text style={styles.detailLabel}>Address:</Text>
-                        <Text style={styles.detailValue}>{requestDetails.requestor_details?.address || 'N/A'}</Text>
+                        <Text style={styles.detailValue}>
+                            {requestDetails.requestor_details?.address_house_number || ''}&nbsp;
+                            {requestDetails.requestor_details?.address_street || ''}&nbsp;
+                            {requestDetails.requestor_details?.address_subdivision_zone || ''}&nbsp;
+                            {requestDetails.requestor_details?.address_city_municipality || ''} 
+                        </Text>
                     </View>
                     <View style={styles.detailRow}>
                         <MaterialCommunityIcons name="phone-outline" size={20} color="#555" style={styles.detailIcon} />
@@ -386,6 +443,23 @@ const styles = StyleSheet.create({
         color: '#5E76FF',
         fontSize: 16,
         fontWeight: '600',
+    },
+    followUpButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        marginTop: 10,
+        backgroundColor: '#FFA726',
+        borderRadius: 8,
+    },
+    followUpButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    disabledButton: {
+        backgroundColor: '#E0E0E0',
     },
 });
 
