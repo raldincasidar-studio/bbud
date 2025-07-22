@@ -43,9 +43,9 @@ const calculateAge = (dobString: string | null): number | null => {
 // --- Initial State Definitions ---
 
 const initialMemberState = {
-    first_name: '', middle_name: '', last_name: '', sex: 'Male',
-    date_of_birth: null as string | null, civil_status: 'Single', citizenship: 'Filipino',
-    occupation_status: 'Student', contact_number: '', relationship_to_head: 'Child',
+    first_name: '', middle_name: '', last_name: '', sex: '',
+    date_of_birth: null as string | null, civil_status: '', citizenship: 'Filipino',
+    occupation_status: '', contact_number: '', relationship_to_head: '',
     other_relationship: '', email: '', password: '', is_voter: false, voter_id_number: '',
     voter_registration_proof_base64: null as string | null, is_pwd: false, pwd_id: '',
     pwd_card_base64: null as string | null, is_senior_citizen: false, senior_citizen_id: '',
@@ -259,7 +259,7 @@ export default function SignupScreen() {
             delete payload.confirmPassword;
             const response = await apiRequest('POST', '/api/residents', payload);
             if (response && (response.message || response.resident)) {
-                Alert.alert('Registration Successful', 'Your household has been registered and is pending for approval.', [{ text: 'OK', onPress: () => router.replace('/login') }]);
+                Alert.alert('Registration Successful', 'Your household has been registered and is pending for approval by the Baranggay Secretary.', [{ text: 'OK', onPress: () => router.replace('/login') }]);
             } else {
                 Alert.alert('Registration Failed', response?.message || response?.error || 'An unknown error occurred.');
             }
@@ -291,22 +291,37 @@ export default function SignupScreen() {
                 <View style={styles.formContainer}>
                     <Text style={styles.subHeader}>Step 1: Household Head Information</Text>
                     <Text style={styles.sectionTitle}>Personal Information</Text>
+                    <Text style={styles.label}>First Name*</Text>
                     <TextInput style={[styles.textInput, !!errors.first_name && styles.inputError]} placeholder="First Name*" value={formData.first_name} onChangeText={(v) => handleInputChange('first_name', v)} /><ErrorMessage error={errors.first_name} />
+                    <Text style={styles.label}>Middle Name*</Text>
                     <TextInput style={styles.textInput} placeholder="Middle Name" value={formData.middle_name} onChangeText={(v) => handleInputChange('middle_name', v)} />
+                    <Text style={styles.label}>Last Name*</Text>
                     <TextInput style={[styles.textInput, !!errors.last_name && styles.inputError]} placeholder="Last Name*" value={formData.last_name} onChangeText={(v) => handleInputChange('last_name', v)} /><ErrorMessage error={errors.last_name} />
+                    <Text style={styles.label}>Contact Number*</Text>
                     <TextInput style={[styles.textInput, !!errors.contact_number && styles.inputError]} placeholder="Contact Number*" keyboardType="phone-pad" value={formData.contact_number} onChangeText={(v) => handleInputChange('contact_number', v)} maxLength={11} /><ErrorMessage error={errors.contact_number} />
+                    <Text style={styles.label}>Date of Birth*</Text>
                     <TouchableOpacity style={[styles.datePickerButton, !!errors.date_of_birth && styles.inputError]} onPress={() => showDatePicker('head')}><Text style={formData.date_of_birth ? styles.datePickerButtonText : styles.datePickerPlaceholderText}>{formData.date_of_birth || 'Date of Birth*'}</Text></TouchableOpacity><ErrorMessage error={errors.date_of_birth} />
+                    <Text style={styles.label}>Age</Text>
                     <TextInput style={[styles.textInput, styles.textInputDisabled]} placeholder="Age" value={headAge !== null ? String(headAge) : ''} editable={false} />
-                    <View style={styles.pickerWrapper}><Picker selectedValue={formData.sex} onValueChange={(v) => handleInputChange('sex', v)}><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View>
-                    <View style={styles.pickerWrapper}><Picker selectedValue={formData.civil_status} onValueChange={(v) => handleInputChange('civil_status', v)}><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View>
+                    <Text style={styles.label}>Sex</Text>
+                    <View style={styles.pickerWrapper}><Picker selectedValue={formData.sex} onValueChange={(v) => handleInputChange('sex', v)}><Picker.Item label="Select Sex*" value="" enabled={false} /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View>
+                    <Text style={styles.label}>Civil Status</Text>
+                    <View style={styles.pickerWrapper}><Picker selectedValue={formData.civil_status} onValueChange={(v) => handleInputChange('civil_status', v)}><Picker.Item label="Select Civil Status*" value="" enabled={false} /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View>
+                    <Text style={styles.label}>Citizenship</Text>
                     <TextInput style={[styles.textInput, !!errors.citizenship && styles.inputError]} placeholder="Citizenship*" value={formData.citizenship} onChangeText={(v) => handleInputChange('citizenship', v)} /><ErrorMessage error={errors.citizenship} />
-                    <View style={styles.pickerWrapper}><Picker selectedValue={formData.occupation_status} onValueChange={(v) => handleInputChange('occupation_status', v)}><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View>
+                    <Text style={styles.label}>Occupation Status</Text>
+                    <View style={styles.pickerWrapper}><Picker selectedValue={formData.occupation_status} onValueChange={(v) => handleInputChange('occupation_status', v)}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View>
                     
                     <Text style={styles.sectionTitle}>Address Information</Text>
+                    <Text style={styles.label}>House No. / Building No.*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_house_number && styles.inputError]} placeholder="House No. / Building No.*" value={formData.address_house_number} onChangeText={(v) => handleInputChange('address_house_number', v)} /><ErrorMessage error={errors.address_house_number} />
+                    <Text style={styles.label}>Street*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_street && styles.inputError]} placeholder="Street*" value={formData.address_street} onChangeText={(v) => handleInputChange('address_street', v)} /><ErrorMessage error={errors.address_street} />
+                    <Text style={styles.label}>Subdivision / Zone / Sitio / Purok*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_subdivision_zone && styles.inputError]} placeholder="Subdivision / Zone / Sitio / Purok*" value={formData.address_subdivision_zone} onChangeText={(v) => handleInputChange('address_subdivision_zone', v)} /><ErrorMessage error={errors.address_subdivision_zone} />
+                    <Text style={styles.label}>City/Municipality</Text>
                     <TextInput style={[styles.textInput, styles.textInputDisabled]} value={formData.address_city_municipality} editable={false} />
+                    <Text style={styles.label}>Years at Current Address*</Text>
                     <TextInput style={[styles.textInput, !!errors.years_at_current_address && styles.inputError]} placeholder="Years at Current Address*" keyboardType="numeric" value={formData.years_at_current_address} onChangeText={(v) => handleInputChange('years_at_current_address', v)} /><ErrorMessage error={errors.years_at_current_address} />
                     <TouchableOpacity style={[styles.filePickerButton, !!errors.proof_of_residency_base64 && styles.inputErrorBorder]} onPress={() => pickImage('proof_of_residency_base64', 'head')}><Text style={styles.filePickerButtonText}>{formData.proof_of_residency_base64 ? 'Change Proof of Residency*' : 'Upload Proof of Residency*'}</Text></TouchableOpacity><ErrorMessage error={errors.proof_of_residency_base64} />
                     {formData.proof_of_residency_base64 && !errors.proof_of_residency_base64 && <Text style={styles.fileNameText}>Proof selected.</Text>}
@@ -317,8 +332,11 @@ export default function SignupScreen() {
                     {(headAge === null || headAge >= 60) && <ToggleSection label="Are you a Senior Citizen?" value={formData.is_senior_citizen} onValueChange={(v:boolean) => handleInputChange('is_senior_citizen', v)} idLabel="Senior Citizen ID*" idValue={formData.senior_citizen_id} onIdChange={(v:string) => handleInputChange('senior_citizen_id', v)} error={errors.senior_citizen_id} proofLabel="Upload Senior Citizen Card*" proofValue={formData.senior_citizen_card_base64} onProofPress={() => pickImage('senior_citizen_card_base64', 'head')} />}
 
                     <Text style={styles.sectionTitle}>Account Credentials</Text>
+                    <Text style={styles.label}>Email*</Text>
                     <TextInput style={[styles.textInput, !!errors.email && styles.inputError]} placeholder="Email*" keyboardType="email-address" autoCapitalize="none" value={formData.email} onChangeText={(v) => handleInputChange('email', v)} /><ErrorMessage error={errors.email} />
+                    <Text style={styles.label}>Password*</Text>
                     <View style={[styles.passwordContainer, !!errors.password && styles.inputError]}><TextInput style={styles.passwordInput} placeholder="Password*" secureTextEntry={!showHeadPassword} value={formData.password} onChangeText={(v) => handleInputChange('password', v)} /><TouchableOpacity onPress={() => setShowHeadPassword(!showHeadPassword)} style={styles.eyeIcon}><Ionicons name={showHeadPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#666" /></TouchableOpacity></View><ErrorMessage error={errors.password} />
+                    <Text style={styles.label}>Confirm Password*</Text>
                     <View style={[styles.passwordContainer, !!errors.confirmPassword && styles.inputError]}><TextInput style={styles.passwordInput} placeholder="Confirm Password*" secureTextEntry={!showHeadPassword} value={formData.confirmPassword} onChangeText={(v) => handleInputChange('confirmPassword', v)} /><TouchableOpacity onPress={() => setShowHeadPassword(!showHeadPassword)} style={styles.eyeIcon}><Ionicons name={showHeadPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#666" /></TouchableOpacity></View><ErrorMessage error={errors.confirmPassword} />
                     
                     <Text style={styles.subHeader}>Step 2: Household Members</Text>
@@ -336,16 +354,25 @@ export default function SignupScreen() {
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>{editingMemberIndex !== null ? 'Edit' : 'Add'} Household Member</Text>
                         <ScrollView keyboardShouldPersistTaps="handled">
+                            <Text style={styles.label}>First Name*</Text>
                             <TextInput style={[styles.modalInput, !!memberErrors.first_name && styles.inputError]} placeholder="First Name*" value={currentMember.first_name} onChangeText={(v) => handleMemberInputChange('first_name', v)} /><ErrorMessage error={memberErrors.first_name} />
+                            <Text style={styles.label}>Middle Name*</Text>
                             <TextInput style={styles.modalInput} placeholder="Middle Name" value={currentMember.middle_name} onChangeText={(v) => handleMemberInputChange('middle_name', v)} />
+                            <Text style={styles.label}>Last Name*</Text>
                             <TextInput style={[styles.modalInput, !!memberErrors.last_name && styles.inputError]} placeholder="Last Name*" value={currentMember.last_name} onChangeText={(v) => handleMemberInputChange('last_name', v)} /><ErrorMessage error={memberErrors.last_name} />
+                            <Text style={styles.label}>Date of Birth*</Text>
                             <TouchableOpacity style={[styles.datePickerButtonModal, !!memberErrors.date_of_birth && styles.inputError]} onPress={() => showDatePicker('member')}><Text style={currentMember.date_of_birth ? styles.datePickerButtonText : styles.datePickerPlaceholderText}>{currentMember.date_of_birth || 'Date of Birth*'}</Text></TouchableOpacity><ErrorMessage error={memberErrors.date_of_birth} />
-                            <View style={[styles.pickerWrapperSmall, !!memberErrors.relationship_to_head && styles.inputError]}><Picker selectedValue={currentMember.relationship_to_head} onValueChange={(v) => handleMemberInputChange('relationship_to_head', v)}><Picker.Item label="Child" value="Child" /><Picker.Item label="Spouse" value="Spouse" /><Picker.Item label="Parent" value="Parent" /><Picker.Item label="Sibling" value="Sibling" /><Picker.Item label="Other Relative" value="Other Relative" /><Picker.Item label="House Helper" value="House Helper" /><Picker.Item label="Other" value="Other" /></Picker></View><ErrorMessage error={memberErrors.relationship_to_head} />
+                            <Text style={styles.label}>Relationship to Head</Text>
+                            <View style={[styles.pickerWrapperSmall, !!memberErrors.relationship_to_head && styles.inputError]}><Picker selectedValue={currentMember.relationship_to_head} onValueChange={(v) => handleMemberInputChange('relationship_to_head', v)}><Picker.Item label="Select Relationship*" value="" enabled={false} /><Picker.Item label="Child" value="Child" /><Picker.Item label="Spouse" value="Spouse" /><Picker.Item label="Parent" value="Parent" /><Picker.Item label="Sibling" value="Sibling" /><Picker.Item label="Other Relative" value="Other Relative" /><Picker.Item label="House Helper" value="House Helper" /><Picker.Item label="Other" value="Other" /></Picker></View><ErrorMessage error={memberErrors.relationship_to_head} />
                             {currentMember.relationship_to_head === 'Other' && (<><TextInput style={[styles.modalInput, !!memberErrors.other_relationship && styles.inputError]} placeholder="Please specify relationship*" value={currentMember.other_relationship} onChangeText={(v) => handleMemberInputChange('other_relationship', v)} /><ErrorMessage error={memberErrors.other_relationship} /></>)}
-                            <View style={styles.pickerWrapperSmall}><Picker selectedValue={currentMember.sex} onValueChange={(v) => handleMemberInputChange('sex', v)}><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View>
-                            <View style={styles.pickerWrapperSmall}><Picker selectedValue={currentMember.civil_status} onValueChange={(v) => handleMemberInputChange('civil_status', v)}><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View>
+                            <Text style={styles.label}>Sex</Text>
+                            <View style={styles.pickerWrapperSmall}><Picker selectedValue={currentMember.sex} onValueChange={(v) => handleMemberInputChange('sex', v)}><Picker.Item label="Select Sex*" value="" enabled={false} /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View>
+                            <Text style={styles.label}>Civil Status</Text>
+                            <View style={styles.pickerWrapperSmall}><Picker selectedValue={currentMember.civil_status} onValueChange={(v) => handleMemberInputChange('civil_status', v)}><Picker.Item label="Select Civil Status*" value="" enabled={false} /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View>
+                            <Text style={styles.label}>Citizenship</Text>
                             <TextInput style={[styles.modalInput, !!memberErrors.citizenship && styles.inputError]} placeholder="Citizenship*" value={currentMember.citizenship} onChangeText={(v) => handleMemberInputChange('citizenship', v)} /><ErrorMessage error={memberErrors.citizenship} />
-                            <View style={styles.pickerWrapperSmall}><Picker selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)}><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View>
+                            <Text style={styles.label}>Occupation Status</Text>
+                            <View style={styles.pickerWrapperSmall}><Picker selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View>
                             <Text style={styles.modalSectionTitle}>Special Classifications</Text>
                             {(memberAge === null || memberAge >= 18) && <ToggleSection label="Is member a registered voter?" value={currentMember.is_voter} onValueChange={(v:boolean) => handleMemberInputChange('is_voter', v)} idLabel="Voter ID Number" idValue={currentMember.voter_id_number} onIdChange={(v:string) => handleMemberInputChange('voter_id_number', v)} error={memberErrors.voter_id_number} proofLabel="Upload Voter's Proof" proofValue={currentMember.voter_registration_proof_base64} onProofPress={() => pickImage('voter_registration_proof_base64', 'member')} />}
                             <ToggleSection label="Is member a PWD?" value={currentMember.is_pwd} onValueChange={(v:boolean) => handleMemberInputChange('is_pwd', v)} idLabel="PWD ID Number*" idValue={currentMember.pwd_id} onIdChange={(v:string) => handleMemberInputChange('pwd_id', v)} error={memberErrors.pwd_id} proofLabel="Upload PWD Card*" proofValue={currentMember.pwd_card_base64} onProofPress={() => pickImage('pwd_card_base64', 'member')} />
@@ -421,5 +448,11 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: -10, // Pulls the error message up closer to the input field
         marginBottom: 10, // Ensures space before the next element
+    },
+    label: {
+        fontSize: 16,
+        color: '#333',
+        fontWeight: '500',
+        paddingBottom: 5, // Added this line
     },
 });
