@@ -20,7 +20,7 @@ import {
     View,
 } from 'react-native';
 
-const STATUSES = ["All", "Pending", "Processing", "Ready for Pickup", "Released", "Declined"];
+const STATUSES = ["All", "Pending", "Follow up", "Processing", "Ready for Pickup", "Released", "Declined"];
 
 const MyRequestedDocumentsScreen = () => {
     const router = useRouter();
@@ -70,7 +70,7 @@ const MyRequestedDocumentsScreen = () => {
             const params: any = {
                 // The API can be hit or miss with this param, so we keep client-side filtering
                 byResidentId: userData._id,
-                sortBy: 'created_at',
+                sortBy: 'date_of_request',
                 sortOrder: 'desc',
             };
 

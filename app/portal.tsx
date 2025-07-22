@@ -1,8 +1,8 @@
 // import { Picker } from '@react-native-picker/picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Import the custom API request handler
@@ -22,13 +22,27 @@ export default function Index() {
 
   const [user, setUser] = useState(null);
   const [officials, setOfficials] = useState<Official[]>([]);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+
+  const fetchNotifications = useCallback(async () => {
+    if (user?._id) {
+      const path = `/api/residents/${user._id}/notifications`;
+      const data = await apiRequest('get', path, null);
+      if (data && data.unreadCount > 0) {
+        setHasUnreadNotifications(true);
+      } else {
+        setHasUnreadNotifications(false);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
         const userData = await AsyncStorage.getItem('userData');
         if (userData) {
-          setUser(JSON.parse(userData));
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
         }
       } catch (error) {
         console.error('Error getting user data from AsyncStorage:', error);
@@ -50,7 +64,13 @@ export default function Index() {
 
     getUserData();
     fetchOfficials();
-  }, [])
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchNotifications();
+    }, [fetchNotifications])
+  );
   
 
   const comingSoon = () => {
@@ -103,7 +123,7 @@ export default function Index() {
       }}>
         <Image style={{ height: 50, width: 130, objectFit: 'contain' }} source={require('@/assets/images/logo-name.png')} />
         <TouchableOpacity onPress={() => router.push('/notification')}>
-          <Image style={{ height: 30, objectFit: 'contain', width: 30 }} source={require('@/assets/images/notification.png')} />
+          <Image style={{ height: 30, objectFit: 'contain', width: 30 }} source={hasUnreadNotifications ? require('@/assets/images/notification-red.png') : require('@/assets/images/notification.png')} />
         </TouchableOpacity>
       </View>
 

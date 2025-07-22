@@ -130,9 +130,8 @@ const ViewNotificationScreen = () => {
                 // Automatically mark as read if residentId is known and status wasn't 'read'
                 if (residentId && fetchedNotificationData._id && initialReadStatusForUser !== 'read') {
                     try {
-                        await apiRequest('PATCH', `/api/residents/${residentId}/notifications/mark-read`, {
-                            notification_ids: [fetchedNotificationData._id],
-                            read: true,
+                        await apiRequest('PATCH', `/api/notifications/${fetchedNotificationData._id}/mark-as-read`, {
+                            resident_id: residentId,
                         });
                         // Optimistically update the local state for immediate UI feedback
                         setNotification(prev => prev ? {

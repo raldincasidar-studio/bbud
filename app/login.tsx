@@ -55,7 +55,7 @@ export default function LoginScreen() { // Renamed component
         Alert.alert('Login Failed', response.message);
       } else {
         // Should not happen if API is correctly implemented to require OTP
-        Alert.alert('Login Failed', 'An unexpected response was received from the server.');
+        // Alert.alert('Login Failed', 'An unexpected response was received from the server.');
       }
     } catch (error: any) {
       console.error('Initial Login API error:', error);
