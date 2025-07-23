@@ -5,10 +5,10 @@ import { Alert } from 'react-native';
 // Axios instance with base URL
 const apiClient = axios.create({
   // baseURL: 'https://b-bud-new.vercel.app', // Update with your actual API URL
-  baseURL: 'https://4d88f73ea952.ngrok-free.app', // Update with your actual API URL
+  baseURL: 'https://014359daa0d0.ngrok-free.app', // Update with your actual API URL
 });
 
-export default async function apiRequest(method, path, data) {
+export default async function apiRequest(method, path, data, config = {}) {
   try {
     // Retrieve user data from AsyncStorage
     const userData = await AsyncStorage.getItem('userData');
@@ -20,6 +20,7 @@ export default async function apiRequest(method, path, data) {
       method,
       url: path,
       data: data,
+      ...config, // Spread the config object here
     });
 
     return response.data;
