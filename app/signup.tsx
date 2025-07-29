@@ -103,6 +103,7 @@ export default function SignupScreen() {
     const [showHeadPassword, setShowHeadPassword] = useState(false);
     const [showMemberPassword, setShowMemberPassword] = useState(false);
 
+
     const validateField = (fieldName: keyof Head | keyof Member, value: any, state: Head | Member, allMembers: Member[] = [], headEmail: string = '', editingIndex: number | null = null) => {
         let error = '';
         // Helper validation functions
@@ -225,15 +226,28 @@ export default function SignupScreen() {
 
     const pickImage = async (field: keyof Head | keyof Member, target: 'head' | 'member') => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') { Alert.alert('Permission Denied', 'Camera roll permissions are required.'); return; }
-        let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [4, 3], quality: 0.5, base64: true });
-        if (!result.canceled && result.assets?.[0]?.base64) {
-            const base64 = `data:image/jpeg;base64,${result.assets[0].base64}`;
-            if (target === 'head') { handleInputChange(field as keyof Head, base64); } 
-            else { handleMemberInputChange(field as keyof Member, base64); }
+        if (status !== 'granted') {
+            Alert.alert('Permission Denied', 'Camera roll permissions are required.');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: false, // Changed to false to remove cropping
+            quality: 0.8,
+            base64: true,
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0 && result.assets[0].base64) {
+            const data = `data:image/jpeg;base64,${result.assets[0].base64}`;
+            if (target === 'head') {
+                handleInputChange(field as keyof Head, data);
+            } else {
+                handleMemberInputChange(field as keyof Member, data);
+            }
         }
     };
-    
+
     const handleSaveMember = () => {
         const fieldsToValidate: (keyof Member)[] = [
             'first_name', 'last_name', 'date_of_birth', 'relationship_to_head', 'other_relationship',
@@ -429,6 +443,7 @@ export default function SignupScreen() {
                 </View>
                 </KeyboardAvoidingView>
             </Modal>
+
         </KeyboardAvoidingView>
     );
 }
@@ -481,7 +496,6 @@ const styles = StyleSheet.create({
     modalButtonText: { color: 'white', fontWeight: 'bold', fontSize: 15 },
     signUpButton: { backgroundColor: '#0F00D7', paddingVertical: 16, borderRadius: 8, alignItems: 'center', marginTop: 30, marginBottom: 15, elevation: 3 },
     signUpButtonText: { color: 'white', fontSize: 17, fontWeight: 'bold' },
-    // Validation Styles
     inputError: {
         borderColor: '#D32F2F',
     },
