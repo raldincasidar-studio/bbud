@@ -220,14 +220,14 @@ export default function Index() {
         </TouchableOpacity>
 
         {/* Budget */}
-        {/* <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
+        <TouchableOpacity onPress={ comingSoon } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
             <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/budget.png')} />
             <Text style={{
               fontSize: 12,
               textAlign: 'center',
               color: 'black',
             }}>Budget</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
           
       {/* --- START: BARANGAY OFFICIALS SLIDER --- */}
