@@ -179,7 +179,7 @@ export default function SettingsScreen() {
             return;
         }
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: false,
             aspect: [4, 3], quality: 0.5, base64: true,
         });
 
