@@ -106,15 +106,17 @@ const BudgetScreen = () => {
 
     // --- Render Functions ---
     const renderItem = ({ item }: { item: BudgetItem }) => (
-        <View style={styles.itemContainer}>
+        <View style={[styles.itemContainer, { paddingRight: 20, paddingLeft: 30}]}>
             <Text style={styles.itemName} numberOfLines={1}>{item.budgetName}</Text>
             <Text style={styles.itemAmount}>{formatCurrency(item.amount)}</Text>
         </View>
     );
 
     const renderSectionHeader = ({ section }: { section: BudgetSection }) => (
-        <View style={styles.sectionHeaderContainer}>
-            <Text style={styles.sectionHeaderText} numberOfLines={1}>{section.title}</Text>
+        <View style={[styles.sectionHeaderContainer, { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }]}>
+            <Text style={[styles.sectionHeaderText, { color: 'black' }]} ellipsizeMode="tail">
+                {section.title}
+            </Text>
             <Text style={styles.sectionHeaderTotal}>{formatCurrency(section.subTotal)}</Text>
         </View>
     );
@@ -144,6 +146,7 @@ const BudgetScreen = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            {/* Navbar */}
             <View style={styles.navbar}>
                 <TouchableOpacity onPress={() => router.back()}>
                     <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
@@ -152,6 +155,8 @@ const BudgetScreen = () => {
                 <View style={{width: 28}} />
             </View>
 
+
+            
             <SectionList
                 sections={sections}
                 keyExtractor={item => item._id}
@@ -163,9 +168,9 @@ const BudgetScreen = () => {
                     <Text style={styles.mainTitle}>Budget Management</Text>
                 )}
                 ListFooterComponent={() => (
-                    <View style={styles.footerContainer}>
-                        <Text style={styles.totalLabel}>Total Expenditures</Text>
-                        <Text style={styles.totalAmount}>P {formatCurrency(totalExpenditures)}</Text>
+                    <View style={[styles.footerContainer, { flex: 1, justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row' }]}>
+                        <Text style={[styles.totalLabel, { color: '#0F00D7'}]}>Total Expenditures</Text>
+                        <Text style={[styles.totalAmount, { color: '#0F00D7'}]}>P {formatCurrency(totalExpenditures)}</Text>
                     </View>
                 )}
                 stickySectionHeadersEnabled={false}
