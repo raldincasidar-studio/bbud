@@ -50,7 +50,7 @@ const AllComplaintsScreen = () => {
                 return;
             }
 
-            const response = await apiRequest('GET', `/api/complaints/by-resident/${residentId}`, {
+            const response = await apiRequest('GET', `/api/complaints/by-resident/${residentId}`, null, {
                 params: {
                     search: searchTerm,
                     page: page,
@@ -133,7 +133,7 @@ const AllComplaintsScreen = () => {
             <View style={styles.itemContent}>
                 <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Ref #:</Text>
-                    <Text style={styles.detailValue}>{item._id}</Text>
+                    <Text style={styles.detailValue}>#{item.ref_no}</Text>
                 </View>
                 <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Against:</Text>
