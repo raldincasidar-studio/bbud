@@ -1,0 +1,939 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:1:1-35:12
+MERGED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:1:1-35:12
+INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+MERGED from [:react-native-community_datetimepicker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-community\datetimepicker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-9:12
+MERGED from [:react-native-gesture-handler] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-gesture-handler\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:react-native-safe-area-context] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-safe-area-context\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:react-native-screens] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-screens\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-19:12
+MERGED from [:react-native-async-storage_async-storage] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-async-storage\async-storage\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:react-native-picker_picker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-picker\picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:react-native-reanimated] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-reanimated\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:react-native-sweet-alert] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-sweet-alert\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-10:12
+MERGED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-32:12
+MERGED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-24:12
+MERGED from [:expo-dev-menu-interface] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu-interface\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-18:12
+MERGED from [:expo-updates] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-9:12
+MERGED from [host.exp.exponent:expo.modules.font:13.3.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e32cb99331b88b4b124539c8026e7695\transformed\expo.modules.font-13.3.2\AndroidManifest.xml:2:1-7:12
+MERGED from [host.exp.exponent:expo.modules.splashscreen:0.30.10] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a765a3a686a063bde613fd3e43950728\transformed\expo.modules.splashscreen-0.30.10\AndroidManifest.xml:2:1-7:12
+MERGED from [host.exp.exponent:expo.modules.systemui:5.0.10] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cc96fd017de12feb66b97e97f76f9a9f\transformed\expo.modules.systemui-5.0.10\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:2:1-24:12
+MERGED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:2:1-15:12
+MERGED from [com.google.android.material:material:1.12.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1d897894ff502f281fbe03c47444295c\transformed\material-1.12.0\AndroidManifest.xml:17:1-24:12
+MERGED from [:expo-structured-headers] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-structured-headers\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:2:1-57:12
+MERGED from [androidx.core:core-splashscreen:1.2.0-alpha02] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\bbecd9188288303fd4e7e2cfd938f39b\transformed\core-splashscreen-1.2.0-alpha02\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4afd1c3db41710cf11635c0b70e524dc\transformed\appcompat-resources-1.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c2743d13801e0672f4c78c3641a0553e\transformed\constraintlayout-2.0.1\AndroidManifest.xml:2:1-11:12
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:2:1-36:12
+MERGED from [androidx.appcompat:appcompat:1.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3b8c969b5ad5d0cac11856ad6347b423\transformed\appcompat-1.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\da585c603839531e847d64d53e7cecfd\transformed\viewpager2-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\56a57cf6309612e6b5a0630847b255c8\transformed\lifecycle-extensions-2.2.0\AndroidManifest.xml:17:1-27:12
+MERGED from [:expo-image-loader] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-image-loader\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [com.github.bumptech.glide:glide:4.16.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3db365379561edf2a20a6b80a88c8b36\transformed\glide-4.16.0\AndroidManifest.xml:2:1-9:12
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:2:1-33:12
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3e35040f19b7c61466d96457d1b02e60\transformed\legacy-support-v4-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.fragment:fragment:1.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d26434a2ab4a7ed4f5d7529f7e76babc\transformed\fragment-1.6.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.fragment:fragment-ktx:1.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f0b1d1a33cf09eb2c8456b9d163a5ea3\transformed\fragment-ktx-1.6.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1458bc95224dd393b6e7a4f8e0c2a37c\transformed\legacy-support-core-ui-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5e0d71681c49cf05068ae8bfd28e30fe\transformed\coordinatorlayout-1.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6eff62e6141b220da32ec6b2faaa560d\transformed\swiperefreshlayout-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.webkit:webkit:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\dc4ce68418f729639b25401769c6ba8c\transformed\webkit-1.4.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.autofill:autofill:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\72031ec9ff8607549c238140607b39e7\transformed\autofill-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [com.facebook.fresco:animated-gif:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\430a22ec655dfc79576d92ce18d49907\transformed\animated-gif-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:webpsupport:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0dc23c716fe33fe478d020648ee43104\transformed\webpsupport-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:fresco:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3adc4244f834e715586680bfb9d89c89\transformed\fresco-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:imagepipeline-okhttp3:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a699530cd25864bfe63660d827ec9dad\transformed\imagepipeline-okhttp3-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:animated-base:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b30f5f5f82da2f6d98a2ad1d2a7764f9\transformed\animated-base-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:animated-drawable:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\91f29fa7424ba8296ef3b3c1f0f77f54\transformed\animated-drawable-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:vito-options:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a920b2621642a69fa0f87d078a7b6c73\transformed\vito-options-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:drawee:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\60c5b81c3c2bae3b77533d2c0ac023fe\transformed\drawee-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:nativeimagefilters:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7120fab884905f2c58cfb0d083b45bf1\transformed\nativeimagefilters-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:memory-type-native:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b91d028a1640b705dade26a50dd85adf\transformed\memory-type-native-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:memory-type-java:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\250e3a5b0059b78642147d6ba5fba990\transformed\memory-type-java-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:imagepipeline-native:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5f7c628f381e42b29147c16fc572f336\transformed\imagepipeline-native-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:memory-type-ashmem:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6fd1cd05ee24a9047886defb0510fc8a\transformed\memory-type-ashmem-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:imagepipeline:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f64ad7befb984e78355e87f3c2766e4e\transformed\imagepipeline-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:nativeimagetranscoder:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f16b0ab931af52a933299cbdef651a65\transformed\nativeimagetranscoder-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:imagepipeline-base:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b75536e59c6afd8addf0b0d1d187ab80\transformed\imagepipeline-base-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:urimod:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1eeffeb75813354b21991391c6d52a4c\transformed\urimod-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:vito-source:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1990ba7adacf31901688c23a8d70288b\transformed\vito-source-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:middleware:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\66e511964242e2337e04a5c19b22098f\transformed\middleware-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:ui-common:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4bc079764411fa90f67a0e9b9d03e785\transformed\ui-common-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:soloader:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b9f237178029748d96ba9a76f5851a8c\transformed\soloader-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.fresco:fbcore:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\63cfaaae7cac3254142dbb3a18a5864b\transformed\fbcore-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.transition:transition:1.5.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\709095dfb4dfbcacd3586f97603ff988\transformed\transition-1.5.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\51b36bf7e9cfb1d07cf68a2142e9241a\transformed\drawerlayout-1.1.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0e11666aa878886fd6d70c228e3f0489\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\ca8d3547787bb9760c33d8af2b25ee73\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\adb7acd2d6a655a874c2db5797a763bb\transformed\vectordrawable-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.browser:browser:1.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\197f4d3c6a246d5602f6565570c461f3\transformed\browser-1.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\26dbc0f8b687e13ec351610ff775b47d\transformed\emoji2-views-helper-1.3.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\01ac4d67ae5d67a61234a5646f9690cf\transformed\recyclerview-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\614bdefefbc7f4a862843dcd823b2b11\transformed\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\618feab527c1f6832b2536ec9799a27f\transformed\slidingpanelayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e915ca7fc11ce9ac0372dea594404111\transformed\customview-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c1be424d5d31268b35589474aad567e5\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media:media:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3708cebbe0a84f5bc847076ddb1dd475\transformed\media-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\275e925e72894b202bef58988009e58e\transformed\loader-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2d6e5aaf2716cd9c4b1bd1f07b1daf1c\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.activity:activity-ktx:1.10.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d8e01666433178221d1378f5e470ac4c\transformed\activity-ktx-1.10.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity:1.10.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2bbaf47923dd2a0a2ed88f75d7f074ec\transformed\activity-1.10.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4e3c50cf7f87c1468c2b6d6a7c1da0b6\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\de4f650f177a84b437c7a2af1c76f2a5\transformed\savedstate-1.2.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2869b87c574e0e2e740aed8ba6899f7d\transformed\lifecycle-viewmodel-ktx-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0e4a02e66987bc05bae85bf2bcfd124a\transformed\lifecycle-viewmodel-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\96ecfa0080deb2ef02415a7c5347c569\transformed\lifecycle-service-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3f2a9705f77611c0df4335c5cb4d84f3\transformed\lifecycle-runtime-ktx-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e4512b66a4f005d916f40f63c206643e\transformed\lifecycle-livedata-core-ktx-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f32cf5d33589855dd75ff18b78d12498\transformed\lifecycle-livedata-core-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\86b470b60d2de2c4c24e1ec0e2b176c4\transformed\lifecycle-livedata-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9c3ce914b1084d49a096c64862efe6c2\transformed\lifecycle-runtime-2.6.2\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d5cc9a1945faf3c84df69aa415c280db\transformed\lifecycle-viewmodel-savedstate-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\47df81dfe4062fa2d74fb9179c617559\transformed\core-ktx-1.13.1\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-constants] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-constants\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-dev-client] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-client\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [host.exp.exponent:expo.modules.insights:0.9.3] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3d7ac0cfbc336271cec7d7c1fae37547\transformed\expo.modules.insights-0.9.3\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-eas-client] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-eas-client\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-image-manipulator] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-image-manipulator\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-manifests] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-manifests\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-json-utils] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-json-utils\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:expo-updates-interface] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates-interface\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [expo.modules.asset:expo.modules.asset:11.1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b91d6cd2649ff0320a22c3c69bbb6e09\transformed\expo.modules.asset-11.1.7\AndroidManifest.xml:2:1-7:12
+MERGED from [host.exp.exponent:expo.modules.blur:14.1.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0dfeac864276a639a9ff1dff3c873fcd\transformed\expo.modules.blur-14.1.5\AndroidManifest.xml:2:1-7:12
+MERGED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:2:1-20:12
+MERGED from [host.exp.exponent:expo.modules.haptics:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f995fb03b0a4f7b444fac6a227e2d25e\transformed\expo.modules.haptics-14.1.4\AndroidManifest.xml:2:1-9:12
+MERGED from [host.exp.exponent:expo.modules.keepawake:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b9994b356a34c4a57287dd07589e5970\transformed\expo.modules.keepawake-14.1.4\AndroidManifest.xml:2:1-7:12
+MERGED from [host.exp.exponent:expo.modules.linking:7.1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b2c3636f10d2cadb9060d85c1e072910\transformed\expo.modules.linking-7.1.7\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c1d71c77fc4479fbb2d66cbd03adf980\transformed\room-ktx-2.6.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6f681676beacc0bbfa3c136ec3992497\transformed\startup-runtime-1.1.1\AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\eac9cbfd558fce07d7713c9cdc1229e9\transformed\tracing-1.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.tracing:tracing-ktx:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5134967f271c5da3138360e377a67109\transformed\tracing-ktx-1.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.facebook.fresco:ui-core:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\42a6961bd7b73287458b7932bbca9f2f\transformed\ui-core-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\02d4548bb96705f5d59de416ed653a70\transformed\annotation-experimental-1.4.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7b2be68fca67dc2be63b2794023aa2bf\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cd96bc284dba3662bd335148df50712c\transformed\sqlite-2.4.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.facebook.fresco:vito-renderer:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\256dd42150880d3ebbb9535282b98bb1\transformed\vito-renderer-3.6.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.react:hermes-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3ec862d63fdddbd4f01d7183afe68cc6\transformed\hermes-android-0.79.5-debug\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d38a7d6d68985661f377ff1e9aee0aec\transformed\cardview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.databinding:viewbinding:8.8.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\37c0db100a3fdbe8f12427a1a2d2a1c4\transformed\viewbinding-8.8.2\AndroidManifest.xml:2:1-7:12
+MERGED from [com.github.Dimezis:BlurView:version-2.0.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9d959df6397bba11a55a2acf33e809e3\transformed\BlurView-version-2.0.6\AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\866b075e66bd79eb0a27c74ec4917271\transformed\exifinterface-1.3.7\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cc02a20caf83c0d069fae58ea1dd5189\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\831ea9c9c7fba5e56d8643c5ead74760\transformed\cursoradapter-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\fa4975f7d8621466f40ebbb01bf2931a\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
+MERGED from [com.github.bumptech.glide:gifdecoder:4.16.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\caf5ea8534e6bba60515ecb24305a76a\transformed\gifdecoder-4.16.0\AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7cfee4fcac3d9ba410968c52a5d1d76c\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\44cb1c29d99094fc16d9d192d7f89adf\transformed\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085b7a4959a908c71316ca2e6145c9c2\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\329539f5f59ff6c9ce99bff35bd34b77\transformed\print-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.github.f0ris.sweetalert:library:1.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\48bf79438d8285d7415d4ac7840863fd\transformed\library-1.6.2\AndroidManifest.xml:2:1-13:12
+MERGED from [com.facebook.fbjni:fbjni:0.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2a9b8162c1a6cb37e3240286c567bff3\transformed\fbjni-0.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:2:1-17:12
+MERGED from [com.pnikosis:materialish-progress:1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9477da32fd6e3e10ef62a8b218037e05\transformed\materialish-progress-1.7\AndroidManifest.xml:2:1-13:12
+	package
+		INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+	xmlns:tools
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:1:70-116
+	android:versionCode
+		INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:1:11-69
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:2:3-64
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:8:5-67
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:8:5-67
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:2:20-62
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:3:3-77
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:12:5-80
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:12:5-80
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:10:5-80
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:10:5-80
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:3:20-75
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:4:3-68
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:4:20-66
+uses-permission#android.permission.SYSTEM_ALERT_WINDOW
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:5:3-75
+MERGED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:5:3-75
+MERGED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:5:3-75
+MERGED from [:react-native-sweet-alert] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-sweet-alert\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-78
+MERGED from [:react-native-sweet-alert] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-sweet-alert\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-78
+MERGED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:16:5-78
+MERGED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:16:5-78
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:5:20-73
+uses-permission#android.permission.VIBRATE
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:6:3-63
+MERGED from [host.exp.exponent:expo.modules.haptics:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f995fb03b0a4f7b444fac6a227e2d25e\transformed\expo.modules.haptics-14.1.4\AndroidManifest.xml:7:5-66
+MERGED from [host.exp.exponent:expo.modules.haptics:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f995fb03b0a4f7b444fac6a227e2d25e\transformed\expo.modules.haptics-14.1.4\AndroidManifest.xml:7:5-66
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:6:20-61
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:7:3-78
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:11:5-81
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:11:5-81
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:9:5-81
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:9:5-81
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:7:20-76
+queries
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:8:3-14:13
+MERGED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-9:15
+MERGED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-9:15
+MERGED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:7:5-13:15
+MERGED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:7:5-13:15
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:14:5-25:15
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:14:5-25:15
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:7:5-18:15
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:7:5-18:15
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:12:5-18:15
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:12:5-18:15
+MERGED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:7:5-18:15
+MERGED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:7:5-18:15
+intent#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+data:scheme:https
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:9:5-13:14
+action#android.intent.action.VIEW
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:7-58
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:15-56
+category#android.intent.category.BROWSABLE
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:7-67
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:17-65
+data
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+	android:scheme
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:13-35
+application
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:3-34:17
+MERGED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:3-34:17
+MERGED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:3-34:17
+INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:6:5-162
+MERGED from [:react-native-community_datetimepicker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-community\datetimepicker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-20
+MERGED from [:react-native-community_datetimepicker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-community\datetimepicker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-20
+MERGED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-17:19
+MERGED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-17:19
+MERGED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-30:19
+MERGED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-30:19
+MERGED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-22:19
+MERGED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-22:19
+MERGED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-16:19
+MERGED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-16:19
+MERGED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:18:5-22:19
+MERGED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:18:5-22:19
+MERGED from [com.google.android.material:material:1.12.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1d897894ff502f281fbe03c47444295c\transformed\material-1.12.0\AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.material:material:1.12.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1d897894ff502f281fbe03c47444295c\transformed\material-1.12.0\AndroidManifest.xml:22:5-20
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:27:5-55:19
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:27:5-55:19
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c2743d13801e0672f4c78c3641a0553e\transformed\constraintlayout-2.0.1\AndroidManifest.xml:9:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c2743d13801e0672f4c78c3641a0553e\transformed\constraintlayout-2.0.1\AndroidManifest.xml:9:5-20
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:20:5-34:19
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:20:5-34:19
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\56a57cf6309612e6b5a0630847b255c8\transformed\lifecycle-extensions-2.2.0\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\56a57cf6309612e6b5a0630847b255c8\transformed\lifecycle-extensions-2.2.0\AndroidManifest.xml:24:5-25:19
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:20:5-31:19
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:20:5-31:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6f681676beacc0bbfa3c136ec3992497\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6f681676beacc0bbfa3c136ec3992497\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [com.github.Dimezis:BlurView:version-2.0.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9d959df6397bba11a55a2acf33e809e3\transformed\BlurView-version-2.0.6\AndroidManifest.xml:9:5-20
+MERGED from [com.github.Dimezis:BlurView:version-2.0.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9d959df6397bba11a55a2acf33e809e3\transformed\BlurView-version-2.0.6\AndroidManifest.xml:9:5-20
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\fa4975f7d8621466f40ebbb01bf2931a\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\fa4975f7d8621466f40ebbb01bf2931a\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [com.github.f0ris.sweetalert:library:1.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\48bf79438d8285d7415d4ac7840863fd\transformed\library-1.6.2\AndroidManifest.xml:11:5-20
+MERGED from [com.github.f0ris.sweetalert:library:1.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\48bf79438d8285d7415d4ac7840863fd\transformed\library-1.6.2\AndroidManifest.xml:11:5-20
+MERGED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:11:5-15:19
+MERGED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:11:5-15:19
+MERGED from [com.pnikosis:materialish-progress:1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9477da32fd6e3e10ef62a8b218037e05\transformed\materialish-progress-1.7\AndroidManifest.xml:11:5-20
+MERGED from [com.pnikosis:materialish-progress:1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9477da32fd6e3e10ef62a8b218037e05\transformed\materialish-progress-1.7\AndroidManifest.xml:11:5-20
+	android:extractNativeLibs
+		INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:221-247
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:221-247
+	android:label
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:48-80
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:48-80
+	tools:ignore
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:6:75-114
+	android:roundIcon
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:116-161
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:116-161
+	tools:targetApi
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:6:54-74
+	android:icon
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:81-115
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:81-115
+	android:allowBackup
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:162-188
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:162-188
+	android:theme
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:189-220
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:189-220
+	tools:replace
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:6:115-159
+	android:usesCleartextTraffic
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:6:18-53
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:16-47
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:16-47
+meta-data#expo.modules.updates.ENABLED
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:16:5-82
+	android:value
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:16:60-80
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:16:16-59
+meta-data#expo.modules.updates.EXPO_RUNTIME_VERSION
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:17:5-119
+	android:value
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:17:73-117
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:17:16-72
+meta-data#expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:18:5-105
+	android:value
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:18:81-103
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:18:16-80
+meta-data#expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:19:5-99
+	android:value
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:19:80-97
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:19:16-79
+meta-data#expo.modules.updates.EXPO_UPDATE_URL
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:20:5-141
+	android:value
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:20:68-139
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:20:16-67
+activity#com.bbud.app.MainActivity
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:5-33:16
+	android:screenOrientation
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:280-316
+	android:launchMode
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:135-166
+	android:windowSoftInputMode
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:167-209
+	android:exported
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:256-279
+	android:configChanges
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:44-134
+	android:theme
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:210-255
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:15-43
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:22:7-25:23
+action#android.intent.action.MAIN
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:23:9-60
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:23:17-58
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:24:9-68
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:24:19-66
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:scheme:exp+bbud+data:scheme:myapp
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:26:7-32:23
+category#android.intent.category.DEFAULT
+ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:9-67
+	android:name
+		ADDED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:19-65
+uses-sdk
+INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+MERGED from [:react-native-community_datetimepicker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-community\datetimepicker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-community_datetimepicker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-community\datetimepicker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-gesture-handler] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-gesture-handler\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-gesture-handler] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-gesture-handler\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-safe-area-context] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-safe-area-context\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-safe-area-context] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-safe-area-context\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-screens] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-screens\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-screens] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-screens\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-async-storage_async-storage] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-async-storage\async-storage\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-async-storage_async-storage] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-async-storage\async-storage\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-picker_picker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-picker\picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-picker_picker] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\@react-native-picker\picker\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-reanimated] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-reanimated\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-reanimated] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-reanimated\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:react-native-sweet-alert] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-sweet-alert\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:react-native-sweet-alert] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-sweet-alert\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-dev-menu-interface] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu-interface\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-dev-menu-interface] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu-interface\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:expo-updates] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-updates] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.font:13.3.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e32cb99331b88b4b124539c8026e7695\transformed\expo.modules.font-13.3.2\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.font:13.3.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e32cb99331b88b4b124539c8026e7695\transformed\expo.modules.font-13.3.2\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.splashscreen:0.30.10] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a765a3a686a063bde613fd3e43950728\transformed\expo.modules.splashscreen-0.30.10\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.splashscreen:0.30.10] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a765a3a686a063bde613fd3e43950728\transformed\expo.modules.splashscreen-0.30.10\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.systemui:5.0.10] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cc96fd017de12feb66b97e97f76f9a9f\transformed\expo.modules.systemui-5.0.10\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.systemui:5.0.10] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cc96fd017de12feb66b97e97f76f9a9f\transformed\expo.modules.systemui-5.0.10\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:10:5-44
+MERGED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:10:5-44
+MERGED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.material:material:1.12.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1d897894ff502f281fbe03c47444295c\transformed\material-1.12.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.12.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1d897894ff502f281fbe03c47444295c\transformed\material-1.12.0\AndroidManifest.xml:20:5-44
+MERGED from [:expo-structured-headers] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-structured-headers\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-structured-headers] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-structured-headers\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:6:5-44
+MERGED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:6:5-44
+MERGED from [androidx.core:core-splashscreen:1.2.0-alpha02] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\bbecd9188288303fd4e7e2cfd938f39b\transformed\core-splashscreen-1.2.0-alpha02\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-splashscreen:1.2.0-alpha02] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\bbecd9188288303fd4e7e2cfd938f39b\transformed\core-splashscreen-1.2.0-alpha02\AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4afd1c3db41710cf11635c0b70e524dc\transformed\appcompat-resources-1.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4afd1c3db41710cf11635c0b70e524dc\transformed\appcompat-resources-1.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c2743d13801e0672f4c78c3641a0553e\transformed\constraintlayout-2.0.1\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c2743d13801e0672f4c78c3641a0553e\transformed\constraintlayout-2.0.1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat:1.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3b8c969b5ad5d0cac11856ad6347b423\transformed\appcompat-1.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat:1.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3b8c969b5ad5d0cac11856ad6347b423\transformed\appcompat-1.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\da585c603839531e847d64d53e7cecfd\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\da585c603839531e847d64d53e7cecfd\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\56a57cf6309612e6b5a0630847b255c8\transformed\lifecycle-extensions-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\56a57cf6309612e6b5a0630847b255c8\transformed\lifecycle-extensions-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [:expo-image-loader] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-image-loader\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-image-loader] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-image-loader\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [com.github.bumptech.glide:glide:4.16.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3db365379561edf2a20a6b80a88c8b36\transformed\glide-4.16.0\AndroidManifest.xml:5:5-7:41
+MERGED from [com.github.bumptech.glide:glide:4.16.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3db365379561edf2a20a6b80a88c8b36\transformed\glide-4.16.0\AndroidManifest.xml:5:5-7:41
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:6:5-44
+MERGED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:6:5-44
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3e35040f19b7c61466d96457d1b02e60\transformed\legacy-support-v4-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3e35040f19b7c61466d96457d1b02e60\transformed\legacy-support-v4-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d26434a2ab4a7ed4f5d7529f7e76babc\transformed\fragment-1.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d26434a2ab4a7ed4f5d7529f7e76babc\transformed\fragment-1.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment-ktx:1.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f0b1d1a33cf09eb2c8456b9d163a5ea3\transformed\fragment-ktx-1.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment-ktx:1.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f0b1d1a33cf09eb2c8456b9d163a5ea3\transformed\fragment-ktx-1.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1458bc95224dd393b6e7a4f8e0c2a37c\transformed\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1458bc95224dd393b6e7a4f8e0c2a37c\transformed\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5e0d71681c49cf05068ae8bfd28e30fe\transformed\coordinatorlayout-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5e0d71681c49cf05068ae8bfd28e30fe\transformed\coordinatorlayout-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6eff62e6141b220da32ec6b2faaa560d\transformed\swiperefreshlayout-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6eff62e6141b220da32ec6b2faaa560d\transformed\swiperefreshlayout-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.webkit:webkit:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\dc4ce68418f729639b25401769c6ba8c\transformed\webkit-1.4.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.webkit:webkit:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\dc4ce68418f729639b25401769c6ba8c\transformed\webkit-1.4.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.autofill:autofill:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\72031ec9ff8607549c238140607b39e7\transformed\autofill-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.autofill:autofill:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\72031ec9ff8607549c238140607b39e7\transformed\autofill-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [com.facebook.fresco:animated-gif:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\430a22ec655dfc79576d92ce18d49907\transformed\animated-gif-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:animated-gif:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\430a22ec655dfc79576d92ce18d49907\transformed\animated-gif-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:webpsupport:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0dc23c716fe33fe478d020648ee43104\transformed\webpsupport-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:webpsupport:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0dc23c716fe33fe478d020648ee43104\transformed\webpsupport-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:fresco:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3adc4244f834e715586680bfb9d89c89\transformed\fresco-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:fresco:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3adc4244f834e715586680bfb9d89c89\transformed\fresco-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline-okhttp3:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a699530cd25864bfe63660d827ec9dad\transformed\imagepipeline-okhttp3-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline-okhttp3:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a699530cd25864bfe63660d827ec9dad\transformed\imagepipeline-okhttp3-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:animated-base:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b30f5f5f82da2f6d98a2ad1d2a7764f9\transformed\animated-base-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:animated-base:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b30f5f5f82da2f6d98a2ad1d2a7764f9\transformed\animated-base-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:animated-drawable:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\91f29fa7424ba8296ef3b3c1f0f77f54\transformed\animated-drawable-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:animated-drawable:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\91f29fa7424ba8296ef3b3c1f0f77f54\transformed\animated-drawable-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:vito-options:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a920b2621642a69fa0f87d078a7b6c73\transformed\vito-options-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:vito-options:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a920b2621642a69fa0f87d078a7b6c73\transformed\vito-options-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:drawee:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\60c5b81c3c2bae3b77533d2c0ac023fe\transformed\drawee-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:drawee:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\60c5b81c3c2bae3b77533d2c0ac023fe\transformed\drawee-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:nativeimagefilters:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7120fab884905f2c58cfb0d083b45bf1\transformed\nativeimagefilters-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:nativeimagefilters:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7120fab884905f2c58cfb0d083b45bf1\transformed\nativeimagefilters-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:memory-type-native:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b91d028a1640b705dade26a50dd85adf\transformed\memory-type-native-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:memory-type-native:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b91d028a1640b705dade26a50dd85adf\transformed\memory-type-native-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:memory-type-java:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\250e3a5b0059b78642147d6ba5fba990\transformed\memory-type-java-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:memory-type-java:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\250e3a5b0059b78642147d6ba5fba990\transformed\memory-type-java-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline-native:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5f7c628f381e42b29147c16fc572f336\transformed\imagepipeline-native-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline-native:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5f7c628f381e42b29147c16fc572f336\transformed\imagepipeline-native-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:memory-type-ashmem:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6fd1cd05ee24a9047886defb0510fc8a\transformed\memory-type-ashmem-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:memory-type-ashmem:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6fd1cd05ee24a9047886defb0510fc8a\transformed\memory-type-ashmem-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f64ad7befb984e78355e87f3c2766e4e\transformed\imagepipeline-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f64ad7befb984e78355e87f3c2766e4e\transformed\imagepipeline-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:nativeimagetranscoder:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f16b0ab931af52a933299cbdef651a65\transformed\nativeimagetranscoder-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:nativeimagetranscoder:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f16b0ab931af52a933299cbdef651a65\transformed\nativeimagetranscoder-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline-base:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b75536e59c6afd8addf0b0d1d187ab80\transformed\imagepipeline-base-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:imagepipeline-base:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b75536e59c6afd8addf0b0d1d187ab80\transformed\imagepipeline-base-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:urimod:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1eeffeb75813354b21991391c6d52a4c\transformed\urimod-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:urimod:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1eeffeb75813354b21991391c6d52a4c\transformed\urimod-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:vito-source:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1990ba7adacf31901688c23a8d70288b\transformed\vito-source-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:vito-source:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\1990ba7adacf31901688c23a8d70288b\transformed\vito-source-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:middleware:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\66e511964242e2337e04a5c19b22098f\transformed\middleware-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:middleware:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\66e511964242e2337e04a5c19b22098f\transformed\middleware-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:ui-common:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4bc079764411fa90f67a0e9b9d03e785\transformed\ui-common-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:ui-common:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4bc079764411fa90f67a0e9b9d03e785\transformed\ui-common-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:soloader:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b9f237178029748d96ba9a76f5851a8c\transformed\soloader-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:soloader:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b9f237178029748d96ba9a76f5851a8c\transformed\soloader-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:fbcore:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\63cfaaae7cac3254142dbb3a18a5864b\transformed\fbcore-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:fbcore:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\63cfaaae7cac3254142dbb3a18a5864b\transformed\fbcore-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.transition:transition:1.5.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\709095dfb4dfbcacd3586f97603ff988\transformed\transition-1.5.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.transition:transition:1.5.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\709095dfb4dfbcacd3586f97603ff988\transformed\transition-1.5.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\51b36bf7e9cfb1d07cf68a2142e9241a\transformed\drawerlayout-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\51b36bf7e9cfb1d07cf68a2142e9241a\transformed\drawerlayout-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0e11666aa878886fd6d70c228e3f0489\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0e11666aa878886fd6d70c228e3f0489\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\ca8d3547787bb9760c33d8af2b25ee73\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\ca8d3547787bb9760c33d8af2b25ee73\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\adb7acd2d6a655a874c2db5797a763bb\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\adb7acd2d6a655a874c2db5797a763bb\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.browser:browser:1.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\197f4d3c6a246d5602f6565570c461f3\transformed\browser-1.6.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\197f4d3c6a246d5602f6565570c461f3\transformed\browser-1.6.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\26dbc0f8b687e13ec351610ff775b47d\transformed\emoji2-views-helper-1.3.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\26dbc0f8b687e13ec351610ff775b47d\transformed\emoji2-views-helper-1.3.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\01ac4d67ae5d67a61234a5646f9690cf\transformed\recyclerview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\01ac4d67ae5d67a61234a5646f9690cf\transformed\recyclerview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\614bdefefbc7f4a862843dcd823b2b11\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\614bdefefbc7f4a862843dcd823b2b11\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\618feab527c1f6832b2536ec9799a27f\transformed\slidingpanelayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\618feab527c1f6832b2536ec9799a27f\transformed\slidingpanelayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e915ca7fc11ce9ac0372dea594404111\transformed\customview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e915ca7fc11ce9ac0372dea594404111\transformed\customview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c1be424d5d31268b35589474aad567e5\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c1be424d5d31268b35589474aad567e5\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3708cebbe0a84f5bc847076ddb1dd475\transformed\media-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3708cebbe0a84f5bc847076ddb1dd475\transformed\media-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\275e925e72894b202bef58988009e58e\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\275e925e72894b202bef58988009e58e\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2d6e5aaf2716cd9c4b1bd1f07b1daf1c\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2d6e5aaf2716cd9c4b1bd1f07b1daf1c\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity-ktx:1.10.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d8e01666433178221d1378f5e470ac4c\transformed\activity-ktx-1.10.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.10.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d8e01666433178221d1378f5e470ac4c\transformed\activity-ktx-1.10.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity:1.10.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2bbaf47923dd2a0a2ed88f75d7f074ec\transformed\activity-1.10.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.10.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2bbaf47923dd2a0a2ed88f75d7f074ec\transformed\activity-1.10.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4e3c50cf7f87c1468c2b6d6a7c1da0b6\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\4e3c50cf7f87c1468c2b6d6a7c1da0b6\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\de4f650f177a84b437c7a2af1c76f2a5\transformed\savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\de4f650f177a84b437c7a2af1c76f2a5\transformed\savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2869b87c574e0e2e740aed8ba6899f7d\transformed\lifecycle-viewmodel-ktx-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2869b87c574e0e2e740aed8ba6899f7d\transformed\lifecycle-viewmodel-ktx-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0e4a02e66987bc05bae85bf2bcfd124a\transformed\lifecycle-viewmodel-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0e4a02e66987bc05bae85bf2bcfd124a\transformed\lifecycle-viewmodel-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\96ecfa0080deb2ef02415a7c5347c569\transformed\lifecycle-service-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\96ecfa0080deb2ef02415a7c5347c569\transformed\lifecycle-service-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3f2a9705f77611c0df4335c5cb4d84f3\transformed\lifecycle-runtime-ktx-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3f2a9705f77611c0df4335c5cb4d84f3\transformed\lifecycle-runtime-ktx-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e4512b66a4f005d916f40f63c206643e\transformed\lifecycle-livedata-core-ktx-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e4512b66a4f005d916f40f63c206643e\transformed\lifecycle-livedata-core-ktx-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f32cf5d33589855dd75ff18b78d12498\transformed\lifecycle-livedata-core-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f32cf5d33589855dd75ff18b78d12498\transformed\lifecycle-livedata-core-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\86b470b60d2de2c4c24e1ec0e2b176c4\transformed\lifecycle-livedata-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\86b470b60d2de2c4c24e1ec0e2b176c4\transformed\lifecycle-livedata-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9c3ce914b1084d49a096c64862efe6c2\transformed\lifecycle-runtime-2.6.2\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9c3ce914b1084d49a096c64862efe6c2\transformed\lifecycle-runtime-2.6.2\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d5cc9a1945faf3c84df69aa415c280db\transformed\lifecycle-viewmodel-savedstate-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d5cc9a1945faf3c84df69aa415c280db\transformed\lifecycle-viewmodel-savedstate-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\47df81dfe4062fa2d74fb9179c617559\transformed\core-ktx-1.13.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\47df81dfe4062fa2d74fb9179c617559\transformed\core-ktx-1.13.1\AndroidManifest.xml:5:5-44
+MERGED from [:expo-constants] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-constants\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-constants] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-constants\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-dev-client] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-client\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-dev-client] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-client\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.insights:0.9.3] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3d7ac0cfbc336271cec7d7c1fae37547\transformed\expo.modules.insights-0.9.3\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.insights:0.9.3] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3d7ac0cfbc336271cec7d7c1fae37547\transformed\expo.modules.insights-0.9.3\AndroidManifest.xml:5:5-44
+MERGED from [:expo-eas-client] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-eas-client\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-eas-client] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-eas-client\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-image-manipulator] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-image-manipulator\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-image-manipulator] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-image-manipulator\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-manifests] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-manifests\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-manifests] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-manifests\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-json-utils] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-json-utils\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-json-utils] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-json-utils\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-updates-interface] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates-interface\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:expo-updates-interface] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates-interface\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [expo.modules.asset:expo.modules.asset:11.1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b91d6cd2649ff0320a22c3c69bbb6e09\transformed\expo.modules.asset-11.1.7\AndroidManifest.xml:5:5-44
+MERGED from [expo.modules.asset:expo.modules.asset:11.1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b91d6cd2649ff0320a22c3c69bbb6e09\transformed\expo.modules.asset-11.1.7\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.blur:14.1.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0dfeac864276a639a9ff1dff3c873fcd\transformed\expo.modules.blur-14.1.5\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.blur:14.1.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\0dfeac864276a639a9ff1dff3c873fcd\transformed\expo.modules.blur-14.1.5\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.haptics:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f995fb03b0a4f7b444fac6a227e2d25e\transformed\expo.modules.haptics-14.1.4\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.haptics:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\f995fb03b0a4f7b444fac6a227e2d25e\transformed\expo.modules.haptics-14.1.4\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.keepawake:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b9994b356a34c4a57287dd07589e5970\transformed\expo.modules.keepawake-14.1.4\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.keepawake:14.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b9994b356a34c4a57287dd07589e5970\transformed\expo.modules.keepawake-14.1.4\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.linking:7.1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b2c3636f10d2cadb9060d85c1e072910\transformed\expo.modules.linking-7.1.7\AndroidManifest.xml:5:5-44
+MERGED from [host.exp.exponent:expo.modules.linking:7.1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b2c3636f10d2cadb9060d85c1e072910\transformed\expo.modules.linking-7.1.7\AndroidManifest.xml:5:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c1d71c77fc4479fbb2d66cbd03adf980\transformed\room-ktx-2.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c1d71c77fc4479fbb2d66cbd03adf980\transformed\room-ktx-2.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6f681676beacc0bbfa3c136ec3992497\transformed\startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6f681676beacc0bbfa3c136ec3992497\transformed\startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\eac9cbfd558fce07d7713c9cdc1229e9\transformed\tracing-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\eac9cbfd558fce07d7713c9cdc1229e9\transformed\tracing-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing-ktx:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5134967f271c5da3138360e377a67109\transformed\tracing-ktx-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing-ktx:1.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5134967f271c5da3138360e377a67109\transformed\tracing-ktx-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [com.facebook.fresco:ui-core:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\42a6961bd7b73287458b7932bbca9f2f\transformed\ui-core-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:ui-core:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\42a6961bd7b73287458b7932bbca9f2f\transformed\ui-core-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\02d4548bb96705f5d59de416ed653a70\transformed\annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\02d4548bb96705f5d59de416ed653a70\transformed\annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7b2be68fca67dc2be63b2794023aa2bf\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7b2be68fca67dc2be63b2794023aa2bf\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cd96bc284dba3662bd335148df50712c\transformed\sqlite-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cd96bc284dba3662bd335148df50712c\transformed\sqlite-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [com.facebook.fresco:vito-renderer:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\256dd42150880d3ebbb9535282b98bb1\transformed\vito-renderer-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fresco:vito-renderer:3.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\256dd42150880d3ebbb9535282b98bb1\transformed\vito-renderer-3.6.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.react:hermes-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3ec862d63fdddbd4f01d7183afe68cc6\transformed\hermes-android-0.79.5-debug\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.react:hermes-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\3ec862d63fdddbd4f01d7183afe68cc6\transformed\hermes-android-0.79.5-debug\AndroidManifest.xml:5:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d38a7d6d68985661f377ff1e9aee0aec\transformed\cardview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\d38a7d6d68985661f377ff1e9aee0aec\transformed\cardview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.databinding:viewbinding:8.8.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\37c0db100a3fdbe8f12427a1a2d2a1c4\transformed\viewbinding-8.8.2\AndroidManifest.xml:5:5-44
+MERGED from [androidx.databinding:viewbinding:8.8.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\37c0db100a3fdbe8f12427a1a2d2a1c4\transformed\viewbinding-8.8.2\AndroidManifest.xml:5:5-44
+MERGED from [com.github.Dimezis:BlurView:version-2.0.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9d959df6397bba11a55a2acf33e809e3\transformed\BlurView-version-2.0.6\AndroidManifest.xml:5:5-7:41
+MERGED from [com.github.Dimezis:BlurView:version-2.0.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9d959df6397bba11a55a2acf33e809e3\transformed\BlurView-version-2.0.6\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\866b075e66bd79eb0a27c74ec4917271\transformed\exifinterface-1.3.7\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\866b075e66bd79eb0a27c74ec4917271\transformed\exifinterface-1.3.7\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cc02a20caf83c0d069fae58ea1dd5189\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\cc02a20caf83c0d069fae58ea1dd5189\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\831ea9c9c7fba5e56d8643c5ead74760\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\831ea9c9c7fba5e56d8643c5ead74760\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\fa4975f7d8621466f40ebbb01bf2931a\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\fa4975f7d8621466f40ebbb01bf2931a\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [com.github.bumptech.glide:gifdecoder:4.16.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\caf5ea8534e6bba60515ecb24305a76a\transformed\gifdecoder-4.16.0\AndroidManifest.xml:5:5-7:41
+MERGED from [com.github.bumptech.glide:gifdecoder:4.16.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\caf5ea8534e6bba60515ecb24305a76a\transformed\gifdecoder-4.16.0\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7cfee4fcac3d9ba410968c52a5d1d76c\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\7cfee4fcac3d9ba410968c52a5d1d76c\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\44cb1c29d99094fc16d9d192d7f89adf\transformed\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\44cb1c29d99094fc16d9d192d7f89adf\transformed\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085b7a4959a908c71316ca2e6145c9c2\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085b7a4959a908c71316ca2e6145c9c2\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\329539f5f59ff6c9ce99bff35bd34b77\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\329539f5f59ff6c9ce99bff35bd34b77\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.github.f0ris.sweetalert:library:1.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\48bf79438d8285d7415d4ac7840863fd\transformed\library-1.6.2\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.f0ris.sweetalert:library:1.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\48bf79438d8285d7415d4ac7840863fd\transformed\library-1.6.2\AndroidManifest.xml:7:5-9:41
+MERGED from [com.facebook.fbjni:fbjni:0.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2a9b8162c1a6cb37e3240286c567bff3\transformed\fbjni-0.7.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.fbjni:fbjni:0.7.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\2a9b8162c1a6cb37e3240286c567bff3\transformed\fbjni-0.7.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:7:5-9:41
+MERGED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:7:5-9:41
+MERGED from [com.pnikosis:materialish-progress:1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9477da32fd6e3e10ef62a8b218037e05\transformed\materialish-progress-1.7\AndroidManifest.xml:7:5-9:41
+MERGED from [com.pnikosis:materialish-progress:1.7] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9477da32fd6e3e10ef62a8b218037e05\transformed\materialish-progress-1.7\AndroidManifest.xml:7:5-9:41
+	android:targetSdkVersion
+		INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml
+provider#com.reactnativecommunity.webview.RNCWebViewFileProvider
+ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-16:20
+	android:grantUriPermissions
+		ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-47
+	android:authorities
+		ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-64
+	android:exported
+		ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-37
+	android:name
+		ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-83
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+	android:resource
+		ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+	android:name
+		ADDED from [:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+package#host.exp.exponent
+ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-53
+	android:name
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:18-50
+activity#expo.modules.devlauncher.launcher.DevLauncherActivity
+ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:9-25:20
+	android:launchMode
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:13-44
+	android:exported
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-36
+	android:theme
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:13-70
+	android:name
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-81
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:scheme:expo-dev-launcher
+ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-24:29
+activity#expo.modules.devlauncher.launcher.errors.DevLauncherErrorActivity
+ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:9-29:70
+	android:screenOrientation
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-49
+	android:theme
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:13-67
+	android:name
+		ADDED from [:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:27:13-93
+activity#expo.modules.devmenu.DevMenuActivity
+ADDED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-21:20
+	android:launchMode
+		ADDED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-44
+	android:exported
+		ADDED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-36
+	android:theme
+		ADDED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-75
+	android:name
+		ADDED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-64
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:scheme:expo-dev-menu
+ADDED from [:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-20:29
+meta-data#org.unimodules.core.AppLoader#react-native-headless
+ADDED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-11:89
+	android:value
+		ADDED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-86
+	android:name
+		ADDED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-79
+meta-data#com.facebook.soloader.enabled
+ADDED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:9-15:45
+MERGED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:12:9-14:37
+MERGED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:12:9-14:37
+	tools:replace
+		ADDED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:13-42
+	android:value
+		ADDED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-33
+		REJECTED from [com.facebook.soloader:soloader:0.12.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\a48e8bc95fe3cc7846392330cb0db9fb\transformed\soloader-0.12.1\AndroidManifest.xml:14:13-34
+	android:name
+		ADDED from [:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-57
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [:expo-updates] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-79
+	android:name
+		ADDED from [:expo-updates] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-76
+activity#com.facebook.react.devsupport.DevSettingsActivity
+ADDED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:19:9-21:40
+	android:exported
+		ADDED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:21:13-37
+	android:name
+		ADDED from [com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:20:13-77
+intent#action:name:android.support.customtabs.action.CustomTabsService
+ADDED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:8:9-12:18
+action#android.support.customtabs.action.CustomTabsService
+ADDED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:11:13-90
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:11:21-87
+uses-permission#android.permission.CAMERA
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:8:5-65
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:8:22-62
+intent#action:name:android.media.action.IMAGE_CAPTURE
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:15:9-19:18
+action#android.media.action.IMAGE_CAPTURE
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:18:13-73
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:18:21-70
+intent#action:name:android.media.action.ACTION_VIDEO_CAPTURE
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:20:9-24:18
+action#android.media.action.ACTION_VIDEO_CAPTURE
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:23:13-80
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:23:21-77
+service#com.google.android.gms.metadata.ModuleDependencies
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:28:9-40:19
+	android:enabled
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:30:13-36
+	android:exported
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:31:13-37
+	tools:ignore
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:32:13-40
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:29:13-78
+intent-filter#action:name:com.google.android.gms.metadata.MODULE_DEPENDENCIES
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:33:13-35:29
+action#com.google.android.gms.metadata.MODULE_DEPENDENCIES
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:34:17-94
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:34:25-91
+meta-data#photopicker_activity:0:required
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:37:13-39:36
+	android:value
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:39:17-33
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:38:17-63
+activity#com.canhub.cropper.CropImageActivity
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:42:9-44:59
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:31:9-33:39
+MERGED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:31:9-33:39
+	android:exported
+		ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:33:13-36
+	android:theme
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:44:13-56
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:43:13-64
+provider#expo.modules.imagepicker.fileprovider.ImagePickerFileProvider
+ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:46:9-54:20
+	android:grantUriPermissions
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:50:13-47
+	android:authorities
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:48:13-75
+	android:exported
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:49:13-37
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:47:13-89
+intent#action:name:android.intent.action.GET_CONTENT+category:name:android.intent.category.OPENABLE+data:mimeType:*/*
+ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:8:9-14:18
+action#android.intent.action.GET_CONTENT
+ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:9:13-72
+	android:name
+		ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:9:21-69
+category#android.intent.category.OPENABLE
+ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:11:13-73
+	android:name
+		ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:11:23-70
+provider#com.canhub.cropper.CropFileProvider
+ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:21:9-29:20
+	android:grantUriPermissions
+		ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:25:13-47
+	android:authorities
+		ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:23:13-72
+	android:exported
+		ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:24:13-37
+	android:name
+		ADDED from [com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:22:13-63
+intent#action:name:android.intent.action.OPEN_DOCUMENT_TREE
+ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:15:9-17:18
+action#android.intent.action.OPEN_DOCUMENT_TREE
+ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:16:13-79
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:16:21-76
+provider#expo.modules.filesystem.FileSystemFileProvider
+ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:21:9-30:20
+	android:grantUriPermissions
+		ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:25:13-47
+	android:authorities
+		ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:23:13-74
+	android:exported
+		ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:24:13-37
+	tools:replace
+		ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:26:13-48
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:22:13-74
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6f681676beacc0bbfa3c136ec3992497\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6f681676beacc0bbfa3c136ec3992497\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+permission#com.bbud.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+uses-permission#com.bbud.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+intent#action:name:android.intent.action.OPEN_DOCUMENT+category:name:android.intent.category.DEFAULT+category:name:android.intent.category.OPENABLE+data:mimeType:*/*
+ADDED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:10:9-17:18
+action#android.intent.action.OPEN_DOCUMENT
+ADDED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:11:13-74
+	android:name
+		ADDED from [host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:11:21-71
+service#androidx.room.MultiInstanceInvalidationService
+ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+	android:exported
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+	tools:ignore
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:28:13-60
+	android:directBootAware
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+	android:name
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92

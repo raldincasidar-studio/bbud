@@ -1,0 +1,492 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.bbud.app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+11-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:5:3-75
+11-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:5:20-73
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:2:3-64
+12-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:2:20-62
+13    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+13-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:3:3-77
+13-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:3:20-75
+14    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+14-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:4:3-68
+14-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:4:20-66
+15    <uses-permission android:name="android.permission.VIBRATE" />
+15-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:6:3-63
+15-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:6:20-61
+16    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+16-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:7:3-78
+16-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:7:20-76
+17
+18    <queries>
+18-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:8:3-14:13
+19        <intent>
+19-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:9:5-13:14
+20            <action android:name="android.intent.action.VIEW" />
+20-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:7-58
+20-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:15-56
+21
+22            <category android:name="android.intent.category.BROWSABLE" />
+22-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:7-67
+22-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:17-65
+23
+24            <data android:scheme="https" />
+24-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+24-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:13-35
+25        </intent>
+26
+27        <package android:name="host.exp.exponent" />
+27-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-53
+27-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:18-50
+28
+29        <intent>
+29-->[host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:8:9-12:18
+30
+31            <!-- Required for opening tabs if targeting API 30 -->
+32            <action android:name="android.support.customtabs.action.CustomTabsService" />
+32-->[host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:11:13-90
+32-->[host.exp.exponent:expo.modules.webbrowser:14.2.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\c7c36c79ad174d9fedeb4789f562985a\transformed\expo.modules.webbrowser-14.2.0\AndroidManifest.xml:11:21-87
+33        </intent>
+34        <intent>
+34-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:15:9-19:18
+35
+36            <!-- Required for picking images from the camera roll if targeting API 30 -->
+37            <action android:name="android.media.action.IMAGE_CAPTURE" />
+37-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:18:13-73
+37-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:18:21-70
+38        </intent>
+39        <intent>
+39-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:20:9-24:18
+40
+41            <!-- Required for picking images from the camera if targeting API 30 -->
+42            <action android:name="android.media.action.ACTION_VIDEO_CAPTURE" />
+42-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:23:13-80
+42-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:23:21-77
+43        </intent>
+44        <intent>
+44-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:8:9-14:18
+45            <action android:name="android.intent.action.GET_CONTENT" />
+45-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:9:13-72
+45-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:9:21-69
+46
+47            <category android:name="android.intent.category.OPENABLE" />
+47-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:11:13-73
+47-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:11:23-70
+48
+49            <data android:mimeType="*/*" />
+49-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+50        </intent> <!-- Query open documents -->
+51        <intent>
+51-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:15:9-17:18
+52            <action android:name="android.intent.action.OPEN_DOCUMENT_TREE" />
+52-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:16:13-79
+52-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:16:21-76
+53        </intent> <!-- Query open documents -->
+54        <intent>
+54-->[host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:10:9-17:18
+55            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+55-->[host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:11:13-74
+55-->[host.exp.exponent:expo.modules.documentpicker:13.1.6] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\22dafd5ebb06b39d229d0c324070030d\transformed\expo.modules.documentpicker-13.1.6\AndroidManifest.xml:11:21-71
+56
+57            <category android:name="android.intent.category.DEFAULT" />
+57-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:9-67
+57-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:19-65
+58            <category android:name="android.intent.category.OPENABLE" />
+58-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:11:13-73
+58-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:11:23-70
+59
+60            <data android:mimeType="*/*" />
+60-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+61        </intent>
+62    </queries>
+63
+64    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Required for picking images from camera directly -->
+64-->[:expo-updates] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-79
+64-->[:expo-updates] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-updates\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-76
+65    <uses-permission android:name="android.permission.CAMERA" />
+65-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:8:5-65
+65-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:8:22-62
+66
+67    <permission
+67-->[androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+68        android:name="com.bbud.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+68-->[androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+69        android:protectionLevel="signature" />
+69-->[androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+70
+71    <uses-permission android:name="com.bbud.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+71-->[androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+71-->[androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+72
+73    <application
+73-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:3-34:17
+74        android:name="com.bbud.app.MainApplication"
+74-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:16-47
+75        android:allowBackup="true"
+75-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:162-188
+76        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+76-->[androidx.core:core:1.13.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\5b620660690c43abdc966ec70f5a5282\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+77        android:debuggable="true"
+78        android:extractNativeLibs="false"
+79        android:icon="@mipmap/ic_launcher"
+79-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:81-115
+80        android:label="@string/app_name"
+80-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:48-80
+81        android:roundIcon="@mipmap/ic_launcher_round"
+81-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:116-161
+82        android:supportsRtl="true"
+82-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:221-247
+83        android:theme="@style/AppTheme"
+83-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:15:189-220
+84        android:usesCleartextTraffic="true" >
+84-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\debug\AndroidManifest.xml:6:18-53
+85        <meta-data
+85-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:16:5-82
+86            android:name="expo.modules.updates.ENABLED"
+86-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:16:16-59
+87            android:value="true" />
+87-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:16:60-80
+88        <meta-data
+88-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:17:5-119
+89            android:name="expo.modules.updates.EXPO_RUNTIME_VERSION"
+89-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:17:16-72
+90            android:value="@string/expo_runtime_version" />
+90-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:17:73-117
+91        <meta-data
+91-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:18:5-105
+92            android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH"
+92-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:18:16-80
+93            android:value="ALWAYS" />
+93-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:18:81-103
+94        <meta-data
+94-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:19:5-99
+95            android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS"
+95-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:19:16-79
+96            android:value="0" />
+96-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:19:80-97
+97        <meta-data
+97-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:20:5-141
+98            android:name="expo.modules.updates.EXPO_UPDATE_URL"
+98-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:20:16-67
+99            android:value="https://u.expo.dev/35009995-0f19-4b12-bcb7-06ed38ca419c" />
+99-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:20:68-139
+100
+101        <activity
+101-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:5-33:16
+102            android:name="com.bbud.app.MainActivity"
+102-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:15-43
+103            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode"
+103-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:44-134
+104            android:exported="true"
+104-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:256-279
+105            android:launchMode="singleTask"
+105-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:135-166
+106            android:screenOrientation="portrait"
+106-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:280-316
+107            android:theme="@style/Theme.App.SplashScreen"
+107-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:210-255
+108            android:windowSoftInputMode="adjustResize" >
+108-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:21:167-209
+109            <intent-filter>
+109-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:22:7-25:23
+110                <action android:name="android.intent.action.MAIN" />
+110-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:23:9-60
+110-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:23:17-58
+111
+112                <category android:name="android.intent.category.LAUNCHER" />
+112-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:24:9-68
+112-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:24:19-66
+113            </intent-filter>
+114            <intent-filter>
+114-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:26:7-32:23
+115                <action android:name="android.intent.action.VIEW" />
+115-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:7-58
+115-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:15-56
+116
+117                <category android:name="android.intent.category.DEFAULT" />
+117-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:9-67
+117-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:19-65
+118                <category android:name="android.intent.category.BROWSABLE" />
+118-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:7-67
+118-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:17-65
+119
+120                <data android:scheme="myapp" />
+120-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+120-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:13-35
+121                <data android:scheme="exp+bbud" />
+121-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+121-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:13-35
+122            </intent-filter>
+123        </activity>
+124
+125        <provider
+125-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-16:20
+126            android:name="com.reactnativecommunity.webview.RNCWebViewFileProvider"
+126-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-83
+127            android:authorities="com.bbud.app.fileprovider"
+127-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-64
+128            android:exported="false"
+128-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-37
+129            android:grantUriPermissions="true" >
+129-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-47
+130            <meta-data
+130-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+131                android:name="android.support.FILE_PROVIDER_PATHS"
+131-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+132                android:resource="@xml/file_provider_paths" />
+132-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+133        </provider>
+134
+135        <activity
+135-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:9-25:20
+136            android:name="expo.modules.devlauncher.launcher.DevLauncherActivity"
+136-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-81
+137            android:exported="true"
+137-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-36
+138            android:launchMode="singleTask"
+138-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:13-44
+139            android:theme="@style/Theme.DevLauncher.LauncherActivity" >
+139-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:13-70
+140            <intent-filter>
+140-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-24:29
+141                <action android:name="android.intent.action.VIEW" />
+141-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:7-58
+141-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:15-56
+142
+143                <category android:name="android.intent.category.DEFAULT" />
+143-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:9-67
+143-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:19-65
+144                <category android:name="android.intent.category.BROWSABLE" />
+144-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:7-67
+144-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:17-65
+145
+146                <data android:scheme="expo-dev-launcher" />
+146-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+146-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:13-35
+147            </intent-filter>
+148        </activity>
+149        <activity
+149-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:9-29:70
+150            android:name="expo.modules.devlauncher.launcher.errors.DevLauncherErrorActivity"
+150-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:27:13-93
+151            android:screenOrientation="portrait"
+151-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-49
+152            android:theme="@style/Theme.DevLauncher.ErrorActivity" />
+152-->[:expo-dev-launcher] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-launcher\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:13-67
+153        <activity
+153-->[:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-21:20
+154            android:name="expo.modules.devmenu.DevMenuActivity"
+154-->[:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-64
+155            android:exported="true"
+155-->[:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-36
+156            android:launchMode="singleTask"
+156-->[:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-44
+157            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" >
+157-->[:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-75
+158            <intent-filter>
+158-->[:expo-dev-menu] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-dev-menu\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-20:29
+159                <action android:name="android.intent.action.VIEW" />
+159-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:7-58
+159-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:10:15-56
+160
+161                <category android:name="android.intent.category.DEFAULT" />
+161-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:9-67
+161-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:28:19-65
+162                <category android:name="android.intent.category.BROWSABLE" />
+162-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:7-67
+162-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:11:17-65
+163
+164                <data android:scheme="expo-dev-menu" />
+164-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:7-37
+164-->C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\android\app\src\main\AndroidManifest.xml:12:13-35
+165            </intent-filter>
+166        </activity>
+167
+168        <meta-data
+168-->[:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-11:89
+169            android:name="org.unimodules.core.AppLoader#react-native-headless"
+169-->[:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-79
+170            android:value="expo.modules.adapters.react.apploader.RNHeadlessAppLoader" />
+170-->[:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-86
+171        <meta-data
+171-->[:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:9-15:45
+172            android:name="com.facebook.soloader.enabled"
+172-->[:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-57
+173            android:value="true" />
+173-->[:expo-modules-core] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-33
+174
+175        <activity
+175-->[com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:19:9-21:40
+176            android:name="com.facebook.react.devsupport.DevSettingsActivity"
+176-->[com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:20:13-77
+177            android:exported="false" />
+177-->[com.facebook.react:react-android:0.79.5] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\aa25acb041d3c941c61c41fc8b8c8466\transformed\react-android-0.79.5-debug\AndroidManifest.xml:21:13-37
+178
+179        <service
+179-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:28:9-40:19
+180            android:name="com.google.android.gms.metadata.ModuleDependencies"
+180-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:29:13-78
+181            android:enabled="false"
+181-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:30:13-36
+182            android:exported="false" >
+182-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:31:13-37
+183            <intent-filter>
+183-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:33:13-35:29
+184                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+184-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:34:17-94
+184-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:34:25-91
+185            </intent-filter>
+186
+187            <meta-data
+187-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:37:13-39:36
+188                android:name="photopicker_activity:0:required"
+188-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:38:17-63
+189                android:value="" />
+189-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:39:17-33
+190        </service>
+191
+192        <activity
+192-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:42:9-44:59
+193            android:name="com.canhub.cropper.CropImageActivity"
+193-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:43:13-64
+194            android:exported="true"
+194-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:33:13-36
+195            android:theme="@style/Base.Theme.AppCompat" /> <!-- https://developer.android.com/guide/topics/manifest/provider-element.html -->
+195-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:44:13-56
+196        <provider
+196-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:46:9-54:20
+197            android:name="expo.modules.imagepicker.fileprovider.ImagePickerFileProvider"
+197-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:47:13-89
+198            android:authorities="com.bbud.app.ImagePickerFileProvider"
+198-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:48:13-75
+199            android:exported="false"
+199-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:49:13-37
+200            android:grantUriPermissions="true" >
+200-->[host.exp.exponent:expo.modules.imagepicker:16.1.4] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\6b0a9a84e6366e1457abb2989eb30a9e\transformed\expo.modules.imagepicker-16.1.4\AndroidManifest.xml:50:13-47
+201            <meta-data
+201-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+202                android:name="android.support.FILE_PROVIDER_PATHS"
+202-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+203                android:resource="@xml/image_picker_provider_paths" />
+203-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+204        </provider>
+205        <provider
+205-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:21:9-29:20
+206            android:name="com.canhub.cropper.CropFileProvider"
+206-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:22:13-63
+207            android:authorities="com.bbud.app.cropper.fileprovider"
+207-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:23:13-72
+208            android:exported="false"
+208-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:24:13-37
+209            android:grantUriPermissions="true" >
+209-->[com.vanniktech:android-image-cropper:4.6.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\b848c8ad091db3287aa941d3f2304711\transformed\android-image-cropper-4.6.0\AndroidManifest.xml:25:13-47
+210            <meta-data
+210-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+211                android:name="android.support.FILE_PROVIDER_PATHS"
+211-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+212                android:resource="@xml/library_file_paths" />
+212-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+213        </provider>
+214        <provider
+214-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:21:9-30:20
+215            android:name="expo.modules.filesystem.FileSystemFileProvider"
+215-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:22:13-74
+216            android:authorities="com.bbud.app.FileSystemFileProvider"
+216-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:23:13-74
+217            android:exported="false"
+217-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:24:13-37
+218            android:grantUriPermissions="true" >
+218-->[host.exp.exponent:expo.modules.filesystem:18.1.11] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\e5dbe248bee037770f2d0231f164db5a\transformed\expo.modules.filesystem-18.1.11\AndroidManifest.xml:25:13-47
+219            <meta-data
+219-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-15:63
+220                android:name="android.support.FILE_PROVIDER_PATHS"
+220-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:17-67
+221                android:resource="@xml/file_system_provider_paths" />
+221-->[:react-native-webview] C:\Users\Raldin Casidar\Desktop\Desktops\B-Bud-Compile\bbud\node_modules\react-native-webview\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-60
+222        </provider>
+223        <provider
+223-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+224            android:name="androidx.startup.InitializationProvider"
+224-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+225            android:authorities="com.bbud.app.androidx-startup"
+225-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+226            android:exported="false" >
+226-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+227            <meta-data
+227-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+228                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+228-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+229                android:value="androidx.startup" />
+229-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\860a8090fd3115e65d05ed1df69d7e98\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+230            <meta-data
+230-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+231                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+231-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+232                android:value="androidx.startup" />
+232-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\085a8947750cea2516443e28b88ba515\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+233            <meta-data
+233-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+234                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+234-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+235                android:value="androidx.startup" />
+235-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+236        </provider>
+237
+238        <service
+238-->[androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+239            android:name="androidx.room.MultiInstanceInvalidationService"
+239-->[androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+240            android:directBootAware="true"
+240-->[androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+241            android:exported="false" />
+241-->[androidx.room:room-runtime:2.6.1] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\882a9ac9c4e077362831e7fa006d3edb\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+242
+243        <receiver
+243-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+244            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+244-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+245            android:directBootAware="false"
+245-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+246            android:enabled="true"
+246-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+247            android:exported="true"
+247-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+248            android:permission="android.permission.DUMP" >
+248-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+249            <intent-filter>
+249-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+250                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+250-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+250-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+251            </intent-filter>
+252            <intent-filter>
+252-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+253                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+253-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+253-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+254            </intent-filter>
+255            <intent-filter>
+255-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+256                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+256-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+256-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+257            </intent-filter>
+258            <intent-filter>
+258-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+259                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+259-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+259-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Raldin Casidar\.gradle\caches\8.13\transforms\9069e62382b07cd116b8d2e450b6a4bd\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+260            </intent-filter>
+261        </receiver>
+262    </application>
+263
+264</manifest>
