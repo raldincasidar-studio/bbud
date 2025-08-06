@@ -11,6 +11,9 @@ dist/
 web-build/
 expo-env.d.ts
 
+android/
+ios/
+
 # Native
 *.orig.*
 *.jks
@@ -38,6 +41,3 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
-
-android/
-ios/
