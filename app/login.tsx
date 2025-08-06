@@ -9,7 +9,7 @@ import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, Scroll
 export default function LoginScreen() { // Renamed component
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState(''); // New state for OTP input
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
@@ -20,11 +20,8 @@ export default function LoginScreen() { // Renamed component
   const [accountLockedMessage, setAccountLockedMessage] = useState('');
 
   const handleInitialLogin = async () => {
-    if (email.trim() === '' || password === '') {
-      Alert.alert('Form Error', 'Please enter both email and password.'); return;
-    }
-    if (!email.trim().match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-      Alert.alert('Form Error', 'Invalid email format.'); return;
+    if (loginIdentifier.trim() === '' || password === '') {
+      Alert.alert('Form Error', 'Please enter both email/contact number and password.'); return;
     }
     if (password.length < 6) {
       Alert.alert('Form Error', 'Password must be at least 6 characters long.'); return;
@@ -36,7 +33,7 @@ export default function LoginScreen() { // Renamed component
 
     try {
       const response = await apiRequest('POST', '/api/residents/login', {
-        email: email.trim().toLowerCase(),
+        login_identifier: loginIdentifier.trim(),
         password: password,
       });
 
@@ -44,7 +41,7 @@ export default function LoginScreen() { // Renamed component
 
       if (response && response.otpRequired === true) {
         // API signaled that OTP is sent and required
-        Alert.alert('OTP Sent', response.message || 'An OTP has been sent to your email. Please enter it below.');
+        Alert.alert('OTP Sent', response.message || 'An OTP has been sent. Please enter it below.');
         setIsOtpStep(true); // Move to OTP input step
       } else if (response && response.error) { // Handle errors like AccountLocked or invalid credentials
          if (response.error === 'AccountLocked') {
@@ -85,7 +82,7 @@ export default function LoginScreen() { // Renamed component
     setIsLoading(true);
     try {
       const response = await apiRequest('POST', '/api/residents/login/verify-otp', {
-        email: email.trim().toLowerCase(), // Email is needed again for verification
+        login_identifier: loginIdentifier.trim(),
         otp: otp.trim(),
       });
 
@@ -144,8 +141,8 @@ export default function LoginScreen() { // Renamed component
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email Address</Text>
-              <TextInput placeholder='Enter your email address' value={email} onChangeText={setEmail} style={styles.textInput} keyboardType="email-address" autoCapitalize="none" />
+              <Text style={styles.label}>Email or Contact Number</Text>
+              <TextInput placeholder='Enter your email or contact number' value={loginIdentifier} onChangeText={setLoginIdentifier} style={styles.textInput} autoCapitalize="none" />
             </View>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Password</Text>
@@ -181,7 +178,7 @@ export default function LoginScreen() { // Renamed component
             <View style={styles.logoContainer}>
               <MaterialCommunityIcons name="shield-key-outline" size={80} color="#0F00D7" />
               <Text style={styles.appName}>Verify OTP</Text>
-              <Text style={styles.loginPrompt}>An OTP has been sent to {email}.</Text>
+              <Text style={styles.loginPrompt}>An OTP has been sent to {loginIdentifier}.</Text>
             </View>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>One-Time Password (OTP)</Text>

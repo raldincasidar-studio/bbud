@@ -54,3 +54,10 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+## keystore.jks
+
+This is the keystore that is needed to compile the app. The passowrd and the alias is:
+
+The alias is `bbud` and password is `bbud123`
