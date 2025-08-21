@@ -319,11 +319,11 @@ export default function SignupScreen() {
             if (response && (response.message || response.resident)) {
                 Alert.alert('Registration Successful', 'Your household has been registered and is pending for approval by the Baranggay Secretary.', [{ text: 'OK', onPress: () => router.replace('/login') }]);
             } else {
-                Alert.alert('Registration Failed', response?.message || response?.error || 'An unknown error occurred.');
+                // Alert.alert('Registration Failed', response?.message || response?.error || 'An unknown error occurred.');
             }
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.response?.data?.error || 'An unexpected error occurred. Please try again.';
-            Alert.alert('Registration Error', errorMessage);
+            // Alert.alert('Registration Error', errorMessage);
         } finally {
             setIsSaving(false);
         }
