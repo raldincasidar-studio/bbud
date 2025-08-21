@@ -1,8 +1,9 @@
-// app/emergency-hotlines.jsx
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // For icons
-import { useRouter } from 'expo-router'; // If you need a back button or other navigation
+// app/emergency-hotlines.tsx
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, Linking, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+// Import FlatList instead of ScrollView for list rendering
+import { Alert, FlatList, Linking, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const emergencyHotlinesData = [
     {
@@ -15,14 +16,14 @@ const emergencyHotlinesData = [
     {
         id: '2',
         name: 'Philippine National Police (PNP)',
-        number: '117', // Or a specific local PNP number
+        number: '117',
         icon: 'shield-account',
         description: 'For police assistance and reporting crimes.',
     },
     {
         id: '3',
         name: 'Bureau of Fire Protection (BFP)',
-        number: '(02) 8426-0219', // Example BFP National HQ, or local number
+        number: '(02) 8426-0219',
         icon: 'fire-truck',
         description: 'For fire emergencies and rescue.',
     },
@@ -30,13 +31,13 @@ const emergencyHotlinesData = [
         id: '4',
         name: 'Philippine Red Cross',
         number: '143',
-        icon: 'hospital-box-outline', // Or 'ambulance'
+        icon: 'hospital-box-outline',
         description: 'For medical emergencies, ambulance, and blood services.',
     },
     {
         id: '5',
         name: 'NDRRMC (Disaster Response)',
-        number: '(02) 8911-5061', // Example NDRRMC number
+        number: '(02) 8911-5061',
         icon: 'weather-hurricane',
         description: 'National Disaster Risk Reduction and Management Council.',
     },
@@ -50,7 +51,7 @@ const emergencyHotlinesData = [
     {
         id: '7',
         name: 'COVID-19 Hotline (DOH)',
-        number: '1555', // Or a specific DOH hotline
+        number: '1555',
         icon: 'virus-outline',
         description: 'For COVID-19 related inquiries and emergencies.',
     },
@@ -60,24 +61,27 @@ const emergencyHotlinesData = [
 const EmergencyHotlinesScreen = () => {
     const router = useRouter();
 
+    // This function for handling the call is correct and has been preserved.
     const handleCall = (phoneNumber) => {
-        let dialNumber = '';
-        if (Platform.OS === 'android') {
-            dialNumber = `tel:${phoneNumber}`;
-        } else {
-            dialNumber = `telprompt:${phoneNumber}`;
-        }
-        Linking.canOpenURL(dialNumber)
+        // Create a clean phone number string by removing everything except digits.
+        const sanitizedNumber = phoneNumber.replace(/[^\d+]/g, '');
+        const dialUrl = `tel:${sanitizedNumber}`;
+
+        Linking.canOpenURL(dialUrl)
             .then((supported) => {
                 if (!supported) {
                     Alert.alert('Not Supported', 'Phone calls are not supported on this device.');
-                } else {
-                    return Linking.openURL(dialNumber);
                 }
+                return Linking.openURL(dialUrl);
             })
-            .catch((err) => console.error('An error occurred', err));
+            .catch((err) => {
+                // Log the specific error to the console for debugging
+                console.error('An error occurred trying to open the URL:', err);
+                Alert.alert('Error', 'An error occurred while trying to make a call.');
+            });
     };
 
+    // This function renders each individual hotline item for the FlatList.
     const renderHotlineItem = ({ item }) => (
         <TouchableOpacity style={styles.hotlineItem} onPress={() => handleCall(item.number)}>
             <View style={styles.iconContainer}>
@@ -92,6 +96,15 @@ const EmergencyHotlinesScreen = () => {
         </TouchableOpacity>
     );
 
+    // This component renders the header content above the list.
+    const ListHeader = () => (
+        <View style={styles.headerContainer}>
+            <MaterialCommunityIcons name="phone-in-talk-outline" size={50} color="#0F00D7" style={{ marginBottom: 10 }} />
+            <Text style={styles.pageTitle}>Important Contacts</Text>
+            <Text style={styles.pageSubtitle}>Tap any item to call directly in case of an emergency.</Text>
+        </View>
+    );
+
     return (
         <SafeAreaView style={styles.safeArea}>
             {/* Custom Navbar */}
@@ -100,23 +113,17 @@ const EmergencyHotlinesScreen = () => {
                     <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.navbarTitle}>Emergency Hotlines</Text>
-                <View style={{width: 28}} /> {/* Spacer for balance */}
+                <View style={{ width: 28 }} /> {/* Spacer for balance */}
             </View>
 
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-                <View style={styles.headerContainer}>
-                     <MaterialCommunityIcons name="phone-in-talk-outline" size={50} color="#0F00D7" style={{marginBottom: 10}}/>
-                    <Text style={styles.pageTitle}>Important Contacts</Text>
-                    <Text style={styles.pageSubtitle}>Tap any number to call directly in case of an emergency.</Text>
-                </View>
-
-                {emergencyHotlinesData.map(item => (
-                    <View key={item.id}>
-                        {renderHotlineItem({item})}
-                    </View>
-                ))}
-
-            </ScrollView>
+            {/* Use FlatList for rendering the list of hotlines */}
+            <FlatList
+                data={emergencyHotlinesData}
+                renderItem={renderHotlineItem}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.listContentContainer}
+                ListHeaderComponent={ListHeader}
+            />
         </SafeAreaView>
     );
 };
@@ -124,7 +131,7 @@ const EmergencyHotlinesScreen = () => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#F4F7FC', // Light background for the whole screen
+        backgroundColor: '#F4F7FC',
     },
     navbar: {
         flexDirection: 'row',
@@ -132,18 +139,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 10,
-        paddingTop: Platform.OS === 'android' ? 30 : 45, // Adjust for status bar
-        backgroundColor: '#D32F2F', // Emergency Red Color for Navbar
+        paddingTop: Platform.OS === 'android' ? 30 : 45,
+        backgroundColor: '#D32F2F',
     },
     navbarTitle: {
         fontSize: 20,
         fontWeight: 'bold',
         color: 'white',
     },
-    scrollView: {
-        flex: 1,
-    },
-    scrollViewContent: {
+    listContentContainer: {
         padding: 15,
     },
     headerContainer: {
@@ -154,7 +158,7 @@ const styles = StyleSheet.create({
     pageTitle: {
         fontSize: 26,
         fontWeight: 'bold',
-        color: '#D32F2F', // Emergency Red
+        color: '#D32F2F',
         textAlign: 'center',
         marginBottom: 8,
     },
@@ -179,7 +183,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
     },
     iconContainer: {
-        backgroundColor: '#E8EAF6', // Light blue/grey background for icon
+        backgroundColor: '#E8EAF6',
         borderRadius: 25,
         width: 50,
         height: 50,
@@ -188,7 +192,7 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
     textContainer: {
-        flex: 1, // Takes up remaining space
+        flex: 1,
     },
     hotlineName: {
         fontSize: 17,
@@ -199,7 +203,7 @@ const styles = StyleSheet.create({
     hotlineNumber: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#0F00D7', // Primary app color for the number itself
+        color: '#0F00D7',
         marginBottom: 4,
     },
     hotlineDescription: {
