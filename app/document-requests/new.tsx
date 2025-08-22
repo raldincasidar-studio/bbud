@@ -1,6 +1,5 @@
 import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-// NEW: Import the DateTimePicker component
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
@@ -10,6 +9,7 @@ import {
     ActivityIndicator,
     Alert,
     KeyboardAvoidingView,
+    Modal,
     Platform,
     ScrollView,
     StyleSheet,
@@ -19,9 +19,9 @@ import {
     View
 } from 'react-native';
 
-// Master list of available document types from the Vue component
+// Master list of available document types
 const DOCUMENT_TYPES = [
-    { label: 'Select Document Type *', value: '' },
+    { label: 'Select Document Type *', value: '', enabled: false },
     { label: 'Certificate of Cohabitation', value: 'Certificate of Cohabitation' },
     { label: 'Certificate of Good Moral', value: 'Certificate of Good Moral' },
     { label: 'Certificate of Residency', value: 'Certificate of Residency' },
@@ -40,6 +40,7 @@ const DateInput = ({ label, value, onChange, error }) => (
         <TextInput
             style={[styles.textInput, !!error && styles.inputError]}
             placeholder="YYYY-MM-DD"
+            placeholderTextColor="#A9A9A9"
             value={value}
             onChangeText={onChange}
             keyboardType="numeric"
@@ -55,7 +56,84 @@ const ErrorMessage = ({ error }) => {
     return <Text style={styles.errorText}>{error}</Text>;
 };
 
-// UPDATED: NameInput component with grey, non-selectable placeholder
+// A platform-aware Picker component that uses a modal on iOS
+const PickerInput = ({ label, value, onValueChange, items, error, placeholder, required = true }) => {
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const selectedItem = items.find(item => item.value === value);
+    const displayLabel = selectedItem?.label ?? placeholder;
+
+    if (Platform.OS === 'android') {
+        return (
+            <View style={styles.inputContainer}>
+                {label && <Text style={styles.label}>{label} {required && <Text style={styles.requiredStar}>*</Text>}</Text>}
+                <View style={[styles.pickerWrapper, !!error && styles.inputError]}>
+                    <Picker
+                        selectedValue={value}
+                        onValueChange={onValueChange}
+                        style={[styles.pickerText, !value && styles.pickerPlaceholder]}
+                        itemStyle={{ color: 'black' }} // Ensures dropdown items are black
+                    >
+                        {items.map((opt, index) => (
+                            <Picker.Item
+                                key={index}
+                                label={opt.label}
+                                value={opt.value}
+                                enabled={opt.enabled !== false}
+                            />
+                        ))}
+                    </Picker>
+                </View>
+                <ErrorMessage error={error} />
+            </View>
+        );
+    }
+
+    // iOS implementation using a Modal
+    return (
+        <View style={styles.inputContainer}>
+            {label && <Text style={styles.label}>{label} {required && <Text style={styles.requiredStar}>*</Text>}</Text>}
+            <TouchableOpacity
+                style={[styles.datePickerButton, !!error && styles.inputError]}
+                onPress={() => setModalVisible(true)}
+            >
+                <Text style={value ? styles.datePickerButtonText : styles.datePickerPlaceholderText}>
+                    {displayLabel}
+                </Text>
+            </TouchableOpacity>
+            <ErrorMessage error={error} />
+
+            <Modal
+                transparent={true}
+                visible={modalVisible}
+                animationType="slide"
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <TouchableOpacity style={styles.modalContainer} activeOpacity={1} onPressOut={() => setModalVisible(false)}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalDoneButton}>
+                                <Text style={styles.modalDoneText}>Done</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Picker
+                            selectedValue={value}
+                            onValueChange={onValueChange}
+                            itemStyle={{ color: 'black' }} // FIX: Ensures picker wheel text is black
+                        >
+                            {items.map((opt, index) => (
+                                <Picker.Item key={index} label={opt.label} value={opt.value} />
+                            ))}
+                        </Picker>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
+        </View>
+    );
+};
+
+
+// NameInput component now uses PickerInput for iOS compatibility
 const NameInput = ({ label, value, onValueChange, error, householdMembers = [] }) => {
     const [isManual, setIsManual] = useState(false);
 
@@ -63,47 +141,56 @@ const NameInput = ({ label, value, onValueChange, error, householdMembers = [] }
         if (selectedValue === 'manual') {
             setIsManual(true);
             onValueChange(''); // Clear previous selection
-        } else if (selectedValue) { // Ensure placeholder (value="") is not processed
+        } else if (selectedValue !== '') { // Ensure placeholder is not processed
             setIsManual(false);
             onValueChange(selectedValue);
         }
     };
 
+    const pickerItems = [
+        { label: "Select from household or enter manually", value: "", enabled: false },
+        ...householdMembers.map(member => ({
+            label: `${member.first_name} ${member.last_name}`,
+            value: `${member.first_name} ${member.last_name}`
+        })),
+        { label: "Enter name manually...", value: "manual" }
+    ];
+
     return (
-        <View style={styles.inputContainer}>
-            <Text style={styles.label}>{label} <Text style={styles.requiredStar}>*</Text></Text>
+        <>
             {!isManual ? (
-                <View style={[styles.pickerWrapper, !!error && styles.inputError]}>
-                    <Picker selectedValue={value} onValueChange={handleSelection}>
-                        {/* UPDATED: Placeholder is now disabled and styled */}
-                        <Picker.Item label="Select from household or enter manually" value="" enabled={false} style={{ color: '#aaa' }} />
-                        {householdMembers.map(member => (
-                            <Picker.Item key={member._id} label={`${member.first_name} ${member.last_name}`} value={`${member.first_name} ${member.last_name}`} />
-                        ))}
-                        <Picker.Item label="Enter name manually..." value="manual" />
-                    </Picker>
-                </View>
-            ) : (
-                <TextInput
-                    style={[styles.textInput, !!error && styles.inputError]}
-                    placeholder="Enter full name"
-                    // UPDATED: Added grey placeholder text color
-                    placeholderTextColor="#888"
+                <PickerInput
+                    label={label}
                     value={value}
-                    onChangeText={onValueChange}
+                    onValueChange={handleSelection}
+                    items={pickerItems}
+                    error={error}
+                    placeholder="Select from household or enter manually"
                 />
+            ) : (
+                <View style={styles.inputContainer}>
+                    <Text style={styles.label}>{label} <Text style={styles.requiredStar}>*</Text></Text>
+                    <TextInput
+                        style={[styles.textInput, !!error && styles.inputError]}
+                        placeholder="Enter full name"
+                        placeholderTextColor="#A9A9A9"
+                        value={value}
+                        onChangeText={onValueChange}
+                    />
+                    <ErrorMessage error={error} />
+                </View>
             )}
-            <ErrorMessage error={error} />
-        </View>
+        </>
     );
 };
 
-// NEW: Component for the date picker button
+
+// Component for the date picker button
 const DatePickerInput = ({ label, value, onPress, error }) => (
     <View style={styles.inputContainer}>
         <Text style={styles.label}>{label}</Text>
-        <TouchableOpacity 
-            style={[styles.datePickerButton, !!error && styles.inputError]} 
+        <TouchableOpacity
+            style={[styles.datePickerButton, !!error && styles.inputError]}
             onPress={onPress}
         >
             <Text style={value ? styles.datePickerButtonText : styles.datePickerPlaceholderText}>
@@ -131,9 +218,8 @@ const NewDocumentRequestScreen = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingInitialData, setIsLoadingInitialData] = useState(true);
 
-    // NEW: State for managing the date picker modal
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [datePickerTarget, setDatePickerTarget] = useState(''); // Stores which date field is being edited
+    const [datePickerTarget, setDatePickerTarget] = useState('');
 
     useEffect(() => {
         const loadInitialData = async () => {
@@ -224,7 +310,7 @@ const NewDocumentRequestScreen = () => {
             default:
                 break;
         }
-        
+
         setErrors(prev => {
             const newErrors = { ...prev };
             if (error) {
@@ -258,7 +344,7 @@ const NewDocumentRequestScreen = () => {
                     return newErrors;
                 });
             }
-            
+
             validateField(field, value);
             return updatedForm;
         });
@@ -272,18 +358,15 @@ const NewDocumentRequestScreen = () => {
         });
     };
 
-    // NEW: Handler for the date picker
     const onDateChange = (event: any, selectedDate?: Date) => {
-        setShowDatePicker(false); // Hide the picker
+        setShowDatePicker(false);
         if (selectedDate && datePickerTarget) {
-            // Format date to 'YYYY-MM-DD'
             const formattedDate = selectedDate.toISOString().split('T')[0];
             handleDetailChange(datePickerTarget, formattedDate);
-            setDatePickerTarget(''); // Reset the target
+            setDatePickerTarget('');
         }
     };
 
-    // NEW: Function to show the date picker for a specific field
     const openDatePicker = (target: string) => {
         setDatePickerTarget(target);
         setShowDatePicker(true);
@@ -295,9 +378,9 @@ const NewDocumentRequestScreen = () => {
             requestor_resident_id: form.requestor_resident_id,
             request_type: form.request_type,
         };
-        
+
         if (form.request_type) {
-             fieldsToValidate.purpose = form.purpose;
+            fieldsToValidate.purpose = form.purpose;
             const details = form.details;
             const requestType = form.request_type;
 
@@ -348,10 +431,10 @@ const NewDocumentRequestScreen = () => {
             setIsSaving(false);
         }
     };
-    
+
     const renderDynamicFields = () => {
         if (!form.request_type) return null;
-        
+
         return (
             <View>
                 <Text style={styles.sectionTitle}>{form.request_type} - Required Information</Text>
@@ -365,14 +448,12 @@ const NewDocumentRequestScreen = () => {
                             error={errors['details.male_partner_name']}
                             householdMembers={householdMembers}
                         />
-                        {/* UPDATED: Using new DatePickerInput */}
-                        <DatePickerInput 
+                        <DatePickerInput
                             label="Birthdate of Male Partner"
                             value={form.details.male_partner_birthdate}
                             onPress={() => openDatePicker('male_partner_birthdate')}
                             error={errors['details.male_partner_birthdate']}
                         />
-                        
                         <NameInput
                             label="Full Name of Female Partner"
                             value={form.details.female_partner_name || ''}
@@ -380,68 +461,67 @@ const NewDocumentRequestScreen = () => {
                             error={errors['details.female_partner_name']}
                             householdMembers={householdMembers}
                         />
-                         {/* UPDATED: Using new DatePickerInput */}
-                        <DatePickerInput 
+                        <DatePickerInput
                             label="Birthdate of Female Partner"
                             value={form.details.female_partner_birthdate}
                             onPress={() => openDatePicker('female_partner_birthdate')}
                             error={errors['details.female_partner_birthdate']}
                         />
-                        
-                        <TextInput style={[styles.textInput, !!errors['details.year_started_cohabiting'] && styles.inputError]} placeholder="Year Started Living Together *" placeholderTextColor="#888" value={form.details.year_started_cohabiting || ''} onChangeText={(val) => handleDetailChange('year_started_cohabiting', val)} keyboardType="numeric" />
+                        <TextInput style={[styles.textInput, !!errors['details.year_started_cohabiting'] && styles.inputError]} placeholder="Year Started Living Together *" placeholderTextColor="#A9A9A9" value={form.details.year_started_cohabiting || ''} onChangeText={(val) => handleDetailChange('year_started_cohabiting', val)} keyboardType="numeric" />
                         <ErrorMessage error={errors['details.year_started_cohabiting']} />
                     </>
                 )}
 
-                {/* Other dynamic fields remain the same... */}
                 {form.request_type === 'Barangay Clearance' && (
                     <>
-                        <TextInput style={[styles.textInput, !!errors['details.type_of_work'] && styles.inputError]} placeholder="Type of Work (e.g., sidewalk repair) *" placeholderTextColor="#888" value={form.details.type_of_work || ''} onChangeText={(val) => handleDetailChange('type_of_work', val)} />
+                        <TextInput style={[styles.textInput, !!errors['details.type_of_work'] && styles.inputError]} placeholder="Type of Work (e.g., sidewalk repair) *" placeholderTextColor="#A9A9A9" value={form.details.type_of_work || ''} onChangeText={(val) => handleDetailChange('type_of_work', val)} />
                         <ErrorMessage error={errors['details.type_of_work']} />
-                        <TextInput style={styles.textInput} placeholder="Other Work (e.g., drainage tapping)" placeholderTextColor="#888" value={form.details.other_work || ''} onChangeText={(val) => handleDetailChange('other_work', val)} />
-                        <TextInput style={styles.textInput} placeholder="Number of Storeys" placeholderTextColor="#888" value={form.details.number_of_storeys || ''} onChangeText={(val) => handleDetailChange('number_of_storeys', val)} />
-                        <TextInput style={[styles.textInput, !!errors['details.purpose_of_clearance'] && styles.inputError]} placeholder="Purpose of this Clearance *" placeholderTextColor="#888" value={form.details.purpose_of_clearance || ''} onChangeText={(val) => handleDetailChange('purpose_of_clearance', val)} />
+                        <TextInput style={styles.textInput} placeholder="Other Work (e.g., drainage tapping)" placeholderTextColor="#A9A9A9" value={form.details.other_work || ''} onChangeText={(val) => handleDetailChange('other_work', val)} />
+                        <TextInput style={styles.textInput} placeholder="Number of Storeys" placeholderTextColor="#A9A9A9" value={form.details.number_of_storeys || ''} onChangeText={(val) => handleDetailChange('number_of_storeys', val)} />
+                        <TextInput style={[styles.textInput, !!errors['details.purpose_of_clearance'] && styles.inputError]} placeholder="Purpose of this Clearance *" placeholderTextColor="#A9A9A9" value={form.details.purpose_of_clearance || ''} onChangeText={(val) => handleDetailChange('purpose_of_clearance', val)} />
                         <ErrorMessage error={errors['details.purpose_of_clearance']} />
                     </>
                 )}
                 
                 {form.request_type === 'Barangay Business Clearance' && (
                     <>
-                        <TextInput style={[styles.textInput, !!errors['details.business_name'] && styles.inputError]} placeholder="Business Trade Name *" placeholderTextColor="#888" value={form.details.business_name || ''} onChangeText={(val) => handleDetailChange('business_name', val)} />
+                        <TextInput style={[styles.textInput, !!errors['details.business_name'] && styles.inputError]} placeholder="Business Trade Name *" placeholderTextColor="#A9A9A9" value={form.details.business_name || ''} onChangeText={(val) => handleDetailChange('business_name', val)} />
                         <ErrorMessage error={errors['details.business_name']} />
-                        <TextInput style={[styles.textInput, !!errors['details.nature_of_business'] && styles.inputError]} placeholder="Nature of Business *" placeholderTextColor="#888" value={form.details.nature_of_business || ''} onChangeText={(val) => handleDetailChange('nature_of_business', val)} />
+                        <TextInput style={[styles.textInput, !!errors['details.nature_of_business'] && styles.inputError]} placeholder="Nature of Business *" placeholderTextColor="#A9A9A9" value={form.details.nature_of_business || ''} onChangeText={(val) => handleDetailChange('nature_of_business', val)} />
                         <ErrorMessage error={errors['details.nature_of_business']} />
                     </>
                 )}
 
                 {form.request_type === 'Barangay Certification (First Time Jobseeker)' && (
                     <>
-                        <TextInput style={[styles.textInput, !!errors['details.years_lived'] && styles.inputError]} placeholder="Number of Years at Address *" placeholderTextColor="#888" value={form.details.years_lived || ''} onChangeText={(val) => handleDetailChange('years_lived', val)} keyboardType="numeric" />
+                        <TextInput style={[styles.textInput, !!errors['details.years_lived'] && styles.inputError]} placeholder="Number of Years at Address *" placeholderTextColor="#A9A9A9" value={form.details.years_lived || ''} onChangeText={(val) => handleDetailChange('years_lived', val)} keyboardType="numeric" />
                         <ErrorMessage error={errors['details.years_lived']} />
-                        <TextInput style={[styles.textInput, !!errors['details.months_lived'] && styles.inputError]} placeholder="Number of Months at Address *" placeholderTextColor="#888" value={form.details.months_lived || ''} onChangeText={(val) => handleDetailChange('months_lived', val)} keyboardType="numeric" />
+                        <TextInput style={[styles.textInput, !!errors['details.months_lived'] && styles.inputError]} placeholder="Number of Months at Address *" placeholderTextColor="#A9A9A9" value={form.details.months_lived || ''} onChangeText={(val) => handleDetailChange('months_lived', val)} keyboardType="numeric" />
                         <ErrorMessage error={errors['details.months_lived']} />
                     </>
                 )}
                 
                 {form.request_type === 'Certificate of Indigency' && (
-                    <>
-                        <View style={[styles.pickerWrapper, !!errors['details.medical_educational_financial'] && styles.inputError]}>
-                            <Picker selectedValue={form.details.medical_educational_financial || ''} onValueChange={(val) => handleDetailChange('medical_educational_financial', val)}>
-                                <Picker.Item label="Select Purpose (Medical/Financial...) *" value="" enabled={false} style={{color: '#aaa'}}/>
-                                <Picker.Item label="Medical" value="Medical" />
-                                <Picker.Item label="Educational" value="Educational" />
-                                <Picker.Item label="Financial" value="Financial" />
-                            </Picker>
-                        </View>
-                        <ErrorMessage error={errors['details.medical_educational_financial']} />
-                    </>
+                    <PickerInput
+                        label="Purpose (Medical/Financial)"
+                        value={form.details.medical_educational_financial || ''}
+                        onValueChange={(val) => handleDetailChange('medical_educational_financial', val)}
+                        items={[
+                            { label: 'Select Purpose *', value: '', enabled: false },
+                            { label: 'Medical', value: 'Medical' },
+                            { label: 'Educational', value: 'Educational' },
+                            { label: 'Financial', value: 'Financial' },
+                        ]}
+                        error={errors['details.medical_educational_financial']}
+                        placeholder="Select Purpose *"
+                    />
                 )}
                 
                 {form.request_type === 'Barangay Permit (for installations)' && (
                      <>
-                        <TextInput style={[styles.textInput, !!errors['details.installation_construction_repair'] && styles.inputError]} placeholder="Installation/Construction/Repair *" placeholderTextColor="#888" value={form.details.installation_construction_repair || ''} onChangeText={(val) => handleDetailChange('installation_construction_repair', val)} />
+                        <TextInput style={[styles.textInput, !!errors['details.installation_construction_repair'] && styles.inputError]} placeholder="Installation/Construction/Repair *" placeholderTextColor="#A9A9A9" value={form.details.installation_construction_repair || ''} onChangeText={(val) => handleDetailChange('installation_construction_repair', val)} />
                         <ErrorMessage error={errors['details.installation_construction_repair']} />
-                        <TextInput style={[styles.textInput, !!errors['details.project_site'] && styles.inputError]} placeholder="Project Site *" placeholderTextColor="#888" value={form.details.project_site || ''} onChangeText={(val) => handleDetailChange('project_site', val)} />
+                        <TextInput style={[styles.textInput, !!errors['details.project_site'] && styles.inputError]} placeholder="Project Site *" placeholderTextColor="#A9A9A9" value={form.details.project_site || ''} onChangeText={(val) => handleDetailChange('project_site', val)} />
                         <ErrorMessage error={errors['details.project_site']} />
                     </>
                 )}
@@ -450,7 +530,7 @@ const NewDocumentRequestScreen = () => {
                      <Text style={styles.label}>Purpose of this Request <Text style={styles.requiredStar}>*</Text></Text>
                      <TextInput
                          placeholder="Be specific (e.g., For hospital application, For new job application)"
-                         placeholderTextColor="#888"
+                         placeholderTextColor="#A9A9A9"
                          value={form.purpose}
                          onChangeText={(val) => handleFormChange('purpose', val)}
                          style={[styles.textInput, { height: 100 }, !!errors.purpose && styles.inputError]}
@@ -467,7 +547,7 @@ const NewDocumentRequestScreen = () => {
         return (
             <View style={styles.loaderContainerFullPage}>
                 <ActivityIndicator size="large" color="#0F00D7" />
-                <Text style={{ marginTop: 10 }}>Loading your information...</Text>
+                <Text style={{ marginTop: 10, color: '#000' }}>Loading your information...</Text>
             </View>
         );
     }
@@ -483,49 +563,37 @@ const NewDocumentRequestScreen = () => {
             </View>
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} keyboardShouldPersistTaps="handled">
                 <Text style={styles.sectionTitle}>Requestor Information</Text>
-                <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Requesting For <Text style={styles.requiredStar}>*</Text></Text>
-                    <View style={[styles.pickerWrapper, !!errors.requestor_resident_id && styles.inputError]}>
-                        <Picker
-                            selectedValue={form.requestor_resident_id}
-                            onValueChange={(itemValue) => handleFormChange('requestor_resident_id', itemValue)}
-                            style={styles.picker}
-                        >
-                            {householdMembers.map((member) => (
-                                <Picker.Item key={member._id} label={`${member.first_name} ${member.last_name}`} value={member._id} />
-                            ))}
-                        </Picker>
-                    </View>
-                     <ErrorMessage error={errors.requestor_resident_id} />
-                </View>
+
+                <PickerInput
+                    label="Requesting For"
+                    value={form.requestor_resident_id}
+                    onValueChange={(itemValue) => handleFormChange('requestor_resident_id', itemValue)}
+                    items={householdMembers.map((member) => ({
+                        label: `${member.first_name} ${member.last_name}`,
+                        value: member._id,
+                    }))}
+                    error={errors.requestor_resident_id}
+                    placeholder="Select Requestor"
+                />
 
                 <Text style={styles.sectionTitle}>Document Details</Text>
-                <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Type of Document to Request <Text style={styles.requiredStar}>*</Text></Text>
-                    <View style={[styles.pickerWrapper, !!errors.request_type && styles.inputError]}>
-                        <Picker
-                            selectedValue={form.request_type}
-                            onValueChange={(itemValue) => handleFormChange('request_type', itemValue)}
-                            style={styles.picker}
-                        >
-                             {/* UPDATED: Placeholder is now disabled and styled */}
-                            <Picker.Item label="Select Document Type *" value="" enabled={false} style={{ color: '#aaa' }} />
-                            {DOCUMENT_TYPES.slice(1).map((opt) => ( // Sliced to skip the original placeholder
-                                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-                            ))}
-                        </Picker>
-                    </View>
-                     <ErrorMessage error={errors.request_type} />
-                </View>
+                
+                <PickerInput
+                    label="Type of Document to Request"
+                    value={form.request_type}
+                    onValueChange={(itemValue) => handleFormChange('request_type', itemValue)}
+                    items={DOCUMENT_TYPES}
+                    error={errors.request_type}
+                    placeholder="Select Document Type *"
+                />
 
                 {renderDynamicFields()}
 
-                {/* NEW: Conditionally render the DateTimePicker */}
                 {showDatePicker && (
                     <DateTimePicker
                         value={form.details[datePickerTarget] ? new Date(form.details[datePickerTarget]) : new Date()}
                         mode="date"
-                        display="default"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'} // FIX: Use spinner on iOS
                         onChange={onDateChange}
                     />
                 )}
@@ -550,42 +618,44 @@ const styles = StyleSheet.create({
     inputContainer: { marginBottom: 15 },
     label: { color: '#444', fontSize: 15, marginBottom: 7, fontWeight: '500' },
     requiredStar: { color: 'red' },
-    textInput: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, fontSize: 16, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 12 : 10, color: '#333', backgroundColor: '#F9F9F9' },
-    readOnlyInput: { backgroundColor: '#ECEFF1', color: '#546E7A' },
+    textInput: { borderWidth: 1, borderColor: '#DDD', marginTop: 5, marginBottom: 5, borderRadius: 8, fontSize: 16, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 12 : 10, color: '#000', backgroundColor: '#F9F9F9' },
     pickerWrapper: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, backgroundColor: '#F9F9F9' },
-    picker: { height: 50, width: '100%', color: '#333' },
+    pickerText: { color: '#000' },
+    pickerPlaceholder: { color: '#A9A9A9' },
     buttonContainer: { marginTop: 25 },
     submitButton: { backgroundColor: '#5E76FF', paddingVertical: 15, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minHeight: 50 },
     buttonDisabled: { backgroundColor: '#A9B4FF' },
     submitButtonText: { color: 'white', fontSize: 17, fontWeight: 'bold' },
     loaderContainerFullPage: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' },
-    inputError: {
-        borderColor: '#D32F2F',
+    inputError: { borderColor: '#D32F2F' },
+    errorText: { color: '#D32F2F', fontSize: 12, marginTop: 4, marginBottom: 4 },
+    datePickerButton: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 12 : 10, backgroundColor: '#F9F9F9', justifyContent: 'center', minHeight: 48 },
+    datePickerButtonText: { fontSize: 16, color: '#000' },
+    datePickerPlaceholderText: { fontSize: 16, color: '#A9A9A9' },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
-    errorText: {
-        color: '#D32F2F',
-        fontSize: 12,
-        marginTop: 4,
-        marginBottom: 4,
+    modalContent: {
+        backgroundColor: 'white',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingBottom: 20,
     },
-    // NEW: Styles for the date picker button
-    datePickerButton: {
-        borderWidth: 1,
-        borderColor: '#DDD',
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: Platform.OS === 'ios' ? 12 : 10,
-        backgroundColor: '#F9F9F9',
-        justifyContent: 'center',
-        minHeight: 48, // Ensure it has a similar height to TextInput
+    modalHeader: {
+        alignItems: 'flex-end',
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
-    datePickerButtonText: {
-        fontSize: 16,
-        color: '#333',
+    modalDoneButton: {
+        padding: 8,
     },
-    datePickerPlaceholderText: {
-        fontSize: 16,
-        color: '#888', // Grey color for placeholder
+    modalDoneText: {
+        color: '#007AFF',
+        fontSize: 17,
+        fontWeight: '600',
     },
 });
 

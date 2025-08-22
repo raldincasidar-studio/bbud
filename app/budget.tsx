@@ -194,6 +194,8 @@ const styles = StyleSheet.create({
         marginTop: 25, 
         marginBottom: 8, 
         paddingHorizontal: 20, 
+        maxWidth: '100%',
+        boxSizing: 'border-box',
     },
     // --- FONT SIZE FIX ---
     sectionHeaderText: { 
@@ -207,6 +209,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold', 
         color: '#333', 
         textAlign: 'right', 
+        paddingLeft: 10,
+        boxSizing: 'border-box',
     },
     itemContainer: { 
         flexDirection: 'row', 
@@ -224,6 +228,7 @@ const styles = StyleSheet.create({
         fontSize: 14, // Changed from 15
         color: '#444', 
         fontWeight: '500', 
+        paddingLeft: 10,
     },
     // --- END FONT SIZE FIX ---
     footerContainer: { 

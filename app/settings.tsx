@@ -66,7 +66,7 @@ const ToggleSection = ({ label, value, onValueChange, idLabel, idValue, onIdChan
         {value && (
             <View style={styles.conditionalContainer}>
                 <Text style={styles.label}>{idLabel}</Text>
-                <TextInput style={[styles.textInput, !!idError && styles.inputError]} value={idValue || ''} onChangeText={onIdChange} placeholder={idLabel.replace('*', '')} />
+                <TextInput style={[styles.textInput, !!idError && styles.inputError]} value={idValue || ''} onChangeText={onIdChange} placeholder={idLabel.replace('*', '')} placeholderTextColor="#A9A9A9" />
                 <ErrorMessage error={idError} />
                 <TouchableOpacity style={styles.imagePickerButton} onPress={onProofPress}>
                     <Text style={styles.imagePickerButtonText}>{proofValue ? 'Change Proof' : 'Upload Proof'}</Text>
@@ -272,13 +272,13 @@ export default function SettingsScreen() {
                     <View style={styles.inputGroup}><Text style={styles.label}>Email Address</Text><TextInput style={[styles.textInput, styles.textInputDisabled]} value={formState.email} editable={false} /></View>
                     <View style={styles.inputGroup}><Text style={styles.label}>Contact Number</Text><TextInput style={[styles.textInput, !!errors.contact_number && styles.inputError]} value={formState.contact_number || ''} onChangeText={(v) => handleInputChange('contact_number', v)} keyboardType="phone-pad" maxLength={11} /><ErrorMessage error={errors.contact_number} /></View>
                     
-                    <View style={styles.inputGroup}><Text style={styles.label}>Date of Birth *</Text><TouchableOpacity style={[styles.datePickerButton, !!errors.date_of_birth && styles.inputError]} onPress={() => setDatePickerVisibility(true)}><Text style={styles.datePickerText}>{formState.date_of_birth || 'Select Date'}</Text></TouchableOpacity><ErrorMessage error={errors.date_of_birth} /></View>
-                    <DateTimePickerModal isVisible={isDatePickerVisible} mode="date" minimumDate={undefined} date={new Date(formState.date_of_birth || Date.now())} onConfirm={(d) => { handleInputChange('date_of_birth', d.toISOString().split('T')[0]); setDatePickerVisibility(false); }} onCancel={() => setDatePickerVisibility(false)} />
+                    <View style={styles.inputGroup}><Text style={styles.label}>Date of Birth *</Text><TouchableOpacity style={[styles.datePickerButton, !!errors.date_of_birth && styles.inputError]} onPress={() => setDatePickerVisibility(true)}><Text style={formState.date_of_birth ? styles.datePickerText : styles.datePickerPlaceholderText}>{formState.date_of_birth || 'Select Date'}</Text></TouchableOpacity><ErrorMessage error={errors.date_of_birth} /></View>
+                    <DateTimePickerModal isVisible={isDatePickerVisible} mode="date" date={new Date(formState.date_of_birth || Date.now())} onConfirm={(d) => { handleInputChange('date_of_birth', d.toISOString().split('T')[0]); setDatePickerVisibility(false); }} onCancel={() => setDatePickerVisibility(false)} display={Platform.OS === 'ios' ? 'spinner' : 'default'} />
                     
-                    <View style={styles.inputGroup}><Text style={styles.label}>Sex *</Text><View style={[styles.pickerWrapper, !!errors.sex && styles.inputError]}><Picker selectedValue={formState.sex} onValueChange={(v) => handleInputChange('sex', v)}><Picker.Item label="Select Sex..." value="" /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View><ErrorMessage error={errors.sex} /></View>
-                    <View style={styles.inputGroup}><Text style={styles.label}>Civil Status *</Text><View style={[styles.pickerWrapper, !!errors.civil_status && styles.inputError]}><Picker selectedValue={formState.civil_status} onValueChange={(v) => handleInputChange('civil_status', v)}><Picker.Item label="Select Status..." value="" /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View><ErrorMessage error={errors.civil_status} /></View>
+                    <View style={styles.inputGroup}><Text style={styles.label}>Sex *</Text><View style={[styles.pickerWrapper, !!errors.sex && styles.inputError]}><Picker selectedValue={formState.sex} onValueChange={(v) => handleInputChange('sex', v)} style={[styles.pickerText, !formState.sex && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Sex..." value="" /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View><ErrorMessage error={errors.sex} /></View>
+                    <View style={styles.inputGroup}><Text style={styles.label}>Civil Status *</Text><View style={[styles.pickerWrapper, !!errors.civil_status && styles.inputError]}><Picker selectedValue={formState.civil_status} onValueChange={(v) => handleInputChange('civil_status', v)} style={[styles.pickerText, !formState.civil_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Status..." value="" /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View><ErrorMessage error={errors.civil_status} /></View>
                     <View style={styles.inputGroup}><Text style={styles.label}>Citizenship *</Text><TextInput style={[styles.textInput, !!errors.citizenship && styles.inputError]} value={formState.citizenship} onChangeText={(v) => handleInputChange('citizenship', v)} /><ErrorMessage error={errors.citizenship} /></View>
-                    <View style={styles.inputGroup}><Text style={styles.label}>Occupation Status *</Text><View style={[styles.pickerWrapper, !!errors.occupation_status && styles.inputError]}><Picker selectedValue={formState.occupation_status} onValueChange={(v) => handleInputChange('occupation_status', v)}><Picker.Item label="Select Status..." value="" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Student" value="Student" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={errors.occupation_status} /></View>
+                    <View style={styles.inputGroup}><Text style={styles.label}>Occupation Status *</Text><View style={[styles.pickerWrapper, !!errors.occupation_status && styles.inputError]}><Picker selectedValue={formState.occupation_status} onValueChange={(v) => handleInputChange('occupation_status', v)} style={[styles.pickerText, !formState.occupation_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Status..." value="" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Student" value="Student" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={errors.occupation_status} /></View>
                     
                     <Text style={styles.sectionTitle}>Address Information</Text>
                      <View style={styles.inputGroup}><Text style={styles.label}>House No. / Bldg No. *</Text><TextInput style={[styles.textInput, !!errors.address_house_number && styles.inputError]} value={formState.address_house_number} onChangeText={(v) => handleInputChange('address_house_number', v)} /><ErrorMessage error={errors.address_house_number} /></View>
@@ -300,16 +300,16 @@ export default function SettingsScreen() {
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>New Password</Text>
                         <View style={[styles.passwordContainer, !!errors.newPassword && styles.inputError]}>
-                            <TextInput style={styles.passwordInput} secureTextEntry={!showPassword} value={formState.newPassword || ''} onChangeText={(v) => handleInputChange('newPassword', v)} placeholder="Leave blank to keep current" />
-                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}><MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={24} color="#666" /></TouchableOpacity>
+                            <TextInput style={styles.passwordInput} secureTextEntry={!showPassword} value={formState.newPassword || ''} onChangeText={(v) => handleInputChange('newPassword', v)} placeholder="Leave blank to keep current" placeholderTextColor="#A9A9A9" />
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}><MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={24} color="#888" /></TouchableOpacity>
                         </View>
                         <ErrorMessage error={errors.newPassword} />
                     </View>
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Confirm New Password</Text>
                         <View style={[styles.passwordContainer, !!errors.confirmNewPassword && styles.inputError]}>
-                            <TextInput style={styles.passwordInput} secureTextEntry={!showPassword} value={formState.confirmNewPassword || ''} onChangeText={(v) => handleInputChange('confirmNewPassword', v)} placeholder="Confirm new password" />
-                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}><MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={24} color="#666" /></TouchableOpacity>
+                            <TextInput style={styles.passwordInput} secureTextEntry={!showPassword} value={formState.confirmNewPassword || ''} onChangeText={(v) => handleInputChange('confirmNewPassword', v)} placeholder="Confirm new password" placeholderTextColor="#A9A9A9" />
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}><MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={24} color="#888" /></TouchableOpacity>
                         </View>
                         <ErrorMessage error={errors.confirmNewPassword} />
                     </View>
@@ -337,13 +337,18 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginTop: 25, marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#E0E0E0', paddingBottom: 8 },
     inputGroup: { marginBottom: 12 },
     label: { fontSize: 14, color: '#424242', marginBottom: 6, fontWeight: '500' },
-    textInput: { backgroundColor: 'white', borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 14 : 10, fontSize: 15, color: '#212121' },
+    textInput: { backgroundColor: 'white', borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 14 : 10, fontSize: 15, color: '#000' },
     textInputDisabled: { backgroundColor: '#EEEEEE', color: '#757575' },
     pickerWrapper: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, backgroundColor: 'white' },
+    // FIX: Style for selected picker text
+    pickerText: { color: '#000' },
+    // FIX: Style for picker placeholder text
+    pickerPlaceholder: { color: '#A9A9A9' },
     datePickerButton: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, padding: 14, backgroundColor: 'white' },
-    datePickerText: { fontSize: 15, color: '#212121' },
+    datePickerText: { fontSize: 15, color: '#000' },
+    datePickerPlaceholderText: { fontSize: 15, color: '#A9A9A9' },
     passwordContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, backgroundColor: 'white' },
-    passwordInput: { flex: 1, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 14 : 10, fontSize: 15 },
+    passwordInput: { flex: 1, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 14 : 10, fontSize: 15, color: '#000' },
     eyeIcon: { padding: 10 },
     toggleSectionContainer: { backgroundColor: '#FFF', padding: 15, borderRadius: 8, borderWidth: 1, borderColor: '#EAEAEA', marginBottom: 15 },
     toggleSwitchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

@@ -218,6 +218,7 @@ const NewBorrowAssetScreen = () => {
                             selectedValue={transaction.item_borrowed}
                             onValueChange={(itemValue) => handleInputChange('item_borrowed', itemValue)}
                             enabled={inventoryItems.length > 0}
+                            itemStyle={{ color: 'black' }}
                         >
                             <Picker.Item label="Select an available item..." value="" />
                             {inventoryItems.map((item) => (

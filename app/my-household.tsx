@@ -395,6 +395,7 @@ const MyHouseholdScreen = () => {
                 <Text style={[styles.memberName, isCurrentUser && styles.currentUserName]}>
                     {`${member.first_name || ''} ${member.middle_name || ''} ${member.last_name || ''}`.trim()}
                     {isCurrentUser && " (You)"}
+                    &nbsp;<Text style={{ color: "#b6b6b6ff" }}>{`#${member?._id.slice(-4)}`}</Text>
                 </Text>
                 <Text style={styles.memberDetail}>{member.relationship_to_head === 'Other' ? member.other_relationship : member.relationship_to_head || 'N/A'}</Text>
             </View>
@@ -479,22 +480,22 @@ const MyHouseholdScreen = () => {
                                 <Text style={styles.label}>Date of Birth*</Text>
                                 <TouchableOpacity style={[styles.datePickerButtonModal, !!memberErrors.date_of_birth && styles.inputError]} onPress={showDatePicker}><Text style={currentMember.date_of_birth ? styles.datePickerButtonText : styles.datePickerPlaceholderText}>{currentMember.date_of_birth || 'Date of Birth*'}</Text></TouchableOpacity><ErrorMessage error={memberErrors.date_of_birth} />
                                 <Text style={styles.label}>Relationship to Head*</Text>
-                                <View style={[styles.pickerWrapperSmall, !!memberErrors.relationship_to_head && styles.inputError]}><Picker selectedValue={currentMember.relationship_to_head} onValueChange={(v) => handleMemberInputChange('relationship_to_head', v)} style={!currentMember.relationship_to_head ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Relationship*" value="" enabled={false} /><Picker.Item label="Child" value="Child" /><Picker.Item label="Spouse" value="Spouse" /><Picker.Item label="Parent" value="Parent" /><Picker.Item label="Sibling" value="Sibling" /><Picker.Item label="Other Relative" value="Other Relative" /><Picker.Item label="House Helper" value="House Helper" /><Picker.Item label="Other" value="Other" /></Picker></View><ErrorMessage error={memberErrors.relationship_to_head} />
+                                <View style={[styles.pickerWrapperSmall, !!memberErrors.relationship_to_head && styles.inputError]}><Picker itemStyle={{ color: 'black' }} selectedValue={currentMember.relationship_to_head} onValueChange={(v) => handleMemberInputChange('relationship_to_head', v)} style={!currentMember.relationship_to_head ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Relationship*" value="" enabled={false} /><Picker.Item label="Child" value="Child" /><Picker.Item label="Spouse" value="Spouse" /><Picker.Item label="Parent" value="Parent" /><Picker.Item label="Sibling" value="Sibling" /><Picker.Item label="Other Relative" value="Other Relative" /><Picker.Item label="House Helper" value="House Helper" /><Picker.Item label="Other" value="Other" /></Picker></View><ErrorMessage error={memberErrors.relationship_to_head} />
                                 {currentMember.relationship_to_head === 'Other' && (<><Text style={styles.label}>Specify Relationship*</Text><TextInput style={[styles.modalInput, !!memberErrors.other_relationship && styles.inputError]} placeholder="Please specify relationship*" value={currentMember.other_relationship} onChangeText={(v) => handleMemberInputChange('other_relationship', v)} /><ErrorMessage error={memberErrors.other_relationship} /></>)}
                                 <Text style={styles.label}>Sex*</Text>
-                                <View style={[styles.pickerWrapperSmall, !!memberErrors.sex && styles.inputError]}><Picker selectedValue={currentMember.sex} onValueChange={(v) => handleMemberInputChange('sex', v)} style={!currentMember.sex ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Sex*" value="" enabled={false} /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View><ErrorMessage error={memberErrors.sex} />
+                                <View style={[styles.pickerWrapperSmall, !!memberErrors.sex && styles.inputError]}><Picker itemStyle={{ color: 'black' }} selectedValue={currentMember.sex} onValueChange={(v) => handleMemberInputChange('sex', v)} style={!currentMember.sex ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Sex*" value="" enabled={false} /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View><ErrorMessage error={memberErrors.sex} />
                                 <Text style={styles.label}>Civil Status*</Text>
-                                <View style={[styles.pickerWrapperSmall, !!memberErrors.civil_status && styles.inputError]}><Picker selectedValue={currentMember.civil_status} onValueChange={(v) => handleMemberInputChange('civil_status', v)} style={!currentMember.civil_status ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Civil Status*" value="" enabled={false} /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View><ErrorMessage error={memberErrors.civil_status} />
+                                <View style={[styles.pickerWrapperSmall, !!memberErrors.civil_status && styles.inputError]}><Picker itemStyle={{ color: 'black' }} selectedValue={currentMember.civil_status} onValueChange={(v) => handleMemberInputChange('civil_status', v)} style={!currentMember.civil_status ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Civil Status*" value="" enabled={false} /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View><ErrorMessage error={memberErrors.civil_status} />
                                 <Text style={styles.label}>Citizenship*</Text>
                                 <TextInput style={[styles.modalInput, !!memberErrors.citizenship && styles.inputError]} placeholder="Citizenship*" value={currentMember.citizenship} onChangeText={(v) => handleMemberInputChange('citizenship', v)} /><ErrorMessage error={memberErrors.citizenship} />
                                 <Text style={styles.label}>Occupation Status*</Text>
-                                <View style={[styles.pickerWrapperSmall, !!memberErrors.occupation_status && styles.inputError]}><Picker selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)} style={!currentMember.occupation_status ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={memberErrors.occupation_status} />
+                                <View style={[styles.pickerWrapperSmall, !!memberErrors.occupation_status && styles.inputError]}><Picker itemStyle={{ color: 'black' }} selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)} style={!currentMember.occupation_status ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={memberErrors.occupation_status} />
                                 
                                 {BLOOD_RELATIONSHIPS.includes(currentMember.relationship_to_head) && (
                                     <View style={styles.proofSection}>
                                         <Text style={styles.modalSectionTitle}>Proof of Relationship</Text>
                                         <Text style={styles.label}>Proof Type*</Text>
-                                        <View style={[styles.pickerWrapperSmall, !!memberErrors.proof_type && styles.inputError]}><Picker selectedValue={proofType} onValueChange={(itemValue) => {setProofType(itemValue); setMemberErrors(p => ({...p, proof_type: undefined}))}}><Picker.Item label="Select Proof Document*" value="" /><Picker.Item label="Birth Certificate" value="Birth Certificate" /><Picker.Item label="Marriage Certificate" value="Marriage Certificate" /><Picker.Item label="Valid ID Card" value="Valid ID Card" /></Picker></View>
+                                        <View style={[styles.pickerWrapperSmall, !!memberErrors.proof_type && styles.inputError]}><Picker itemStyle={{ color: 'black' }} selectedValue={proofType} onValueChange={(itemValue) => {setProofType(itemValue); setMemberErrors(p => ({...p, proof_type: undefined}))}}><Picker.Item label="Select Proof Document*" value="" /><Picker.Item label="Birth Certificate" value="Birth Certificate" /><Picker.Item label="Marriage Certificate" value="Marriage Certificate" /><Picker.Item label="Valid ID Card" value="Valid ID Card" /></Picker></View>
                                         <ErrorMessage error={memberErrors.proof_type} />
                                         <Text style={styles.label}>Proof Image*</Text>
                                         <TouchableOpacity style={[styles.filePickerButton, !!memberErrors.proof_image && styles.inputErrorBorder]} onPress={() => pickImage(setProofImageBase64, 'proof_image')}>
@@ -523,16 +524,17 @@ const MyHouseholdScreen = () => {
                         </View>
                     </View>
                 </KeyboardAvoidingView>
+                
+                <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={handleConfirmDate}
+                    onCancel={hideDatePicker}
+                    minimumDate={new Date(1900, 0, 1)}
+                    maximumDate={new Date()}
+                />
             </Modal>
 
-            <DateTimePickerModal
-                isVisible={isDatePickerVisible}
-                mode="date"
-                onConfirm={handleConfirmDate}
-                onCancel={hideDatePicker}
-                minimumDate={new Date(1900, 0, 1)}
-                maximumDate={new Date()}
-            />
         </SafeAreaView>
     );
 };
