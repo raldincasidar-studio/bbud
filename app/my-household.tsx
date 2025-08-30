@@ -57,7 +57,6 @@ const initialMemberState = {
     civil_status: '',
     citizenship: 'Filipino',
     occupation_status: '',
-    contact_number: '',
     relationship_to_head: '',
     other_relationship: '',
     email: '',
@@ -130,43 +129,62 @@ const MyHouseholdScreen = () => {
         setIsSaving(false);
     };
 
+    // Helper for common validation patterns
+    const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim());
+
     const validateMemberField = (fieldName: keyof Member, value: any, state: Member) => {
         let error = '';
-        const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim());
-        const isEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-        const hasNumber = (val: string) => /\d/.test(val);
 
         switch (fieldName) {
             case 'first_name':
             case 'last_name':
                 if (isRequired(value)) error = 'This field is required.';
-                else if (hasNumber(value)) error = 'This field cannot contain numbers.';
+                else if (value.length < 2) error = 'This field must be at least 2 characters long.';
+                else if (/[^a-zA-Z\s\-']/.test(value)) error = 'Only letters, spaces, hyphens, and apostrophes are allowed.';
                 break;
             case 'middle_name':
-                 if (value && hasNumber(value)) error = 'This field cannot contain numbers.';
-                 break;
-            case 'sex': case 'civil_status': case 'occupation_status':
-                 if (isRequired(value)) error = 'This field is required.'; break;
-            case 'date_of_birth': if (isRequired(value)) error = 'Date of birth is required.'; break;
+                if (value && /[^a-zA-Z\s\-']/.test(value)) error = 'Only letters, spaces, hyphens, and apostrophes are allowed.';
+                break;
+            case 'sex':
+            case 'civil_status':
+            case 'occupation_status':
+                if (isRequired(value)) error = 'This field is required.';
+                break;
+            case 'date_of_birth':
+                if (isRequired(value)) error = 'Date of birth is required.';
+                break;
             case 'citizenship':
                 if (isRequired(value)) error = 'Citizenship is required.';
-                else if (hasNumber(value)) error = 'This field cannot contain numbers.';
+                else if (value.length < 2) error = 'Citizenship must be at least 2 characters long.';
+                else if (/[^a-zA-Z\s\-']/.test(value)) error = 'Only letters, spaces, hyphens, and apostrophes are allowed.';
                 break;
             case 'email':
-                if (value && !isEmail(value)) error = 'Please enter a valid email address.';
+                if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Please enter a valid email address.';
                 break;
             case 'password':
-                if (state.email && isRequired(value)) error = 'Password is required for account creation.';
+                if (state.email && isRequired(value)) error = 'Password is required for account creation if an email is provided.';
                 else if (value && value.length < 6) error = 'Password must be at least 6 characters.';
                 break;
-            case 'relationship_to_head': if (value === 'Other' && isRequired(state.other_relationship)) {} else if (isRequired(value)) error = 'Relationship is required.'; break;
+            case 'relationship_to_head':
+                if (isRequired(value)) error = 'Relationship is required.';
+                break;
             case 'other_relationship':
                 if (state.relationship_to_head === 'Other' && isRequired(value)) error = 'Please specify the relationship.';
-                else if (value && hasNumber(value)) error = 'This field cannot contain numbers.';
+                else if (value && value.length < 2) error = 'This field must be at least 2 characters long.';
+                else if (value && /[^a-zA-Z\s\-']/.test(value)) error = 'Only letters, spaces, hyphens, and apostrophes are allowed.';
                 break;
-            case 'voter_id_number': if (state.is_voter && isRequired(value)) error = "Voter ID is required."; break;
-            case 'pwd_id': if (state.is_pwd && isRequired(value)) error = "PWD ID is required."; break;
-            case 'senior_citizen_id': if (state.is_senior_citizen && isRequired(value)) error = "Senior Citizen ID is required."; break;
+            case 'voter_id_number':
+                if (state.is_voter && isRequired(value)) error = "Voter ID is required.";
+                else if (value && !/^[a-zA-Z0-9\s\-\/]{1,}$/.test(value)) error = "Invalid format. Alphanumeric, spaces, hyphens, and slashes are allowed.";
+                break;
+            case 'pwd_id':
+                if (state.is_pwd && isRequired(value)) error = "PWD ID is required.";
+                else if (value && !/^[a-zA-Z0-9\s\-\/]{1,}$/.test(value)) error = "Invalid format. Alphanumeric, spaces, hyphens, and slashes are allowed.";
+                break;
+            case 'senior_citizen_id':
+                if (state.is_senior_citizen && isRequired(value)) error = "Senior Citizen ID is required.";
+                else if (value && !/^[a-zA-Z0-9\s\-\/]{1,}$/.test(value)) error = "Invalid format. Alphanumeric, spaces, hyphens, and slashes are allowed.";
+                break;
         }
         return error;
     };
@@ -247,6 +265,7 @@ const MyHouseholdScreen = () => {
         }
 
         const memberAge = calculateAge(currentMember.date_of_birth);
+        // Only require email/password if member is old enough AND one of them is provided
         if (memberAge !== null && memberAge >= 15 && (currentMember.email || currentMember.password)) {
             fieldsToValidate.push('email', 'password');
         }

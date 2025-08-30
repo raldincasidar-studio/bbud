@@ -106,15 +106,15 @@ const BudgetScreen = () => {
 
     // --- Render Functions ---
     const renderItem = ({ item }: { item: BudgetItem }) => (
-        <View style={[styles.itemContainer, { paddingRight: 20, paddingLeft: 30}]}>
+        <View style={styles.itemContainer}> 
             <Text style={styles.itemName} numberOfLines={1}>{item.budgetName}</Text>
             <Text style={styles.itemAmount}>{formatCurrency(item.amount)}</Text>
         </View>
     );
 
     const renderSectionHeader = ({ section }: { section: BudgetSection }) => (
-        <View style={[styles.sectionHeaderContainer, { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }]}>
-            <Text style={[styles.sectionHeaderText, { color: 'black' }]} ellipsizeMode="tail">
+        <View style={styles.sectionHeaderContainer}> 
+            <Text style={styles.sectionHeaderText} ellipsizeMode="tail">
                 {section.title}
             </Text>
             <Text style={styles.sectionHeaderTotal}>{formatCurrency(section.subTotal)}</Text>
@@ -152,25 +152,25 @@ const BudgetScreen = () => {
                     <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.navbarTitle}>Budget</Text>
-                <View style={{width: 28}} />
+                {/* Placeholder for consistent spacing */}
+                <View style={{width: 28}} /> 
             </View>
 
-
-            
             <SectionList
                 sections={sections}
                 keyExtractor={item => item._id}
                 renderItem={renderItem}
                 renderSectionHeader={renderSectionHeader}
                 style={styles.container}
-                contentContainerStyle={{ paddingBottom: 40 }}
+                contentContainerStyle={{ paddingBottom: 60 }} 
                 ListHeaderComponent={() => (
                     <Text style={styles.mainTitle}>Budget Management</Text>
                 )}
                 ListFooterComponent={() => (
-                    <View style={[styles.footerContainer, { flex: 1, justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row' }]}>
-                        <Text style={[styles.totalLabel, { color: '#0F00D7'}]}>Total Expenditures</Text>
-                        <Text style={[styles.totalAmount, { color: '#0F00D7'}]}>P {formatCurrency(totalExpenditures)}</Text>
+                    // The footerContainer is now set to a column layout
+                    <View style={styles.footerContainer}>
+                        <Text style={styles.totalLabel}>Total Expenditures</Text>
+                        <Text style={styles.totalAmount}>₱ {formatCurrency(totalExpenditures)}</Text>
                     </View>
                 )}
                 stickySectionHeadersEnabled={false}
@@ -181,91 +181,130 @@ const BudgetScreen = () => {
 };
 
 // ===================================================================
-// === STYLESHEET WITH UPDATED FONT SIZES
+// === UPDATED STYLESHEET FOR BETTER DESIGN
 // ===================================================================
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#0F00D7' },
-    navbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, paddingTop: Platform.OS === 'android' ? 30 : 45, backgroundColor: '#0F00D7'},
-    navbarTitle: { fontSize: 20, fontWeight: 'bold', color: 'white' },
-    container: { flex: 1, backgroundColor: '#FFFFFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, marginTop: -1, },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: 'white',},
-    mainTitle: { fontSize: 22, fontWeight: 'bold', marginVertical: 15, textAlign: 'center', paddingHorizontal: 20,},
+    safeArea: { 
+        flex: 1, 
+        backgroundColor: '#0F00D7' 
+    },
+    navbar: { 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        paddingHorizontal: 15, 
+        paddingVertical: 10, 
+        paddingTop: Platform.OS === 'android' ? 30 : 45, 
+        backgroundColor: '#0F00D7'
+    },
+    navbarTitle: { 
+        fontSize: 20, 
+        fontWeight: 'bold', 
+        color: 'white' 
+    },
+    container: { 
+        flex: 1, 
+        backgroundColor: '#FFFFFF', 
+        borderTopLeftRadius: 20, 
+        borderTopRightRadius: 20, 
+        marginTop: -1, 
+    },
+    centered: { 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        padding: 20, 
+        backgroundColor: 'white',
+    },
+    mainTitle: { 
+        fontSize: 24, 
+        fontWeight: 'bold', 
+        marginVertical: 25, 
+        textAlign: 'center', 
+        paddingHorizontal: 20,
+        color: '#333', 
+    },
     sectionHeaderContainer: { 
         marginTop: 25, 
-        marginBottom: 8, 
-        paddingHorizontal: 20, 
-        maxWidth: '100%',
-        boxSizing: 'border-box',
+        marginBottom: 12, 
+        paddingHorizontal: 24, 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
     },
-    // --- FONT SIZE FIX ---
     sectionHeaderText: { 
-        fontSize: 16, // Changed from 18
+        fontSize: 18, 
         fontWeight: 'bold', 
-        color: '#000', 
-        marginBottom: 4,
+        color: '#222', 
+        flex: 1, 
+        marginRight: 10, 
     },
     sectionHeaderTotal: { 
-        fontSize: 16, // Changed from 18
+        fontSize: 18, 
         fontWeight: 'bold', 
-        color: '#333', 
+        color: '#555', 
         textAlign: 'right', 
-        paddingLeft: 10,
-        boxSizing: 'border-box',
     },
     itemContainer: { 
         flexDirection: 'row', 
         justifyContent: 'space-between', 
-        paddingVertical: 8, 
-        paddingHorizontal: 35, 
+        alignItems: 'center', 
+        paddingVertical: 12, 
+        paddingHorizontal: 24, 
+        borderBottomWidth: StyleSheet.hairlineWidth, 
+        borderColor: '#eee', 
     },
     itemName: { 
-        fontSize: 14, // Changed from 15
+        fontSize: 15, 
         color: '#444', 
         flex: 1, 
-        marginRight: 8,
+        marginRight: 16, 
     },
     itemAmount: { 
-        fontSize: 14, // Changed from 15
+        fontSize: 15, 
         color: '#444', 
-        fontWeight: '500', 
-        paddingLeft: 10,
+        fontWeight: '600', 
     },
-    // --- END FONT SIZE FIX ---
     footerContainer: { 
-        marginTop: 30, 
-        marginHorizontal: 20, 
-        paddingTop: 15, 
+        marginTop: 35, 
+        marginHorizontal: 24, 
+        paddingTop: 18, 
         borderTopWidth: 2, 
-        borderColor: '#000', 
+        borderColor: '#0F00D7', 
+        flexDirection: 'column', // <--- CHANGED: Layout children in a column
+        // alignItems: 'flex-start', // <--- CHANGED: Align children to the start (left)
+        paddingBottom: 20, // Added some padding at the bottom of the footer
     },
     totalLabel: { 
-        fontSize: 17, // Changed from 18
+        fontSize: 18, 
         fontWeight: 'bold', 
-        color: '#000', 
-        marginBottom: 5, 
+        color: '#0F00D7', 
+        marginBottom: 8, // <--- ADDED: Space between label and amount
+        alignSelf: 'flex-start',
     },
     totalAmount: { 
-        fontSize: 17, // Changed from 18
+        fontSize: 22, // <--- CHANGED: Slightly larger for emphasis
         fontWeight: 'bold', 
-        color: '#000', 
-        textAlign: 'right', 
+        color: '#0F00D7', 
+        // Removed textAlign: 'right' as it's not needed with column layout and flex-start alignment
+        alignSelf: 'flex-end',
     },
     errorText: { 
         color: '#D32F2F', 
         fontSize: 18, 
         fontWeight: 'bold', 
-        marginBottom: 5, 
+        marginBottom: 8, 
         textAlign: 'center', 
     },
     retryButton: { 
         backgroundColor: '#0F00D7', 
-        paddingVertical: 12, 
-        paddingHorizontal: 25, 
-        borderRadius: 8, 
+        paddingVertical: 14, 
+        paddingHorizontal: 30, 
+        borderRadius: 10, 
     },
     retryButtonText: { 
         color: '#FFFFFF', 
-        fontSize: 16, 
+        fontSize: 17, 
         fontWeight: 'bold', 
     }
 });

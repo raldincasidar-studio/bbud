@@ -1,4 +1,3 @@
-// import { Picker } from '@react-native-picker/picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -22,16 +21,21 @@ export default function Index() {
 
   const [user, setUser] = useState(null);
   const [officials, setOfficials] = useState<Official[]>([]);
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0); // New state for notification count
 
   const fetchNotifications = useCallback(async () => {
     if (user?._id) {
       const path = `/api/residents/${user._id}/notifications`;
-      const data = await apiRequest('get', path, null);
-      if (data && data.unreadCount > 0) {
-        setHasUnreadNotifications(true);
-      } else {
-        setHasUnreadNotifications(false);
+      try {
+        const data = await apiRequest('get', path, null);
+        if (data && typeof data.unreadCount === 'number') {
+          setUnreadNotificationCount(data.unreadCount); // Set the actual unread count
+        } else {
+          setUnreadNotificationCount(0); // Default to 0 if data or unreadCount is missing/invalid
+        }
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        setUnreadNotificationCount(0); // Ensure count is reset on error
       }
     }
   }, [user]);
@@ -122,8 +126,19 @@ export default function Index() {
         paddingTop: 40
       }}>
         <Image style={{ height: 50, width: 130, objectFit: 'contain' }} source={require('@/assets/images/logo-name.png')} />
-        <TouchableOpacity onPress={() => router.push('/notification')}>
-          <Image style={{ height: 30, objectFit: 'contain', width: 30 }} source={hasUnreadNotifications ? require('@/assets/images/notification-red.png') : require('@/assets/images/notification.png')} />
+        {/* Updated Notification Icon with Number Badge */}
+        <TouchableOpacity onPress={() => router.push('/notification')} style={{ position: 'relative' }}>
+          <Image
+            style={{ height: 30, objectFit: 'contain', width: 30 }}
+            source={require('@/assets/images/notification.png')} // Always use the regular bell icon
+          />
+          {unreadNotificationCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationBadgeText}>
+                {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount} {/* Display '99+' for counts over 99 */}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -159,74 +174,53 @@ export default function Index() {
       
 
       {/* Grid of selection */}
-      <View style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        padding: 20,
-        paddingBottom: 0,
-        width: '100%',
-      }}>
+      <View style={styles.menuGridContainer}>
         {/* Request Document */}
-        <TouchableOpacity onPress={() => router.push('/request-document')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/request-document.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>Request Document</Text>
+        <TouchableOpacity onPress={() => router.push('/request-document')} style={styles.menuItemWrapper}>
+            <View style={styles.menuItemIconContainer}>
+                <Image style={styles.menuItemIcon} source={require('@/assets/images/request-document.png')} />
+            </View>
+            <Text style={styles.menuItemText}>Request Document</Text>
         </TouchableOpacity>
 
-        {/* File a complaint */}
-        <TouchableOpacity onPress={() => router.push('/complaints')} style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/file-a-complaint.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>File a complaint</Text>
+        {/* File Complaint */}
+        <TouchableOpacity onPress={() => router.push('/complaints')} style={styles.menuItemWrapper}>
+            <View style={styles.menuItemIconContainer}>
+                <Image style={styles.menuItemIcon} source={require('@/assets/images/file-a-complaint.png')} />
+            </View>
+            <Text style={styles.menuItemText}>File Complaint</Text>
         </TouchableOpacity>
 
         {/* Borrow Assets */}
-        <TouchableOpacity onPress={ () => router.push('/borrowed-assets') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/borrow-assets.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>Borrow Assets</Text>
+        <TouchableOpacity onPress={ () => router.push('/borrowed-assets') } style={styles.menuItemWrapper}>
+            <View style={styles.menuItemIconContainer}>
+                <Image style={styles.menuItemIcon} source={require('@/assets/images/borrow-assets.png')} />
+            </View>
+            <Text style={styles.menuItemText}>Borrow Assets</Text>
         </TouchableOpacity>
 
         {/* Emergency Hotlines */}
-        <TouchableOpacity onPress={ () => router.push('/emergency-hotlines') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/emergency-hotlines.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>Emergency Hotlines</Text>
+        <TouchableOpacity onPress={ () => router.push('/emergency-hotlines') } style={styles.menuItemWrapper}>
+            <View style={styles.menuItemIconContainer}>
+                <Image style={styles.menuItemIcon} source={require('@/assets/images/emergency-hotlines.png')} />
+            </View>
+            <Text style={styles.menuItemText}>Emergency Hotlines</Text>
         </TouchableOpacity>
 
         {/* Household */}
-        <TouchableOpacity onPress={ () => router.push('/my-household') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/household.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>Household</Text>
+        <TouchableOpacity onPress={ () => router.push('/my-household') } style={styles.menuItemWrapper}>
+            <View style={styles.menuItemIconContainer}>
+                <Image style={styles.menuItemIcon} source={require('@/assets/images/household.png')} />
+            </View>
+            <Text style={styles.menuItemText}>Household</Text>
         </TouchableOpacity>
 
         {/* Budget */}
-        <TouchableOpacity onPress={ () => router.push('/budget') } style={{ borderColor: '#0F00D7', padding: 10, display: 'flex', alignItems: 'center', width: '33%'}}>
-            <Image style={{ width: 60, height: 60, objectFit: 'contain', padding: 15, marginBottom: 10, backgroundColor: '#D8E9FC', borderRadius: 10}} source={require('@/assets/images/budget.png')} />
-            <Text style={{
-              fontSize: 12,
-              textAlign: 'center',
-              color: 'black',
-            }}>Budget</Text>
+        <TouchableOpacity onPress={ () => router.push('/budget') } style={styles.menuItemWrapper}>
+            <View style={styles.menuItemIconContainer}>
+                <Image style={styles.menuItemIcon} source={require('@/assets/images/budget.png')} />
+            </View>
+            <Text style={styles.menuItemText}>Budget</Text>
         </TouchableOpacity>
       </View>
           
@@ -306,5 +300,58 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#757575',
     textAlign: 'center',
+  },
+  // New styles for the notification badge
+  notificationBadge: {
+    position: 'absolute',
+    right: -5, // Adjust this value to position the badge horizontally
+    top: -5,   // Adjust this value to position the badge vertically
+    backgroundColor: 'red',
+    borderRadius: 10, // Makes it circular
+    width: 20,       // Badge width
+    height: 20,      // Badge height
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1, // Ensures the badge appears on top of the bell icon
+  },
+  notificationBadgeText: {
+    color: 'white',
+    fontSize: 11, // Adjust font size for better fit within the badge
+    fontWeight: 'bold',
+  },
+
+  // --- NEW STYLES FOR MENU GRID ---
+  menuGridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between', // Distribute items evenly
+    paddingHorizontal: 20, // Overall padding for the grid
+    paddingBottom: 0,
+    marginTop: 10, // Add some top margin to separate from the welcome message
+  },
+  menuItemWrapper: {
+    width: '30%', // Allows for 3 items per row with space in between
+    marginBottom: 20, // Vertical spacing between rows of items
+    alignItems: 'center', // Centers content (icon and text) horizontally
+  },
+  menuItemIconContainer: {
+    width: 70, // Fixed size for the background circle/square
+    height: 70,
+    borderRadius: 15, // Rounded corners for the icon background
+    backgroundColor: '#D8E9FC',
+    justifyContent: 'center', // Center icon vertically
+    alignItems: 'center', // Center icon horizontally
+    marginBottom: 10, // Space between icon and text
+  },
+  menuItemIcon: {
+    width: 45, // Size of the actual icon image
+    height: 45,
+    objectFit: 'contain',
+  },
+  menuItemText: {
+    fontSize: 12,
+    textAlign: 'center',
+    color: 'black',
+    fontWeight: '500', // Make text a bit bolder for better readability
   },
 });
