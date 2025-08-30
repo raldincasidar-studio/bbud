@@ -7,6 +7,7 @@ import React, { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Image, // Import Image for preview
     KeyboardAvoidingView,
     Modal,
     Platform,
@@ -40,6 +41,56 @@ const calculateAge = (dobString: string | null): number | null => {
     return age >= 0 ? age : null;
 };
 
+// --- Proof of Relationship Configuration (Copied from my-household.tsx) ---
+const ALL_POSSIBLE_PROOF_DOCUMENTS = [
+    { label: "PSA Birth Certificate", value: "PSA Birth Certificate" },
+    { label: "Adoption Certificate", value: "Adoption Certificate" },
+    { label: "Baptismal Certificate", value: "Baptismal Certificate" },
+    { label: "PSA Marriage Certificate", value: "PSA Marriage Certificate" },
+    { label: "LCR Marriage Certificate", value: "LCR Marriage Certificate" },
+    { label: "Joint Affidavit", value: "Joint Affidavit" },
+    { label: "Guardianship Affidavit", value: "Guardianship Affidavit" },
+    { label: "Affidavit of Siblinghood", value: "Affidavit of Siblinghood" },
+    { label: "Affidavit of Relationship", value: "Affidavit of Relationship" },
+    { label: "Valid ID Card (e.g., Driver's License, Passport)", value: "Valid ID Card" },
+];
+
+interface ProofRequirement {
+    allowedProofValues: string[];
+    displayInfo: string;
+}
+
+const RELATIONSHIP_PROOF_CONFIG: { [key: string]: ProofRequirement } = {
+    Child: {
+        allowedProofValues: ["PSA Birth Certificate", "Adoption Certificate", "Baptismal Certificate"],
+        displayInfo: 'Primary proof: PSA Birth Certificate (of child). Optional supporting: Adoption Certificate, Baptismal Certificate.',
+    },
+    Spouse: {
+        allowedProofValues: ["PSA Marriage Certificate", "LCR Marriage Certificate", "Joint Affidavit"],
+        displayInfo: 'Primary proof: PSA Marriage Certificate. Optional supporting: LCR Marriage Certificate, Joint Affidavit.',
+    },
+    Parent: {
+        allowedProofValues: ["PSA Birth Certificate", "Guardianship Affidavit"],
+        displayInfo: 'Primary proof: PSA Birth Certificate (of child). Optional supporting: Guardianship Affidavit.',
+    },
+    Sibling: {
+        allowedProofValues: ["PSA Birth Certificate", "Affidavit of Siblinghood"],
+        displayInfo: 'Primary proof: PSA Birth Certificates of both parties. Optional supporting: Affidavit of Siblinghood.',
+    },
+    'Other Relative': {
+        allowedProofValues: ["PSA Birth Certificate", "Valid ID Card", "Affidavit of Relationship"],
+        displayInfo: 'Primary proof: PSA Birth Certificate(s) or Valid ID Card. Optional supporting: Affidavit of Relationship.',
+    },
+    'House Helper': {
+        allowedProofValues: ALL_POSSIBLE_PROOF_DOCUMENTS.map(doc => doc.value),
+        displayInfo: 'Any of the above-mentioned documents may be accepted as available.',
+    },
+};
+
+const RELATIONSHIPS_REQUIRING_PROOF = Object.keys(RELATIONSHIP_PROOF_CONFIG);
+// --- End Proof of Relationship Configuration ---
+
+
 // --- Initial State Definitions ---
 
 const initialMemberState = {
@@ -50,6 +101,9 @@ const initialMemberState = {
     voter_registration_proof_base64: null as string | null, is_pwd: false, pwd_id: '',
     pwd_card_base64: null as string | null, is_senior_citizen: false, senior_citizen_id: '',
     senior_citizen_card_base64: null as string | null,
+    // Add proof of relationship fields
+    proof_of_relationship_type: null as string | null,
+    proof_of_relationship_base64: null as string | null,
 };
 
 type Member = typeof initialMemberState;
@@ -59,9 +113,16 @@ const initialHeadState = {
     confirmPassword: '', address_house_number: '', address_street: '', address_subdivision_zone: '',
     address_city_municipality: 'Manila City', years_at_current_address: '',
     proof_of_residency_base64: null as string | null,
+    // Remove proof_of_relationship for Head as it's not applicable
+    proof_of_relationship_type: null,
+    proof_of_relationship_base64: null,
 };
 
-type Head = typeof initialHeadState;
+type Head = Omit<typeof initialHeadState, 'proof_of_relationship_type' | 'proof_of_relationship_base64'> & {
+    proof_of_relationship_type?: null; // Explicitly make it optional/null for Head
+    proof_of_relationship_base64?: null;
+};
+
 
 // Reusable component for toggled sections with validation
 const ToggleSection = ({ label, value, onValueChange, idLabel, idValue, onIdChange, error, proofLabel, proofValue, onProofPress }: any) => (
@@ -94,7 +155,8 @@ export default function SignupScreen() {
     const [members, setMembers] = useState<Member[]>([]);
     const [isMemberModalVisible, setMemberModalVisible] = useState(false);
     const [currentMember, setCurrentMember] = useState<Member>(initialMemberState);
-    const [memberErrors, setMemberErrors] = useState<Partial<Record<keyof Member, string>>>({});
+    // Update memberErrors type to include proof-related errors
+    const [memberErrors, setMemberErrors] = useState<Partial<Record<keyof Member | 'proof_type' | 'proof_image', string>>>({});
     const [editingMemberIndex, setEditingMemberIndex] = useState<number | null>(null);
 
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -148,6 +210,10 @@ export default function SignupScreen() {
                             if (mem.email) allEmails.push(mem.email.trim().toLowerCase());
                         }
                     });
+                    // Check for duplicate emails among all members and head
+                    if (allEmails.filter(e => e === value.trim().toLowerCase()).length > 1) {
+                         error = 'This email is already used by another household member or the head.';
+                    }
                 }
                 break;
 
@@ -157,12 +223,16 @@ export default function SignupScreen() {
             case 'years_at_current_address': if (isRequired(value)) error = 'Years at address is required.'; else if (!/^\d+$/.test(value)) error = 'Must be a valid number.'; break;
             case 'proof_of_residency_base64': if (isRequired(value)) error = 'Proof of residency is required.'; break;
             case 'password':
-                if (('confirmPassword' in state && isRequired(value))) { // Head password is required
+                // Check if the current state being validated is for the head (has confirmPassword)
+                if ('confirmPassword' in state && isRequired(value)) {
                     error = 'Password is required.';
-                } else if (value && value.length < 6) {
+                }
+                // Check if the current state being validated is for a member (has email field, but not confirmPassword)
+                else if ('email' in state && !('confirmPassword' in state) && (state as Member).email && isRequired(value)) {
+                    error = 'Password is required for account creation if an email is provided.';
+                }
+                else if (value && value.length < 6) {
                     error = 'Password must be at least 6 characters.';
-                } else if ('email' in state && (state as Member).email && isRequired(value)) { // Member password required if email exists
-                    error = 'Password is required with email.';
                 }
                 break;
             case 'confirmPassword':
@@ -176,6 +246,16 @@ export default function SignupScreen() {
             // --- Member-specific fields ---
             case 'relationship_to_head': if (isRequired(value)) error = 'Relationship is required.'; break;
             case 'other_relationship': if ((state as Member).relationship_to_head === 'Other' && isRequired(value)) error = 'Please specify the relationship.'; break;
+            case 'proof_of_relationship_type': // This will be validated outside this function generally, but for consistency
+                if (RELATIONSHIPS_REQUIRING_PROOF.includes((state as Member).relationship_to_head) && isRequired(value)) {
+                    error = 'Please select a proof document type.';
+                }
+                break;
+            case 'proof_of_relationship_base64': // This will be validated outside this function generally, but for consistency
+                if (RELATIONSHIPS_REQUIRING_PROOF.includes((state as Member).relationship_to_head) && isRequired(value)) {
+                    error = 'An image of the proof document is required.';
+                }
+                break;
 
             // --- Conditional fields ---
             case 'voter_id_number': if ((state as Head | Member).is_voter && isRequired(value)) error = "Voter ID is required."; break;
@@ -203,16 +283,47 @@ export default function SignupScreen() {
 
     const handleMemberInputChange = useCallback((name: keyof Member, value: any) => {
         setCurrentMember(prev => {
-            const newState = { ...prev, [name]: value };
-            const error = validateField(name, value, newState, members, formData.email, editingMemberIndex);
-            setMemberErrors(currentErrors => ({ ...currentErrors, [name]: error || undefined }));
+            let newState = { ...prev, [name]: value };
+            
+            // Relationship change specific logic
             if (name === 'relationship_to_head') {
-                const otherRelError = validateField('other_relationship', newState.other_relationship, newState);
+                // Reset proof related fields when relationship changes
+                newState.proof_of_relationship_type = null;
+                newState.proof_of_relationship_base64 = null;
+                setMemberErrors(currentErrors => ({
+                    ...currentErrors,
+                    other_relationship: (value === 'Other') ? validateField('other_relationship', newState.other_relationship, newState) || undefined : undefined,
+                    proof_type: undefined, // Clear proof type error
+                    proof_image: undefined, // Clear proof image error
+                }));
+            } else if (name === 'other_relationship' && newState.relationship_to_head === 'Other') {
+                const otherRelError = validateField('other_relationship', value, newState, members, formData.email, editingMemberIndex);
                 setMemberErrors(currentErrors => ({ ...currentErrors, other_relationship: otherRelError || undefined }));
             }
-             if (name === 'date_of_birth') {
-                setMemberErrors(currentErrors => ({...currentErrors, is_voter: undefined, is_senior_citizen: undefined}));
+
+            // Age-related special classification resets
+            if (name === 'date_of_birth') {
+                const newAge = calculateAge(value as string | null);
+                if (newAge !== null && newAge < 18) {
+                    newState.is_voter = false;
+                    newState.voter_id_number = '';
+                    newState.voter_registration_proof_base64 = null;
+                }
+                if (newAge !== null && newAge < 60) {
+                    newState.is_senior_citizen = false;
+                    newState.senior_citizen_id = '';
+                    newState.senior_citizen_card_base64 = null;
+                }
+                setMemberErrors(currentErrors => ({
+                    ...currentErrors, is_voter: undefined, voter_id_number: undefined,
+                    is_senior_citizen: undefined, senior_citizen_id: undefined,
+                }));
             }
+
+            // General field validation
+            const error = validateField(name, value, newState, members, formData.email, editingMemberIndex);
+            setMemberErrors(currentErrors => ({ ...currentErrors, [name]: error || undefined }));
+
             return newState;
         });
     }, [members, formData.email, editingMemberIndex]);
@@ -224,7 +335,7 @@ export default function SignupScreen() {
         hideDatePicker();
     };
 
-    const pickImage = async (field: keyof Head | keyof Member, target: 'head' | 'member') => {
+    const pickImage = async (field: keyof Head | keyof Member, target: 'head' | 'member', proofTypeFieldName?: 'proof_type' | 'proof_image') => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
             Alert.alert('Permission Denied', 'Camera roll permissions are required.');
@@ -233,7 +344,7 @@ export default function SignupScreen() {
 
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: false, // Changed to false to remove cropping
+            allowsEditing: false,
             quality: 0.8,
             base64: true,
         });
@@ -243,24 +354,36 @@ export default function SignupScreen() {
             if (target === 'head') {
                 handleInputChange(field as keyof Head, data);
             } else {
-                handleMemberInputChange(field as keyof Member, data);
+                // Update currentMember for specific proof fields
+                setCurrentMember(prev => ({ ...prev, [field]: data }));
+                // Clear the specific proof image error if any
+                if (proofTypeFieldName) {
+                     setMemberErrors(prevErrors => ({ ...prevErrors, [proofTypeFieldName]: undefined }));
+                }
             }
         }
     };
 
     const handleSaveMember = () => {
         const fieldsToValidate: (keyof Member)[] = [
-            'first_name', 'last_name', 'date_of_birth', 'relationship_to_head', 'other_relationship',
+            'first_name', 'last_name', 'date_of_birth', 'relationship_to_head',
             'sex', 'civil_status', 'citizenship', 'occupation_status'
         ];
+        
+        // Conditional validation for 'Other' relationship
+        if (currentMember.relationship_to_head === 'Other') {
+            fieldsToValidate.push('other_relationship');
+        }
+
         let hasErrors = false;
-        const newErrors: Partial<Record<keyof Member, string>> = {};
+        const newErrors: Partial<Record<keyof Member | 'proof_type' | 'proof_image', string>> = {};
 
         const memberAge = calculateAge(currentMember.date_of_birth);
         if (memberAge !== null && memberAge >= 15 && (currentMember.email || currentMember.password)) {
             fieldsToValidate.push('email', 'password');
         }
 
+        // Validate basic fields
         fieldsToValidate.forEach(field => {
             const error = validateField(field, currentMember[field], currentMember, members, formData.email, editingMemberIndex);
             if (error) {
@@ -268,9 +391,52 @@ export default function SignupScreen() {
                 newErrors[field] = error;
             }
         });
+
+        // Validate conditional special classifications (already handled by ToggleSection passing errors)
+        if (currentMember.is_voter) {
+            const error = validateField('voter_id_number', currentMember.voter_id_number, currentMember);
+            if(error) { hasErrors = true; newErrors.voter_id_number = error; }
+        }
+        if (currentMember.is_pwd) {
+            const error = validateField('pwd_id', currentMember.pwd_id, currentMember);
+            if(error) { hasErrors = true; newErrors.pwd_id = error; }
+        }
+        if (currentMember.is_senior_citizen) {
+            const error = validateField('senior_citizen_id', currentMember.senior_citizen_id, currentMember);
+            if(error) { hasErrors = true; newErrors.senior_citizen_id = error; }
+        }
+
+        // --- Proof of Relationship Validation ---
+        const requiresProof = RELATIONSHIPS_REQUIRING_PROOF.includes(currentMember.relationship_to_head);
+        if (requiresProof) {
+            const relationshipConfig = RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head];
+
+            if (!currentMember.proof_of_relationship_type) {
+                newErrors.proof_type = 'Please select a proof document type.';
+                hasErrors = true;
+            } else if (!relationshipConfig.allowedProofValues.includes(currentMember.proof_of_relationship_type)) {
+                newErrors.proof_type = `"${currentMember.proof_of_relationship_type}" is not a valid proof document for a ${currentMember.relationship_to_head}. Please choose from the allowed options.`;
+                hasErrors = true;
+            }
+
+            if (!currentMember.proof_of_relationship_base64) {
+                newErrors.proof_image = 'An image of the proof document is required.';
+                hasErrors = true;
+            }
+        }
+        // If relationship does not require proof, ensure proof fields are null/empty
+        else {
+            currentMember.proof_of_relationship_type = null;
+            currentMember.proof_of_relationship_base64 = null;
+        }
+
+
         setMemberErrors(newErrors);
 
-        if (hasErrors) { Alert.alert('Validation Error', 'Please fix the errors shown in the form.'); return; }
+        if (hasErrors || Object.keys(newErrors).length > 0) { // Double check newErrors just in case
+            Alert.alert('Validation Error', 'Please fix the errors shown in the form.');
+            return;
+        }
         
         if (editingMemberIndex !== null) {
             const updatedMembers = [...members];
@@ -315,15 +481,22 @@ export default function SignupScreen() {
         try {
             const payload: any = { ...formData, household_members_to_create: members };
             delete payload.confirmPassword;
+            // Remove relationship_to_head, other_relationship, and proof fields from head payload, as they are not applicable to the head's registration payload
+            delete payload.relationship_to_head;
+            delete payload.other_relationship;
+            delete payload.proof_of_relationship_type;
+            delete payload.proof_of_relationship_base64;
+
             const response = await apiRequest('POST', '/api/residents', payload);
             if (response && (response.message || response.resident)) {
                 Alert.alert('Registration Successful', 'Your household has been registered and is pending for approval by the Baranggay Secretary.', [{ text: 'OK', onPress: () => router.replace('/login') }]);
             } else {
-                // Alert.alert('Registration Failed', response?.message || response?.error || 'An unknown error occurred.');
+                Alert.alert('Registration Failed', response?.message || response?.error || 'An unknown error occurred.');
             }
         } catch (error: any) {
+            console.error("Registration Error:", error.response?.data || error.message);
             const errorMessage = error.response?.data?.message || error.response?.data?.error || 'An unexpected error occurred. Please try again.';
-            // Alert.alert('Registration Error', errorMessage);
+            Alert.alert('Registration Error', errorMessage);
         } finally {
             setIsSaving(false);
         }
@@ -432,6 +605,48 @@ export default function SignupScreen() {
                             <TextInput style={[styles.modalInput, !!memberErrors.citizenship && styles.inputError]} placeholder="Citizenship*" placeholderTextColor="#A9A9A9" value={currentMember.citizenship} onChangeText={(v) => handleMemberInputChange('citizenship', v)} /><ErrorMessage error={memberErrors.citizenship} />
                             <Text style={styles.label}>Occupation Status*</Text>
                             <View style={[styles.pickerWrapperSmall, !!memberErrors.occupation_status && styles.inputError]}><Picker selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)} style={[styles.pickerText, !currentMember.occupation_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={memberErrors.occupation_status} />
+
+                            {/* --- Proof of Relationship Section for Members --- */}
+                            {RELATIONSHIPS_REQUIRING_PROOF.includes(currentMember.relationship_to_head) && (
+                                <View style={styles.proofSection}>
+                                    <Text style={styles.modalSectionTitle}>Proof of Relationship</Text>
+                                    {RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head]?.displayInfo && (
+                                        <Text style={styles.labelInfo}>{RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head].displayInfo}</Text>
+                                    )}
+                                    
+                                    <Text style={styles.label}>Proof Document Type*</Text>
+                                    <View style={[styles.pickerWrapperSmall, !!memberErrors.proof_type && styles.inputError]}>
+                                        <Picker
+                                            itemStyle={{ color: 'black' }}
+                                            selectedValue={currentMember.proof_of_relationship_type}
+                                            onValueChange={(itemValue: string) => {
+                                                setCurrentMember(prev => ({ ...prev, proof_of_relationship_type: itemValue }));
+                                                setMemberErrors(p => ({...p, proof_type: undefined}));
+                                            }}
+                                            style={!currentMember.proof_of_relationship_type ? styles.pickerPlaceholder : {}}
+                                        >
+                                            <Picker.Item label="Select Proof Document Type*" value="" enabled={false} />
+                                            {currentMember.relationship_to_head && RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head] &&
+                                                ALL_POSSIBLE_PROOF_DOCUMENTS
+                                                    .filter(option => RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head].allowedProofValues.includes(option.value))
+                                                    .map(option => (
+                                                        <Picker.Item key={option.value} label={option.label} value={option.value} />
+                                                    ))
+                                            }
+                                        </Picker>
+                                    </View>
+                                    <ErrorMessage error={memberErrors.proof_type} />
+
+                                    <Text style={styles.label}>Proof Document Image*</Text>
+                                    <TouchableOpacity style={[styles.filePickerButton, !!memberErrors.proof_image && styles.inputErrorBorder]} onPress={() => pickImage('proof_of_relationship_base64', 'member', 'proof_image')}>
+                                        <Text style={styles.filePickerButtonText}>{currentMember.proof_of_relationship_base64 ? 'Change Proof Image' : 'Upload Proof Image'}</Text>
+                                    </TouchableOpacity>
+                                    {currentMember.proof_of_relationship_base64 && <Image source={{ uri: currentMember.proof_of_relationship_base64 }} style={styles.previewImageSmall} />}
+                                    <ErrorMessage error={memberErrors.proof_image} />
+                                </View>
+                            )}
+                            {/* --- End Proof of Relationship Section --- */}
+
                             <Text style={styles.modalSectionTitle}>Special Classifications</Text>
                             {(memberAge === null || memberAge >= 18) && <ToggleSection label="Is member a registered voter?" value={currentMember.is_voter} onValueChange={(v:boolean) => handleMemberInputChange('is_voter', v)} idLabel="Voter ID Number" idValue={currentMember.voter_id_number} onIdChange={(v:string) => handleMemberInputChange('voter_id_number', v)} error={memberErrors.voter_id_number} proofLabel="Upload Voter's Proof" proofValue={currentMember.voter_registration_proof_base64} onProofPress={() => pickImage('voter_registration_proof_base64', 'member')} />}
                             <ToggleSection label="Is member a PWD?" value={currentMember.is_pwd} onValueChange={(v:boolean) => handleMemberInputChange('is_pwd', v)} idLabel="PWD ID Number*" idValue={currentMember.pwd_id} onIdChange={(v:string) => handleMemberInputChange('pwd_id', v)} error={memberErrors.pwd_id} proofLabel="Upload PWD Card*" proofValue={currentMember.pwd_card_base64} onProofPress={() => pickImage('pwd_card_base64', 'member')} />
@@ -456,15 +671,14 @@ const styles = StyleSheet.create({
     subHeader: { fontSize: 22, fontWeight: '600', color: '#333', marginTop: 15, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#ddd', paddingBottom: 5 },
     sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F00D7', marginTop: 20, marginBottom: 15 },
     label: { fontSize: 16, color: '#333', fontWeight: '500', paddingBottom: 5 },
+    labelInfo: { fontSize: 14, color: '#666', marginBottom: 10, fontStyle: 'italic' }, // Added for proof info
     textInput: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, fontSize: 16, paddingHorizontal: 14, paddingVertical: Platform.OS === 'ios' ? 14 : 10, marginBottom: 15, color: '#000', backgroundColor: 'white' },
     textInputDisabled: { backgroundColor: '#EEEEEE', color: '#757575' },
     passwordContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, backgroundColor: 'white', marginBottom: 15 },
     passwordInput: { flex: 1, fontSize: 16, paddingHorizontal: 14, paddingVertical: Platform.OS === 'ios' ? 14 : 10, color: '#000' },
     eyeIcon: { paddingHorizontal: 12, paddingVertical: 10 },
     pickerWrapper: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, backgroundColor: 'white', marginBottom: 15 },
-    // FIX: Style for selected picker text
     pickerText: { color: '#000' },
-    // FIX: Style for picker placeholder text
     pickerPlaceholder: { color: '#A9A9A9' },
     datePickerButton: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, paddingVertical: 14, backgroundColor: 'white', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 14, height: 50, marginBottom: 15 },
     datePickerButtonText: { fontSize: 16, color: '#000' },
@@ -513,4 +727,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         paddingLeft: 2,
     },
+    proofSection: { marginTop: 15, paddingTop: 15, borderTopWidth: 1, borderTopColor: '#E0E0E0', marginBottom: 10 },
+    previewImageSmall: { width: 70, height: 70, borderRadius: 4, alignSelf: 'center', marginTop: 10 },
 });

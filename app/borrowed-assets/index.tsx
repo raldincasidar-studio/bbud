@@ -24,7 +24,7 @@ const borrowedStatusConfig: { [key: string]: { colorName: string, icon: string, 
   'All':        { colorName: 'primary', icon: 'filter-variant', hexColor: '#0F00D7' }, // Your app's primary blue
   'Pending':    { colorName: 'blue-grey', icon: 'clock-outline', hexColor: '#607D8B' },
   'Processing': { colorName: 'blue', icon: 'cogs', hexColor: '#2196F3' },
-  'Approved':   { colorName: 'orange', icon: 'check-circle-outline', hexColor: '#FF9800' },
+  'Approved':   { colorName: 'orange', icon: 'check-circle-outline', hexColor: '#25f56aff' },
   'Returned':   { colorName: 'green-darken-1', icon: 'check-all', hexColor: '#4CAF50' },
   'Overdue':    { colorName: 'red-darken-2', icon: 'alert-octagon-outline', hexColor: '#D32F2F' },
   'Lost':       { colorName: 'black', icon: 'help-rhombus-outline', hexColor: '#000000' },

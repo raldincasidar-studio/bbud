@@ -74,8 +74,55 @@ const initialMemberState = {
 
 type Member = typeof initialMemberState;
 
-// Define which relationships require proof
-const BLOOD_RELATIONSHIPS = ['Child', 'Spouse', 'Parent', 'Sibling', 'Grandparent', 'Grandchild', 'Other Relative'];
+// Define all possible proof documents as per the prompt
+const ALL_POSSIBLE_PROOF_DOCUMENTS = [
+    { label: "PSA Birth Certificate", value: "PSA Birth Certificate" },
+    { label: "Adoption Certificate", value: "Adoption Certificate" },
+    { label: "Baptismal Certificate", value: "Baptismal Certificate" },
+    { label: "PSA Marriage Certificate", value: "PSA Marriage Certificate" },
+    { label: "LCR Marriage Certificate", value: "LCR Marriage Certificate" },
+    { label: "Joint Affidavit", value: "Joint Affidavit" },
+    { label: "Guardianship Affidavit", value: "Guardianship Affidavit" },
+    { label: "Affidavit of Siblinghood", value: "Affidavit of Siblinghood" },
+    { label: "Affidavit of Relationship", value: "Affidavit of Relationship" },
+    { label: "Valid ID Card (e.g., Driver's License, Passport)", value: "Valid ID Card" }, // Added Valid ID for "Other relative" / House Helper flexibility
+];
+
+interface ProofRequirement {
+    allowedProofValues: string[]; // These are the 'value' strings from ALL_POSSIBLE_PROOF_DOCUMENTS that are allowed
+    displayInfo: string; // Text to display to the user about what proofs are needed
+}
+
+// Configuration for relationship-specific proof requirements
+const RELATIONSHIP_PROOF_CONFIG: { [key: string]: ProofRequirement } = {
+    Child: {
+        allowedProofValues: ["PSA Birth Certificate", "Adoption Certificate", "Baptismal Certificate"],
+        displayInfo: 'Primary proof: PSA Birth Certificate (of child). Optional supporting: Adoption Certificate, Baptismal Certificate.',
+    },
+    Spouse: {
+        allowedProofValues: ["PSA Marriage Certificate", "LCR Marriage Certificate", "Joint Affidavit"],
+        displayInfo: 'Primary proof: PSA Marriage Certificate. Optional supporting: LCR Marriage Certificate, Joint Affidavit.',
+    },
+    Parent: {
+        allowedProofValues: ["PSA Birth Certificate", "Guardianship Affidavit"], // Refers to the child's PSA Birth Certificate
+        displayInfo: 'Primary proof: PSA Birth Certificate (of child). Optional supporting: Guardianship Affidavit.',
+    },
+    Sibling: {
+        allowedProofValues: ["PSA Birth Certificate", "Affidavit of Siblinghood"], // Implies both parties' birth certificates
+        displayInfo: 'Primary proof: PSA Birth Certificates of both parties. Optional supporting: Affidavit of Siblinghood.',
+    },
+    'Other Relative': {
+        allowedProofValues: ["PSA Birth Certificate", "Valid ID Card", "Affidavit of Relationship"],
+        displayInfo: 'Primary proof: PSA Birth Certificate(s) or Valid ID Card. Optional supporting: Affidavit of Relationship.',
+    },
+    'House Helper': {
+        allowedProofValues: ALL_POSSIBLE_PROOF_DOCUMENTS.map(doc => doc.value), // Any of the above mentioned documents
+        displayInfo: 'Any of the above-mentioned documents may be accepted as available.',
+    },
+};
+
+// Relationships that require proof of relationship
+const RELATIONSHIPS_REQUIRING_PROOF = Object.keys(RELATIONSHIP_PROOF_CONFIG);
 
 
 // Reusable component for toggled sections
@@ -211,12 +258,24 @@ const MyHouseholdScreen = () => {
                 }));
             }
 
-            const error = validateMemberField(name, value, newState);
-            setMemberErrors(currentErrors => ({ ...currentErrors, [name]: error || undefined }));
-            
+            // Relationship change specific logic
             if (name === 'relationship_to_head') {
-                const otherRelError = validateMemberField('other_relationship', newState.other_relationship, newState);
+                setProofType(''); // Reset selected proof type
+                setProofImageBase64(null); // Reset uploaded proof image
+                // Clear related errors
+                setMemberErrors(currentErrors => ({
+                    ...currentErrors,
+                    other_relationship: (value === 'Other') ? validateMemberField('other_relationship', newState.other_relationship, newState) || undefined : undefined,
+                    proof_type: undefined,
+                    proof_image: undefined,
+                }));
+            } else if (name === 'other_relationship' && newState.relationship_to_head === 'Other') {
+                const otherRelError = validateMemberField('other_relationship', value, newState);
                 setMemberErrors(currentErrors => ({ ...currentErrors, other_relationship: otherRelError || undefined }));
+            } else {
+                // General field validation
+                const error = validateMemberField(name, value, newState);
+                setMemberErrors(currentErrors => ({ ...currentErrors, [name]: error || undefined }));
             }
 
             return newState;
@@ -289,12 +348,21 @@ const MyHouseholdScreen = () => {
             }
         });
 
-        if (BLOOD_RELATIONSHIPS.includes(currentMember.relationship_to_head)) {
+        // --- Proof of Relationship Validation ---
+        const requiresProof = RELATIONSHIPS_REQUIRING_PROOF.includes(currentMember.relationship_to_head);
+        if (requiresProof) {
+            const relationshipConfig = RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head];
+
+            // Validate proof type selected
             if (!proofType) {
-                newErrors.proof_type = 'Please select a proof type.';
+                newErrors.proof_type = 'Please select a proof document type.';
+            } else if (!relationshipConfig.allowedProofValues.includes(proofType)) {
+                newErrors.proof_type = `"${proofType}" is not a valid proof document for a ${currentMember.relationship_to_head}. Please choose from the allowed options.`;
             }
+
+            // Validate proof image uploaded
             if (!proofImageBase64) {
-                newErrors.proof_image = 'An image of the proof is required.';
+                newErrors.proof_image = 'An image of the proof document is required.';
             }
         }
 
@@ -309,9 +377,8 @@ const MyHouseholdScreen = () => {
         try {
             const payload = {
                 ...currentMember,
-                // photo_base64 is removed
-                proof_of_relationship_type: BLOOD_RELATIONSHIPS.includes(currentMember.relationship_to_head) ? proofType : null,
-                proof_of_relationship_base64: BLOOD_RELATIONSHIPS.includes(currentMember.relationship_to_head) ? proofImageBase64 : null,
+                proof_of_relationship_type: requiresProof ? proofType : null,
+                proof_of_relationship_base64: requiresProof ? proofImageBase64 : null,
             };
 
             const response = await apiRequest('POST', `/api/residents/${householdData.resident._id}/members`, payload);
@@ -510,13 +577,36 @@ const MyHouseholdScreen = () => {
                                 <Text style={styles.label}>Occupation Status*</Text>
                                 <View style={[styles.pickerWrapperSmall, !!memberErrors.occupation_status && styles.inputError]}><Picker itemStyle={{ color: 'black' }} selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)} style={!currentMember.occupation_status ? styles.pickerPlaceholder : {}}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={memberErrors.occupation_status} />
                                 
-                                {BLOOD_RELATIONSHIPS.includes(currentMember.relationship_to_head) && (
+                                {RELATIONSHIPS_REQUIRING_PROOF.includes(currentMember.relationship_to_head) && (
                                     <View style={styles.proofSection}>
                                         <Text style={styles.modalSectionTitle}>Proof of Relationship</Text>
-                                        <Text style={styles.label}>Proof Type*</Text>
-                                        <View style={[styles.pickerWrapperSmall, !!memberErrors.proof_type && styles.inputError]}><Picker itemStyle={{ color: 'black' }} selectedValue={proofType} onValueChange={(itemValue) => {setProofType(itemValue); setMemberErrors(p => ({...p, proof_type: undefined}))}}><Picker.Item label="Select Proof Document*" value="" /><Picker.Item label="Birth Certificate" value="Birth Certificate" /><Picker.Item label="Marriage Certificate" value="Marriage Certificate" /><Picker.Item label="Valid ID Card" value="Valid ID Card" /></Picker></View>
+                                        {RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head]?.displayInfo && (
+                                            <Text style={styles.labelInfo}>{RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head].displayInfo}</Text>
+                                        )}
+                                        
+                                        <Text style={styles.label}>Proof Document Type*</Text>
+                                        <View style={[styles.pickerWrapperSmall, !!memberErrors.proof_type && styles.inputError]}>
+                                            <Picker
+                                                itemStyle={{ color: 'black' }}
+                                                selectedValue={proofType}
+                                                onValueChange={(itemValue: string) => {
+                                                    setProofType(itemValue);
+                                                    setMemberErrors(p => ({...p, proof_type: undefined}));
+                                                }}
+                                                style={!proofType ? styles.pickerPlaceholder : {}}
+                                            >
+                                                <Picker.Item label="Select Proof Document Type*" value="" enabled={false} />
+                                                {currentMember.relationship_to_head && RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head] &&
+                                                    ALL_POSSIBLE_PROOF_DOCUMENTS
+                                                        .filter(option => RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head].allowedProofValues.includes(option.value))
+                                                        .map(option => (
+                                                            <Picker.Item key={option.value} label={option.label} value={option.value} />
+                                                        ))
+                                                }
+                                            </Picker>
+                                        </View>
                                         <ErrorMessage error={memberErrors.proof_type} />
-                                        <Text style={styles.label}>Proof Image*</Text>
+                                        <Text style={styles.label}>Proof Document Image*</Text>
                                         <TouchableOpacity style={[styles.filePickerButton, !!memberErrors.proof_image && styles.inputErrorBorder]} onPress={() => pickImage(setProofImageBase64, 'proof_image')}>
                                             <Text style={styles.filePickerButtonText}>{proofImageBase64 ? 'Change Proof Image' : 'Upload Proof Image'}</Text>
                                         </TouchableOpacity>
@@ -610,6 +700,7 @@ const styles = StyleSheet.create({
     inputError: { borderColor: '#D32F2F' },
     inputErrorBorder: { borderWidth: 1, borderColor: '#D32F2F' },
     label: { fontSize: 16, color: '#333', fontWeight: '500', paddingBottom: 5 },
+    labelInfo: { fontSize: 14, color: '#666', marginBottom: 10, fontStyle: 'italic' }, // New style for proof info
     toggleContainer: { backgroundColor: '#FFFFFF', borderRadius: 8, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: '#E0E0E0' },
     toggleSwitchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     conditionalContainer: { marginTop: 15, paddingTop: 15, borderTopWidth: 1, borderTopColor: '#EEE' },
