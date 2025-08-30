@@ -6,7 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Platform, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // Debounce utility
 function debounce(func, delay) {
@@ -36,6 +36,7 @@ const ViewComplaintScreen = () => {
         person_complained_against_resident_id: null,
         status: 'New',
         notes_description: '',
+        proofs_base64: [], // Initialize proofs_base64 here
     });
 
     const getStatusColor = (status) => {
@@ -45,7 +46,6 @@ const ViewComplaintScreen = () => {
         "Resolved": '#4CAF50',            // Green
         "Closed": '#9E9E9E',              // Grey
         "Dismissed": '#F44336',           // Red
-        // Add more statuses and their corresponding colors if needed
     };
         return colors[status] || '#757575'; // Default Grey for any other status
     };
@@ -73,7 +73,6 @@ const ViewComplaintScreen = () => {
         { label: 'New', value: 'New' }, { label: 'Under Investigation', value: 'Under Investigation' },
         { label: 'Resolved', value: 'Resolved' }, { label: 'Closed', value: 'Closed' }, { label: 'Dismissed', value: 'Dismissed' }
     ];
-    // const rules = { /* ... your rules object, or implement manual checks ... */ }; // Define if using form library
 
     const formatDateForInput = (isoStr, type = 'date') => {
         if (!isoStr) return (type === 'date' ? new Date().toISOString().split('T')[0] : new Date().toTimeString().slice(0,5));
@@ -116,6 +115,7 @@ const ViewComplaintScreen = () => {
                     time_of_complaint: fetched.time_of_complaint || formatDateForInput(new Date().toISOString(), 'time'),
                     complainant_display_name: fetched.complainant_display_name || `${fetched.complainant_details?.first_name || ''} ${fetched.complainant_details?.middle_name || ''} ${fetched.complainant_details?.last_name || ''}`.trim(),
                     person_complained_against_name: fetched.person_complained_against_name || `${fetched.person_complained_details?.first_name || ''} ${fetched.person_complained_details?.middle_name || ''} ${fetched.person_complained_details?.last_name || ''}`.trim(),
+                    proofs_base64: fetched.proofs_base64 || [], // Ensure proofs are initialized
                 };
                 setEditableComplaint(initialEditable);
                 setComplainantSearchQuery(initialEditable.complainant_display_name);
@@ -144,6 +144,7 @@ const ViewComplaintScreen = () => {
                 date_of_complaint: new Date().toISOString().split('T')[0], time_of_complaint: new Date().toTimeString().slice(0,5),
                 person_complained_against_name: '', person_complained_against_resident_id: null,
                 status: 'New', notes_description: '',
+                proofs_base64: [], // Reset proofs
             });
             setComplainantSearchQuery('');
             setPersonComplainedSearchQuery('');
@@ -156,6 +157,7 @@ const ViewComplaintScreen = () => {
             time_of_complaint: complaintData.time_of_complaint || formatDateForInput(new Date().toISOString(), 'time'),
             complainant_display_name: complaintData.complainant_display_name || `${complaintData.complainant_details?.first_name || ''} ${complaintData.complainant_details?.middle_name || ''} ${complaintData.complainant_details?.last_name || ''}`.trim(),
             person_complained_against_name: complaintData.person_complained_against_name || `${complaintData.person_complained_details?.first_name || ''} ${complaintData.person_complained_details?.middle_name || ''} ${complaintData.person_complained_details?.last_name || ''}`.trim(),
+            proofs_base64: complaintData.proofs_base64 || [], // Keep proofs on reset
         };
         setEditableComplaint(newEditable);
         setComplainantSearchQuery(newEditable.complainant_display_name);
@@ -168,7 +170,7 @@ const ViewComplaintScreen = () => {
     const toggleEditMode = (enable) => { setEditMode(enable); if (enable) resetEditableData(); };
     const cancelEdit = () => { setEditMode(false); resetEditableData(); };
 
-    const searchResidentsAPI = useCallback(async (query, type) => {
+    const searchResidentsAPI = useCallback(debounce(async (query, type) => {
         const trimmedQuery = typeof query === 'string' ? query.trim() : '';
         const setIsLoading = type === 'complainant' ? setIsLoadingComplainants : setIsLoadingPersonComplained;
         const setSearchResults = type === 'complainant' ? setComplainantSearchResults : setPersonComplainedSearchResults;
@@ -181,21 +183,19 @@ const ViewComplaintScreen = () => {
             else { setSearchResults([]); }
         } catch (e) { console.error(`Exception searching ${type}:`, e); setSearchResults([]); }
         finally { setIsLoading(false); }
-    }, []);
+    }, 500), []); // Debounce directly on useCallback
 
     // Complainant Search
-    const debouncedComplainantSearch = useCallback(debounce((q) => searchResidentsAPI(q, 'complainant'), 500), [searchResidentsAPI]);
     useEffect(() => {
         if (!editMode) return;
-        // Check against the current value in editableComplaint, not its previous state
         if (complainantSearchQuery === editableComplaint.complainant_display_name && editableComplaint.complainant_resident_id) {
             if (complainantSearchResults.length > 0) setComplainantSearchResults([]); return;
         }
         if (!complainantSearchQuery || complainantSearchQuery.trim().length < 2) {
             setComplainantSearchResults([]); return;
         }
-        debouncedComplainantSearch(complainantSearchQuery);
-    }, [complainantSearchQuery, editMode, editableComplaint.complainant_display_name, editableComplaint.complainant_resident_id, debouncedComplainantSearch]);
+        searchResidentsAPI(complainantSearchQuery, 'complainant'); // Call the debounced function
+    }, [complainantSearchQuery, editMode, editableComplaint.complainant_display_name, editableComplaint.complainant_resident_id, searchResidentsAPI]);
 
     const selectComplainant = (res) => {
         const name = `${res.first_name||''} ${res.middle_name||''} ${res.last_name||''}`.trim();
@@ -220,33 +220,27 @@ const ViewComplaintScreen = () => {
     };
 
     // Person Complained Against Search
-    const debouncedPersonComplainedSearch = useCallback(debounce((q) => searchResidentsAPI(q, 'personComplained'), 500), [searchResidentsAPI]);
     useEffect(() => {
         if (!editMode) return;
-        // When user types in personComplainedSearchQuery, update editableComplaint.person_complained_against_name
-        // and if it differs from a previously selected resident, clear the resident ID.
         if (personComplainedSearchQuery !== editableComplaint.person_complained_against_name) {
              setEditableComplaint(prev => ({
                 ...prev,
-                person_complained_against_name: personComplainedSearchQuery, // Update name from input
-                person_complained_against_resident_id: (prev.person_complained_against_name === personComplainedSearchQuery && prev.person_complained_against_resident_id) ? prev.person_complained_against_resident_id : null // Clear ID if name manually changed from selected
+                person_complained_against_name: personComplainedSearchQuery,
+                person_complained_against_resident_id: (prev.person_complained_against_name === personComplainedSearchQuery && prev.person_complained_against_resident_id) ? prev.person_complained_against_resident_id : null
             }));
-            setSelectedPersonComplainedIsResident(false); // Assume manual entry until new selection
+            setSelectedPersonComplainedIsResident(false);
         }
-
 
         if (!personComplainedSearchQuery || personComplainedSearchQuery.trim().length < 2) {
             setPersonComplainedSearchResults([]); return;
         }
 
-        // Only search if not confirming a selection or if it's a new manual query
         if (!selectedPersonComplainedIsResident || personComplainedSearchQuery !== editableComplaint.person_complained_against_name) {
-            debouncedPersonComplainedSearch(personComplainedSearchQuery);
+            searchResidentsAPI(personComplainedSearchQuery, 'personComplained'); // Call the debounced function
         } else if (selectedPersonComplainedIsResident && personComplainedSearchQuery === editableComplaint.person_complained_against_name) {
-            setPersonComplainedSearchResults([]); // Hide list if query matches current selected name
+            setPersonComplainedSearchResults([]);
         }
-    }, [personComplainedSearchQuery, editMode, editableComplaint.person_complained_against_name, selectedPersonComplainedIsResident, debouncedPersonComplainedSearch]); // Added selectedPersonComplainedIsResident
-
+    }, [personComplainedSearchQuery, editMode, editableComplaint.person_complained_against_name, selectedPersonComplainedIsResident, searchResidentsAPI]);
 
     const selectPersonComplained = (res) => {
         const name = `${res.first_name || ''} ${res.middle_name || ''} ${res.last_name || ''}`.trim();
@@ -270,7 +264,7 @@ const ViewComplaintScreen = () => {
         setPersonComplainedSearchResults([]);
     };
 
-    const saveChanges = async () => { /* ... same validation and save logic as before ... */
+    const saveChanges = async () => { 
         if (!editableComplaint.complainant_resident_id) { Alert.alert("Error", "Complainant info is missing."); return; }
         if (!editableComplaint.date_of_complaint || !editableComplaint.time_of_complaint) { Alert.alert("Validation Error", "Date and Time of Complaint are required."); return; }
         if (!editableComplaint.person_complained_against_name?.trim()) { Alert.alert("Validation Error", "Person Complained Against is required."); return; }
@@ -294,10 +288,11 @@ const ViewComplaintScreen = () => {
                 person_complained_against_resident_id: selectedPersonComplainedIsResident ? editableComplaint.person_complained_against_resident_id : null,
                 status: editableComplaint.status,
                 notes_description: editableComplaint.notes_description.trim(),
+                // proofs_base64 are not updated through this screen, so we don't send them in PUT payload unless there's a specific edit functionality for them
+                // If you need to allow adding/removing proofs in edit mode, you would need to add state and logic for it.
             };
-            const { complainant_details, person_complained_details, ...payloadToSend } = payload; // Remove details objects
 
-            const response = await apiRequest('PUT', `/api/complaints/${complaintId}`, payloadToSend);
+            const response = await apiRequest('PUT', `/api/complaints/${complaintId}`, payload);
             if (response && (response.message || response.complaint?._id)) {
                 Alert.alert("Success", response.message || "Complaint updated successfully!");
                 fetchComplaintDetails();
@@ -306,8 +301,34 @@ const ViewComplaintScreen = () => {
         } catch (error) { console.error("Error saving changes:", error); Alert.alert("Error", error.response?.data?.message || error.message || "An unexpected error occurred.");
         } finally { setIsSaving(false); }
     };
-    const showDeleteConfirmation = () => { /* ... same ... */ };
-    const deleteComplaint = async () => { /* ... same ... */ };
+    const showDeleteConfirmation = () => {
+        Alert.alert(
+            "Delete Complaint",
+            "Are you sure you want to delete this complaint? This action cannot be undone.",
+            [
+                { text: "Cancel", style: "cancel" },
+                { text: "Delete", onPress: deleteComplaint, style: "destructive" },
+            ],
+            { cancelable: true }
+        );
+    };
+    const deleteComplaint = async () => {
+        setIsDeleting(true);
+        try {
+            const response = await apiRequest('DELETE', `/api/complaints/${complaintId}`);
+            if (response && response.message) {
+                Alert.alert("Success", response.message || "Complaint deleted successfully!");
+                router.replace('/complaints'); // Navigate back to list
+            } else {
+                Alert.alert("Error", response?.error || response?.message || "Could not delete complaint.");
+            }
+        } catch (error) {
+            console.error("Error deleting complaint:", error);
+            Alert.alert("Error", error.response?.data?.message || error.message || "An unexpected error occurred.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
 
     // --- JSX for rendering ---
@@ -317,13 +338,32 @@ const ViewComplaintScreen = () => {
     const displayComplainantName = !editMode && complaintData ? (complaintData.complainant_display_name || `${complaintData.complainant_details?.first_name || ''} ${complaintData.complainant_details?.middle_name || ''} ${complaintData.complainant_details?.last_name || ''}`.trim() || 'N/A') : editableComplaint.complainant_display_name;
     const displayPersonComplained = !editMode && complaintData ? (complaintData.person_complained_against_name || `${complaintData.person_complained_details?.first_name || ''} ${complaintData.person_complained_details?.middle_name || ''} ${complaintData.person_complained_details?.last_name || ''}`.trim() || 'N/A') : editableComplaint.person_complained_against_name;
 
-
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.navbar}>
                 <TouchableOpacity onPress={() => router.back()}><MaterialCommunityIcons name="arrow-left" size={28} color="white" /></TouchableOpacity>
-                <Text style={styles.navbarTitle} numberOfLines={1}>{editMode ? "Edit Complaint" : "Complaint Details"}</Text>
-                <View style={{width:28}}/>
+                <Text style={styles.navbarTitle} numberOfLines={1}>{editMode ? "Edit Complaint" : `Complaint: ${complaintData.ref_no}`}</Text>
+                <View style={styles.navbarActions}>
+                    {editMode ? (
+                        <>
+                            <TouchableOpacity onPress={cancelEdit} style={{ marginRight: 15 }} disabled={isSaving}>
+                                <MaterialCommunityIcons name="close" size={26} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={saveChanges} disabled={isSaving}>
+                                {isSaving ? <ActivityIndicator size="small" color="white" /> : <MaterialCommunityIcons name="content-save" size={26} color="white" />}
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <>
+                            <TouchableOpacity onPress={() => toggleEditMode(true)} style={{ marginRight: 15 }}>
+                                <MaterialCommunityIcons name="pencil-outline" size={26} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={showDeleteConfirmation} disabled={isDeleting}>
+                                {isDeleting ? <ActivityIndicator size="small" color="white" /> : <MaterialCommunityIcons name="delete-outline" size={26} color="white" />}
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
             </View>
 
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#0F00D7"]}/>}>
@@ -358,7 +398,7 @@ const ViewComplaintScreen = () => {
                         <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
                             <Text style={styles.datePickerButtonText}>{new Date(editableComplaint.date_of_complaint || Date.now()).toLocaleDateString('en-CA')}</Text>
                         </TouchableOpacity>
-                    ) : <Text style={styles.detailValueDisplay}>{formatDateForDisplay(new Date(editableComplaint.date_of_complaint))}</Text>}
+                    ) : <Text style={styles.detailValueDisplay}>{formatDateForDisplay(editableComplaint.date_of_complaint)}</Text>}
                     {showDatePicker && editMode && <DateTimePicker value={new Date(editableComplaint.date_of_complaint || Date.now())} mode="date" display="default" onChange={(e,d) => {setShowDatePicker(Platform.OS === 'ios'); if(e.type==='set'&&d)setEditableComplaint(p=>({...p,date_of_complaint:d.toISOString().split('T')[0]}))}} />}
                 </View>
                 <View style={styles.inputContainer}>
@@ -405,6 +445,33 @@ const ViewComplaintScreen = () => {
                     ) : <Text style={[styles.detailValueDisplay, { color: getStatusColor(editableComplaint.status), fontWeight: 'bold'}]}>{editableComplaint.status || 'N/A'}</Text>}
                 </View>
 
+                {/* Proof of Complaint Display Section */}
+                {!editMode && complaintData.proofs_base64 && complaintData.proofs_base64.length > 0 && (
+                    <>
+                        <Text style={styles.sectionTitle}>Proof of Complaint</Text>
+                        <ScrollView horizontal style={styles.proofsPreviewScroll}>
+                            <View style={styles.proofsPreviewContainer}>
+                                {complaintData.proofs_base64.map((base64String, index) => (
+                                    <View key={index} style={styles.proofPreviewItem}>
+                                        {base64String.startsWith('data:image') ? (
+                                            <Image source={{ uri: base64String }} style={styles.proofThumbnail} />
+                                        ) : base64String.startsWith('data:video') ? (
+                                            <MaterialCommunityIcons name="video" size={40} color="#555" />
+                                        ) : (
+                                            <MaterialCommunityIcons name="file-question" size={40} color="#555" />
+                                        )}
+                                        {/* In view mode, we don't allow removal directly */}
+                                        {/* <TouchableOpacity onPress={() => removeProof(index)} style={styles.removeProofButton}>
+                                            <MaterialCommunityIcons name="close-circle" size={20} color="red" />
+                                        </TouchableOpacity> */}
+                                    </View>
+                                ))}
+                            </View>
+                        </ScrollView>
+                    </>
+                )}
+                {/* End Proof of Complaint Display Section */}
+
                  {!editMode && complaintData.created_at && (
                     <View style={styles.inputContainer}>
                         <Text style={styles.label}>Filed On:</Text>
@@ -418,7 +485,6 @@ const ViewComplaintScreen = () => {
                     </View>
                 )}
             </ScrollView>
-            {/* Delete button in header actions, confirmation handled by Alert */}
         </SafeAreaView>
     );
 };
@@ -428,6 +494,7 @@ const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#F4F7FC' },
     navbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, paddingTop: Platform.OS === 'android' ? 30 : 45, backgroundColor: '#0F00D7' },
     navbarTitle: { fontSize: 18, fontWeight: 'bold', color: 'white', flex: 1, textAlign: 'center', marginHorizontal: 10 },
+    navbarActions: { flexDirection: 'row', alignItems: 'center' }, // Added for actions on the right
     scrollView: { flex: 1 },
     scrollViewContent: { padding: 15, paddingBottom: 30 },
     loaderContainerFullPage: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' },
@@ -446,12 +513,38 @@ const styles = StyleSheet.create({
     datePickerButtonText: { fontSize: 16, color: '#333' },
     detailValueDisplay: { fontSize: 16, color: '#333', paddingVertical: Platform.OS === 'ios' ? 13 : 11, paddingHorizontal: 12, borderWidth:1, borderColor: '#F0F0F0', borderRadius: 8, backgroundColor: '#F9F9F9', minHeight: 48, textAlignVertical: 'center'},
     sectionTitle: { fontSize: 17, fontWeight: '600', color: '#0F00D7', marginTop: 20, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#ddd', paddingBottom: 6},
-    searchResultsContainer: { marginTop: 5, borderColor: '#DDD', borderWidth: 1, borderRadius: 8, maxHeight: 150, backgroundColor: 'white', zIndex: 1000, /* position: 'absolute', top: '100%', left:0, right:0 */ },
+    searchResultsContainer: { marginTop: 5, borderColor: '#DDD', borderWidth: 1, borderRadius: 8, maxHeight: 150, backgroundColor: 'white', zIndex: 1000, },
     searchResultItem: { padding: 12, borderBottomWidth: 1, borderColor: '#EEE' },
     searchLoader: { marginVertical: 5 },
     noResultsTextSmall: { textAlign: 'center', color: '#777', padding: 8, fontSize: 13 },
     selectedNameHint: { fontSize: 13, color: 'green', marginTop: 5, marginLeft: 2 },
-    // getStatusColor is used inline
+    // Styles for Proof of Complaint
+    proofsPreviewScroll: {
+        marginTop: 10,
+        maxHeight: 120,
+    },
+    proofsPreviewContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    proofPreviewItem: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginRight: 10,
+        marginBottom: 10,
+        padding: 5,
+        borderWidth: 1,
+        borderColor: '#EEE',
+        borderRadius: 8,
+        backgroundColor: '#F9F9F9',
+        position: 'relative',
+    },
+    proofThumbnail: {
+        width: 60,
+        height: 60,
+        borderRadius: 5,
+        resizeMode: 'cover',
+    },
 });
 
 export default ViewComplaintScreen;

@@ -20,7 +20,7 @@ import {
     View,
 } from 'react-native';
 
-const STATUSES = ["All", "Pending", "Follow up", "Processing", "Ready for Pickup", "Released", "Declined"];
+const STATUSES = ["All", "Pending", "Processing", "Approved", "Ready for Pickup", "Released", "Declined"];
 
 const MyRequestedDocumentsScreen = () => {
     const router = useRouter();
@@ -30,6 +30,18 @@ const MyRequestedDocumentsScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
+
+    // Configuration for document status filters (colors and icons)
+    const documentStatusConfig: { [key: string]: { colorName: string, icon: string, hexColor: string } } = {
+        'All':             { colorName: 'primary', icon: 'filter-variant', hexColor: '#0F00D7' }, // Using your app's primary blue
+        'Pending':         { colorName: 'orange-darken-1', icon: 'clock-outline', hexColor: '#FB8C00' },
+        // 'Follow up':       { colorName: 'blue-darken-1', icon: 'account-voice', hexColor: '#1976D2' },
+        'Processing':      { colorName: 'blue-darken-1', icon: 'cogs', hexColor: '#1976D2' }, // Same as Follow up for now
+        'Approved':        { colorName: 'cyan-darken-1', icon: 'check-circle-outline', hexColor: '#00BCD4' },
+        'Ready for Pickup':{ colorName: 'teal-darken-1', icon: 'package-variant-closed', hexColor: '#009688' },
+        'Released':        { colorName: 'green-darken-1', icon: 'check-decagram-outline', hexColor: '#4CAF50' },
+        'Declined':        { colorName: 'red-darken-2', icon: 'close-octagon-outline', hexColor: '#C62828' }
+    };
 
     // --- Step 1: Dedicated effect to load user data on mount ---
     useEffect(() => {
@@ -68,7 +80,6 @@ const MyRequestedDocumentsScreen = () => {
 
         try {
             const params: any = {
-                // The API can be hit or miss with this param, so we keep client-side filtering
                 byResidentId: userData._id,
                 sortBy: 'date_of_request',
                 sortOrder: 'desc',
@@ -78,6 +89,7 @@ const MyRequestedDocumentsScreen = () => {
                 params.search = searchQuery;
             }
 
+            // Only send the status parameter if it's not 'All'
             if (statusFilter !== 'All') {
                 params.status = statusFilter;
             }
@@ -85,11 +97,7 @@ const MyRequestedDocumentsScreen = () => {
             const response = await apiRequest('GET', `/api/document-requests?${new URLSearchParams(params).toString()}`,);
 
             if (response && response.requests) {
-                // IMPORTANT: Client-side filtering as a reliable fallback
-                const myRequests = response.requests.filter(
-                    (req: any) => true
-                );
-                setRequestedDocuments(myRequests);
+                setRequestedDocuments(response.requests); // Backend should now handle filtering
             } else {
                 setRequestedDocuments([]);
             }
@@ -133,18 +141,18 @@ const MyRequestedDocumentsScreen = () => {
     }, [fetchDocuments]);
 
 
-    // --- Helper and Render Functions (No changes needed below this line) ---
+    // --- Helper and Render Functions ---
 
+    // Gets the hex color for a status (for badges and active filters)
     const getStatusColor = (status: string) => {
-        const colors: { [key: string]: string } = {
-            "Pending": '#FFA726',
-            "Processing": '#29B6F6',
-            "Approved": '#26C6DA',
-            "Ready for Pickup": '#26A69A',
-            "Released": '#66BB6A',
-            "Declined": '#EF5350',
-        };
-        return colors[status] || '#9E9E9E';
+        const config = documentStatusConfig[status];
+        return config ? config.hexColor : '#9E9E9E'; // Default grey for unknown
+    };
+
+    // Gets the icon name for a status (for list items and filter buttons)
+    const getStatusIcon = (status: string) => {
+        const config = documentStatusConfig[status];
+        return config ? config.icon : 'file-document-outline'; // Default icon
     };
 
     const formatDate = (dateString: string) => {
@@ -159,18 +167,19 @@ const MyRequestedDocumentsScreen = () => {
 
     const renderDocumentItem = ({ item }: { item: any }) => (
         <TouchableOpacity
-            style={styles.documentItem}
-            onPress={() => router.push(`/document-requests/${item._id}`)}
+            style={[styles.documentItem, { borderLeftColor: getStatusColor(item.document_status) }]} // Dynamic border color
+            onPress={() => router.push(`/document-requests/${item.ref_no}`)}
         >
             <View style={styles.itemHeader}>
-                <MaterialCommunityIcons name="file-document-outline" size={24} color="#5E76FF" style={styles.itemIcon} />
+                {/* Dynamic icon based on status */}
+                <MaterialCommunityIcons name={getStatusIcon(item.document_status)} size={24} color={getStatusColor(item.document_status)} style={styles.itemIcon} />
                 <Text style={styles.documentType}>{item.request_type}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.document_status) }]}>
                     <Text style={styles.statusText}>{item.document_status}</Text>
                 </View>
             </View>
             <Text style={styles.detailText} numberOfLines={1}>Purpose: {item.purpose_of_request}</Text>
-            <Text style={styles.detailText}>Ref #: {item._id}</Text>
+            <Text style={styles.detailText}>Ref #: {item.ref_no}</Text>
             <Text style={styles.detailText}>Requested: {formatDate(item.date_of_request)}</Text>
         </TouchableOpacity>
     );
@@ -211,15 +220,28 @@ const MyRequestedDocumentsScreen = () => {
                         />
                     </View>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipContainer}>
-                        {STATUSES.map(status => (
-                            <TouchableOpacity
-                                key={status}
-                                style={[styles.chip, statusFilter === status && styles.chipActive]}
-                                onPress={() => setStatusFilter(status)}
-                            >
-                                <Text style={[styles.chipText, statusFilter === status && styles.chipTextActive]}>{status}</Text>
-                            </TouchableOpacity>
-                        ))}
+                        {STATUSES.map(status => {
+                            const config = documentStatusConfig[status];
+                            const isActive = statusFilter === status;
+                            const bgColor = isActive ? config.hexColor : 'white';
+                            const borderColor = isActive ? config.hexColor : '#E0E0E0';
+                            const textColor = isActive ? 'white' : '#555';
+                            const iconColor = isActive ? 'white' : '#555';
+
+                            return (
+                                <TouchableOpacity
+                                    key={status}
+                                    style={[
+                                        styles.chip,
+                                        { backgroundColor: bgColor, borderColor: borderColor }
+                                    ]}
+                                    onPress={() => setStatusFilter(status)}
+                                >
+                                    <MaterialCommunityIcons name={config.icon} size={16} color={iconColor} style={styles.chipIcon} />
+                                    <Text style={[styles.chipText, { color: textColor }]}>{status}</Text>
+                                </TouchableOpacity>
+                            );
+                        })}
                     </ScrollView>
                 </View>
 
@@ -251,7 +273,6 @@ const MyRequestedDocumentsScreen = () => {
     );
 };
 
-// --- Styles (No changes needed) ---
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
@@ -329,26 +350,31 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
     },
     chip: {
+        flexDirection: 'row', // Align icon and text horizontally
+        alignItems: 'center',
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 20,
         backgroundColor: '#E8EAF6',
         marginRight: 8,
         borderWidth: 1,
-        borderColor: '#C5CAE9'
+        borderColor: '#C5CAE9',
+        shadowColor: '#000', // Added shadow for a bit of depth
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 1,
     },
-    chipActive: {
-        backgroundColor: '#5E76FF',
-        borderColor: '#3D5AFE',
+    chipIcon: { // New style for icons within filter chips
+        marginRight: 6,
     },
     chipText: {
         fontSize: 14,
         fontWeight: '600',
         color: '#3F51B5'
     },
-    chipTextActive: {
-        color: 'white',
-    },
+    // chipActive and chipTextActive are no longer directly used as styles,
+    // their properties are applied inline based on `isActive` for dynamic colors.
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -369,7 +395,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         elevation: 1,
         borderLeftWidth: 5,
-        borderLeftColor: '#5E76FF',
+        // borderLeftColor is now dynamic
     },
     itemHeader: {
         flexDirection: 'row',
