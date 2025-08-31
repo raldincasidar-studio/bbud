@@ -90,11 +90,15 @@ const RELATIONSHIP_PROOF_CONFIG: { [key: string]: ProofRequirement } = {
 const RELATIONSHIPS_REQUIRING_PROOF = Object.keys(RELATIONSHIP_PROOF_CONFIG);
 // --- End Proof of Relationship Configuration ---
 
+// --- Suffix Options ---
+const suffixOptions = ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V', 'VI'];
+
 
 // --- Initial State Definitions ---
 
 const initialMemberState = {
-    first_name: '', middle_name: '', last_name: '', sex: '',
+    first_name: '', middle_name: '', last_name: '', suffix: null as string | null, // ADDED SUFFIX
+    sex: '',
     date_of_birth: null as string | null, civil_status: '', citizenship: 'Filipino',
     occupation_status: '', contact_number: '', relationship_to_head: '',
     other_relationship: '', email: '', password: '', is_voter: false, voter_id_number: '',
@@ -119,6 +123,7 @@ const initialHeadState = {
 };
 
 type Head = Omit<typeof initialHeadState, 'proof_of_relationship_type' | 'proof_of_relationship_base64'> & {
+    suffix: string | null; // Explicitly add suffix to Head type as well
     proof_of_relationship_type?: null; // Explicitly make it optional/null for Head
     proof_of_relationship_base64?: null;
 };
@@ -185,6 +190,11 @@ export default function SignupScreen() {
                 }
                 break;
             case 'middle_name':
+                if (value && isInvalidName(value)) {
+                    error = 'This field cannot contain numbers.';
+                }
+                break;
+            case 'suffix': // ADDED SUFFIX VALIDATION (optional, but no numbers)
                 if (value && isInvalidName(value)) {
                     error = 'This field cannot contain numbers.';
                 }
@@ -392,6 +402,14 @@ export default function SignupScreen() {
             }
         });
 
+        // Validate suffix (optional field, but check for invalid characters if present)
+        const suffixError = validateField('suffix', currentMember.suffix, currentMember);
+        if (suffixError) {
+            hasErrors = true;
+            newErrors.suffix = suffixError;
+        }
+
+
         // Validate conditional special classifications (already handled by ToggleSection passing errors)
         if (currentMember.is_voter) {
             const error = validateField('voter_id_number', currentMember.voter_id_number, currentMember);
@@ -469,6 +487,14 @@ export default function SignupScreen() {
                 newErrors[field] = error;
             }
         });
+        
+        // Validate suffix for head
+        const suffixError = validateField('suffix', formData.suffix, formData, members, formData.email);
+        if (suffixError) {
+            hasErrors = true;
+            newErrors.suffix = suffixError;
+        }
+
         setErrors(newErrors);
 
         const headAge = calculateAge(formData.date_of_birth);
@@ -528,6 +554,25 @@ export default function SignupScreen() {
                     <TextInput style={[styles.textInput, !!errors.middle_name && styles.inputError]} placeholder="Middle Name" placeholderTextColor="#A9A9A9" value={formData.middle_name} onChangeText={(v) => handleInputChange('middle_name', v)} /><ErrorMessage error={errors.middle_name} />
                     <Text style={styles.label}>Last Name*</Text>
                     <TextInput style={[styles.textInput, !!errors.last_name && styles.inputError]} placeholder="Last Name*" placeholderTextColor="#A9A9A9" value={formData.last_name} onChangeText={(v) => handleInputChange('last_name', v)} /><ErrorMessage error={errors.last_name} />
+                    
+                    {/* NEW: Suffix field for Head */}
+                    <Text style={styles.label}>Suffix</Text>
+                    <View style={styles.pickerWrapper}>
+                        <Picker
+                            selectedValue={formData.suffix}
+                            onValueChange={(v) => handleInputChange('suffix', v as string | null)}
+                            style={[styles.pickerText, !formData.suffix && styles.pickerPlaceholder]}
+                            itemStyle={{ color: 'black' }}
+                        >
+                            <Picker.Item label="Select Suffix (Optional)" value={null} />
+                            {suffixOptions.map((option) => (
+                                <Picker.Item key={option} label={option} value={option} />
+                            ))}
+                        </Picker>
+                    </View>
+                    <ErrorMessage error={errors.suffix} />
+                    {/* END NEW: Suffix field for Head */}
+
                     <Text style={styles.label}>Contact Number*</Text>
                     <TextInput style={[styles.textInput, !!errors.contact_number && styles.inputError]} placeholder="Contact Number*" placeholderTextColor="#A9A9A9" keyboardType="phone-pad" value={formData.contact_number} onChangeText={(v) => handleInputChange('contact_number', v)} maxLength={11} /><ErrorMessage error={errors.contact_number} />
                     <Text style={styles.label}>Date of Birth*</Text>
@@ -572,7 +617,17 @@ export default function SignupScreen() {
                     <View style={[styles.passwordContainer, !!errors.confirmPassword && styles.inputError]}><TextInput style={styles.passwordInput} placeholder="Confirm Password*" placeholderTextColor="#A9A9A9" secureTextEntry={!showHeadPassword} value={formData.confirmPassword} onChangeText={(v) => handleInputChange('confirmPassword', v)} /><TouchableOpacity onPress={() => setShowHeadPassword(!showHeadPassword)} style={styles.eyeIcon}><Ionicons name={showHeadPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#888" /></TouchableOpacity></View><ErrorMessage error={errors.confirmPassword} />
                     
                     <Text style={styles.subHeader}>Step 2: Household Members</Text>
-                    {members.map((member, index) => (<View key={index} style={styles.memberCard}><View style={styles.memberHeader}><Text style={styles.memberTitle}>{`${member.first_name} ${member.last_name}`}</Text><View style={{flexDirection: 'row'}}><TouchableOpacity onPress={() => openEditMemberModal(index)} style={{marginRight: 15}}><Ionicons name="pencil-outline" size={22} color="#0F00D7" /></TouchableOpacity><TouchableOpacity onPress={() => handleRemoveMember(index)}><Ionicons name="trash-bin-outline" size={22} color="#D32F2F" /></TouchableOpacity></View></View><Text style={styles.memberDetailText}>Relationship: {member.relationship_to_head === 'Other' ? member.other_relationship : member.relationship_to_head}</Text><Text style={styles.memberDetailText}>Age: {calculateAge(member.date_of_birth)}</Text></View>))}
+                    {members.map((member, index) => (
+                        <View key={index} style={styles.memberCard}>
+                            <View style={styles.memberHeader}>
+                                {/* UPDATED: Display middle name and suffix for members */}
+                                <Text style={styles.memberTitle}>{`${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name}${member.suffix ? ' ' + member.suffix : ''}`}</Text>
+                                <View style={{flexDirection: 'row'}}><TouchableOpacity onPress={() => openEditMemberModal(index)} style={{marginRight: 15}}><Ionicons name="pencil-outline" size={22} color="#0F00D7" /></TouchableOpacity><TouchableOpacity onPress={() => handleRemoveMember(index)}><Ionicons name="trash-bin-outline" size={22} color="#D32F2F" /></TouchableOpacity></View>
+                            </View>
+                            <Text style={styles.memberDetailText}>Relationship: {member.relationship_to_head === 'Other' ? member.other_relationship : member.relationship_to_head}</Text>
+                            <Text style={styles.memberDetailText}>Age: {calculateAge(member.date_of_birth)}</Text>
+                        </View>
+                    ))}
                     <TouchableOpacity style={styles.addMemberButton} onPress={openAddMemberModal}><Ionicons name="add-circle-outline" size={22} color="#0F00D7" style={{marginRight: 8}} /><Text style={styles.addMemberButtonText}>Add Household Member</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.signUpButton} onPress={handleRegister} disabled={isSaving}>{isSaving ? <ActivityIndicator color="#FFF" /> : <Text style={styles.signUpButtonText}>Register Household</Text>}</TouchableOpacity>
                     <TouchableOpacity onPress={() => router.navigate('/login')}><Text style={styles.loginText}>Already have an account? Login</Text></TouchableOpacity>
@@ -592,6 +647,25 @@ export default function SignupScreen() {
                             <TextInput style={[styles.modalInput, !!memberErrors.middle_name && styles.inputError]} placeholder="Middle Name" placeholderTextColor="#A9A9A9" value={currentMember.middle_name} onChangeText={(v) => handleMemberInputChange('middle_name', v)} /><ErrorMessage error={memberErrors.middle_name} />
                             <Text style={styles.label}>Last Name*</Text>
                             <TextInput style={[styles.modalInput, !!memberErrors.last_name && styles.inputError]} placeholder="Last Name*" placeholderTextColor="#A9A9A9" value={currentMember.last_name} onChangeText={(v) => handleMemberInputChange('last_name', v)} /><ErrorMessage error={memberErrors.last_name} />
+                            
+                            {/* NEW: Suffix field for Member */}
+                            <Text style={styles.label}>Suffix</Text>
+                            <View style={styles.pickerWrapperSmall}>
+                                <Picker
+                                    selectedValue={currentMember.suffix}
+                                    onValueChange={(v) => handleMemberInputChange('suffix', v as string | null)}
+                                    style={[styles.pickerText, !currentMember.suffix && styles.pickerPlaceholder]}
+                                    itemStyle={{ color: 'black' }}
+                                >
+                                    <Picker.Item label="Select Suffix (Optional)" value={null} />
+                                    {suffixOptions.map((option) => (
+                                        <Picker.Item key={option} label={option} value={option} />
+                                    ))}
+                                </Picker>
+                            </View>
+                            <ErrorMessage error={memberErrors.suffix} />
+                            {/* END NEW: Suffix field for Member */}
+
                             <Text style={styles.label}>Date of Birth*</Text>
                             <TouchableOpacity style={[styles.datePickerButtonModal, !!memberErrors.date_of_birth && styles.inputError]} onPress={() => showDatePicker('member')}><Text style={currentMember.date_of_birth ? styles.datePickerButtonText : styles.datePickerPlaceholderText}>{currentMember.date_of_birth || 'Date of Birth*'}</Text></TouchableOpacity><ErrorMessage error={memberErrors.date_of_birth} />
                             <Text style={styles.label}>Relationship to Head*</Text>
@@ -625,7 +699,7 @@ export default function SignupScreen() {
                                             }}
                                             style={!currentMember.proof_of_relationship_type ? styles.pickerPlaceholder : {}}
                                         >
-                                            <Picker.Item label="Select Proof Document Type*" value="" enabled={false} />
+                                            <Picker.Item label="Select Proof Document Type*" value={null} enabled={false} />
                                             {currentMember.relationship_to_head && RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head] &&
                                                 ALL_POSSIBLE_PROOF_DOCUMENTS
                                                     .filter(option => RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head].allowedProofValues.includes(option.value))
