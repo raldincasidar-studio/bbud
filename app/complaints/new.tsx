@@ -1,23 +1,11 @@
-// app/complaints/new.jsx
 import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
-// Debounce utility
-function debounce(func, delay) {
-  let timeoutId;
-  return function(...args) {
-    const context = this;
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func.apply(context, args);
-    }, delay);
-  };
-}
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // Reusable component for displaying validation errors
 const ErrorMessage = ({ error }) => {
@@ -52,24 +40,21 @@ const NewComplaintScreen = () => {
     const [category, setCategory] = useState('');
     const [isCategoryPickerVisible, setCategoryPickerVisible] = useState(false);
 
-    const [personComplainedSearchQuery, setPersonComplainedSearchQuery] = useState('');
-    const [personComplainedSearchResults, setPersonComplainedSearchResults] = useState([]);
-    const [isLoadingPersonComplained, setIsLoadingPersonComplained] = useState(false);
-    const [selectedPersonComplainedId, setSelectedPersonComplainedId] = useState(null);
-    const [selectedPersonComplainedName, setSelectedPersonComplainedName] = useState('');
-    const [selectedPersonComplainedIsResident, setSelectedPersonComplainedIsResident] = useState(false);
+    const [personComplainedAgainstName, setPersonComplainedAgainstName] = useState('');
     
+    const [proofsBase64, setProofsBase64] = useState([]);
+    const proofsBase64Ref = useRef(proofsBase64); 
+    useEffect(() => {
+        proofsBase64Ref.current = proofsBase64;
+    }, [proofsBase64]);
+
     const [errors, setErrors] = useState({});
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingInitialData, setIsLoadingInitialData] = useState(true);
 
-    // Central validation logic
     const validateField = (fieldName, value) => {
         let error = '';
         switch (fieldName) {
-            case 'personComplainedSearchQuery':
-                if (!value.trim()) error = 'Person complained against is required.';
-                break;
             case 'category':
                 if (!value) error = 'Category is required.';
                 break;
@@ -136,48 +121,8 @@ const NewComplaintScreen = () => {
     const formatDateForAPI = (date) => date ? date.toISOString().split('T')[0] : null;
     const formatTimeForAPI = (time) => time ? time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : null;
 
-    const searchResidentsAPI = async (query) => {
-        const trimmedQuery = typeof query === 'string' ? query.trim() : '';
-        if (trimmedQuery.length < 2) { setPersonComplainedSearchResults([]); setIsLoadingPersonComplained(false); return; }
-        setIsLoadingPersonComplained(true); setPersonComplainedSearchResults([]);
-        try {
-            const response = await apiRequest('GET', '/api/residents/search?q=' + trimmedQuery);
-            setPersonComplainedSearchResults(response.residents || []);
-        } catch (e) { console.error(`Exception searching:`, e); setPersonComplainedSearchResults([]); }
-        finally { setIsLoadingPersonComplained(false); }
-    };
-    
-    const debouncedPersonComplainedSearch = useCallback(debounce(searchResidentsAPI, 500), []);
-
-    useEffect(() => {
-        if (personComplainedSearchQuery !== selectedPersonComplainedName && selectedPersonComplainedId) {
-            setSelectedPersonComplainedId(null);
-            setSelectedPersonComplainedIsResident(false);
-        }
-        if (!personComplainedSearchQuery || personComplainedSearchQuery.trim().length < 2) {
-            setPersonComplainedSearchResults([]);
-            return;
-        }
-        if (!selectedPersonComplainedIsResident || personComplainedSearchQuery !== selectedPersonComplainedName) {
-            debouncedPersonComplainedSearch(personComplainedSearchQuery);
-        } else if (selectedPersonComplainedIsResident && personComplainedSearchQuery === selectedPersonComplainedName) {
-            setPersonComplainedSearchResults([]);
-        }
-    }, [personComplainedSearchQuery, selectedPersonComplainedName, selectedPersonComplainedIsResident, debouncedPersonComplainedSearch]);
-
-    const selectPersonComplained = (resident) => {
-        const name = `${resident.first_name || ''} ${resident.middle_name || ''} ${resident.last_name || ''}`.trim();
-        setSelectedPersonComplainedId(resident._id);
-        setSelectedPersonComplainedName(name);
-        setPersonComplainedSearchQuery(name);
-        setSelectedPersonComplainedIsResident(true);
-        setPersonComplainedSearchResults([]);
-        validateField('personComplainedSearchQuery', name);
-    };
-
-    const handlePersonComplainedChange = (text) => {
-        setPersonComplainedSearchQuery(text);
-        validateField('personComplainedSearchQuery', text);
+    const handlePersonComplainedAgainstNameChange = (text) => {
+        setPersonComplainedAgainstName(text);
     };
 
     const handleCategorySelect = (cat) => {
@@ -190,11 +135,105 @@ const NewComplaintScreen = () => {
         setNotesDescription(text);
         validateField('notesDescription', text);
     };
+
+    const pickProof = async () => {
+        console.log("pickProof function called.");
+
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        console.log("Permission status:", status);
+
+        if (status !== 'granted') {
+            Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to select files.');
+            return;
+        }
+
+        console.log("Permissions granted, launching image library...");
+
+        let result;
+        try {
+            result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsMultipleSelection: true,
+                quality: 0.7,
+                base64: true,
+            });
+            console.log("ImagePicker Result:", JSON.stringify(result, null, 2));
+        } catch (error) {
+            console.error("Error launching ImagePicker:", error);
+            Alert.alert("Error", "Failed to open file picker: " + error.message);
+            return;
+        }
+        
+        if (result.canceled) {
+            console.log("Image picker was canceled.");
+        } else if (result.assets && result.assets.length > 0) {
+            console.log("Assets found:", result.assets.length);
+
+            const newProofs = await Promise.all(result.assets.map(async (asset, index) => {
+                console.log(`--- Processing asset ${index + 1} ---`);
+                console.log("  Asset URI:", asset.uri);
+                console.log("  Asset MediaType (from Expo):", asset.mediaType); 
+                console.log("  Asset MimeType (from Expo):", asset.mimeType);
+                console.log("  Is asset.base64 a string?", typeof asset.base64 === 'string');
+                console.log("  Length of asset.base64:", asset.base64 ? asset.base64.length : 'N/A');
+                console.log("  Asset Base64 (first 50 chars):", typeof asset.base64 === 'string' && asset.base64.length > 0 ? asset.base64.substring(0, 50) : asset.base64);
+
+                // **CRITICAL FIX: Explicitly check for typeof string AND ensure it's not an empty string**
+                if (asset.base64 && typeof asset.base64 === 'string' && asset.base64.length > 0) {
+                    let detectedMimeType = 'application/octet-stream'; // Default generic binary
+                    
+                    if (asset.mimeType) {
+                        detectedMimeType = asset.mimeType;
+                    } else if (asset.mediaType === ImagePicker.MediaType.Video) {
+                        detectedMimeType = 'video/mp4'; // Common video type
+                    } else { // Assume image, try to get from URI or default
+                        const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
+                        if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
+                            detectedMimeType = 'image/jpeg';
+                        } else if (fileExtension === 'png') {
+                            detectedMimeType = 'image/png';
+                        } else if (fileExtension === 'gif') {
+                            detectedMimeType = 'image/gif';
+                        } else {
+                            detectedMimeType = 'image/jpeg'; // Fallback for image
+                        }
+                    }
+
+                    const dataUri = `data:${detectedMimeType};base64,${asset.base64}`;
+                    console.log("  Generated data URI (first 50 chars):", dataUri.substring(0, 50));
+                    console.log("  Generated data URI (length):", dataUri.length);
+                    return dataUri;
+                } else {
+                    console.warn(`Asset ${index + 1} missing valid base64 data or empty string, skipping:`, asset.uri);
+                    // Log the problematic base64 to understand why it's failing
+                    console.warn("  Problematic asset.base64:", asset.base64);
+                    return null;
+                }
+            }));
+            
+            const proofsToAdd = newProofs.filter(Boolean); // Filter out any nulls
+            console.log("Proofs successfully extracted and filtered (count):", proofsToAdd.length);
+            if (proofsToAdd.length > 0) {
+                console.log("First filtered proof (first 50 chars):", proofsToAdd[0].substring(0, 50));
+            }
+            
+            setProofsBase64(prev => {
+                const updatedProofs = [...prev, ...proofsToAdd];
+                console.log("Proofs state AFTER setProofsBase64 (total count):", updatedProofs.length);
+                return updatedProofs;
+            });
+
+        } else if (!result.canceled && (!result.assets || result.assets.length === 0)) {
+            console.warn("User selected files, but no assets were returned or assets array is empty.");
+        }
+    };
+
+    const removeProof = (indexToRemove) => {
+        setProofsBase64(prev => prev.filter((_, index) => index !== indexToRemove));
+    };
     
     const saveComplaint = async () => {
-        // Run validation on all fields before submitting
         const validationErrors = {};
-        if (validateField('personComplainedSearchQuery', personComplainedSearchQuery)) validationErrors.personComplainedSearchQuery = true;
         if (validateField('category', category)) validationErrors.category = true;
         if (validateField('notesDescription', notesDescription)) validationErrors.notesDescription = true;
         if (validateField('dateOfComplaint', dateOfComplaint)) validationErrors.dateOfComplaint = true;
@@ -207,6 +246,11 @@ const NewComplaintScreen = () => {
 
         setIsSaving(true);
         try {
+            console.log('Current proofsBase64 state via ref before sending:', proofsBase64Ref.current.length, 'proofs');
+            if (proofsBase64Ref.current.length > 0) {
+                console.log('First proof in ref (first 50 chars):', proofsBase64Ref.current[0].substring(0, 50));
+            }
+
             const payload = {
                 complainant_resident_id: complainantResidentId,
                 complainant_display_name: complainantDisplayName,
@@ -214,12 +258,19 @@ const NewComplaintScreen = () => {
                 contact_number: complainantContactNumber,
                 date_of_complaint: formatDateForAPI(dateOfComplaint),
                 time_of_complaint: formatTimeForAPI(timeOfComplaint),
-                person_complained_against_name: personComplainedSearchQuery.trim(),
-                person_complained_against_resident_id: selectedPersonComplainedIsResident ? selectedPersonComplainedId : null,
+                person_complained_against_name: personComplainedAgainstName.trim(), 
+                person_complained_against_resident_id: null,
                 category: category,
                 status: status,
                 notes_description: notesDescription.trim(),
+                proofs_base64: proofsBase64Ref.current, 
             };
+            console.log('Complaint payload being sent:', payload);
+            console.log('Number of proofs in payload:', payload.proofs_base64.length); 
+            if (payload.proofs_base64.length > 0) {
+                console.log('First proof in payload length (approx):', payload.proofs_base64[0].length);
+            }
+
             const response = await apiRequest('POST', '/api/complaints', payload);
             if (response && (response.message || response.complaint?._id)) {
                 Alert.alert("Success", response.message || "Complaint submitted successfully!");
@@ -227,7 +278,7 @@ const NewComplaintScreen = () => {
             } else {
                 Alert.alert("Error", response?.error || response?.message || "Could not submit complaint.");
             }
-        } catch (error) { console.error(error); Alert.alert("Error", "An unexpected error occurred.");
+        } catch (error) { console.error("Error submitting complaint:", error); Alert.alert("Error", "An unexpected error occurred.");
         } finally { setIsSaving(false); }
     };
 
@@ -267,26 +318,13 @@ const NewComplaintScreen = () => {
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Person Complained Against <Text style={styles.requiredStar}>*</Text></Text>
+                    <Text style={styles.label}>Person Complained Against</Text>
                     <TextInput
-                        placeholder="Search Resident or Enter Name..."
-                        value={personComplainedSearchQuery}
-                        onChangeText={handlePersonComplainedChange}
-                        style={[styles.textInput, !!errors.personComplainedSearchQuery && styles.inputError]}
-                        onBlur={() => { if(personComplainedSearchResults.length > 0) setTimeout(() => setPersonComplainedSearchResults([]), 200) }}
+                        placeholder="Enter Name (Optional)"
+                        value={personComplainedAgainstName}
+                        onChangeText={handlePersonComplainedAgainstNameChange}
+                        style={styles.textInput}
                     />
-                    <ErrorMessage error={errors.personComplainedSearchQuery} />
-                    {isLoadingPersonComplained && <ActivityIndicator style={styles.searchLoader}/>}
-                    {personComplainedSearchQuery.trim().length >=2 && !isLoadingPersonComplained && !selectedPersonComplainedIsResident && (
-                        <View style={styles.searchResultsContainer}>
-                            {personComplainedSearchResults.length > 0 ? personComplainedSearchResults.map(res => (
-                                <TouchableOpacity key={res._id} style={styles.searchResultItem} onPress={() => selectPersonComplained(res)}>
-                                    <Text>{`${res.first_name||''} ${res.middle_name||''} ${res.last_name||''}`.trim()}</Text>
-                                </TouchableOpacity>
-                            )) : <Text style={styles.noResultsTextSmall}>No matching residents. Enter name manually.</Text>}
-                        </View>
-                    )}
-                    {selectedPersonComplainedName && <Text style={styles.selectedNameHint}>{selectedPersonComplainedIsResident ? "Selected Resident: " : "Entered Name: "}{selectedPersonComplainedName}</Text>}
                 </View>
 
                 <View style={styles.inputContainer}>
@@ -318,6 +356,44 @@ const NewComplaintScreen = () => {
                     <TextInput placeholder="Describe the complaint..." value={notesDescription} onChangeText={handleDescriptionChange} style={[styles.textInput, {height: 120}, !!errors.notesDescription && styles.inputError]} multiline textAlignVertical="top"/>
                     <ErrorMessage error={errors.notesDescription} />
                 </View>
+                
+                {/* Proof of Complaint Section */}
+                <Text style={styles.sectionTitle}>Proof of Complaint</Text>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Attach Proof (Photos or Videos)</Text>
+                    <TouchableOpacity onPress={pickProof} style={styles.attachButton}>
+                        <MaterialCommunityIcons name="attachment" size={24} color="#5E76FF" />
+                        <Text style={styles.attachButtonText}>
+                            {proofsBase64.length > 0
+                                ? `${proofsBase64.length} File(s) Attached`
+                                : 'Select Files'}
+                        </Text>
+                    </TouchableOpacity>
+                    {proofsBase64.length > 0 && (
+                        <ScrollView horizontal style={styles.proofsPreviewScroll}>
+                            <View style={styles.proofsPreviewContainer}>
+                                {proofsBase64.map((base64String, index) => (
+                                    <View key={index} style={styles.proofPreviewItem}>
+                                        {/* Use base64String to determine if it's an image or video for display */}
+                                        {base64String.startsWith('data:image') ? (
+                                            <Image source={{ uri: base64String }} style={styles.proofThumbnail} />
+                                        ) : base64String.startsWith('data:video') ? (
+                                            <MaterialCommunityIcons name="video" size={40} color="#555" />
+                                        ) : (
+                                            // Fallback for unknown type or if something went wrong
+                                            <MaterialCommunityIcons name="file-question" size={40} color="#555" />
+                                        )}
+                                        <TouchableOpacity onPress={() => removeProof(index)} style={styles.removeProofButton}>
+                                            <MaterialCommunityIcons name="close-circle" size={20} color="red" />
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </View>
+                        </ScrollView>
+                    )}
+                </View>
+                {/* End Proof of Complaint Section */}
+
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Status</Text>
                     <TextInput value={status} style={[styles.textInput, styles.readOnlyInput]} editable={false} />
@@ -367,6 +443,57 @@ const styles = StyleSheet.create({
         color: '#D32F2F',
         fontSize: 12,
         marginTop: 4,
+    },
+    // New styles for Proof of Complaint
+    attachButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: '#5E76FF',
+        borderRadius: 8,
+        paddingVertical: 12,
+        backgroundColor: '#EBF0FF',
+    },
+    attachButtonText: {
+        fontSize: 16,
+        color: '#5E76FF',
+        fontWeight: '500',
+        marginLeft: 10,
+    },
+    proofsPreviewScroll: {
+        marginTop: 10,
+        maxHeight: 120, // Limit height of horizontal scroll
+    },
+    proofsPreviewContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flexWrap: 'wrap', // Allow items to wrap if not horizontal scroll
+    },
+    proofPreviewItem: {
+        flexDirection: 'column', // Align content vertically
+        alignItems: 'center',
+        marginRight: 10,
+        marginBottom: 10,
+        padding: 5,
+        borderWidth: 1,
+        borderColor: '#EEE',
+        borderRadius: 8,
+        backgroundColor: '#F9F9F9',
+        position: 'relative',
+    },
+    proofThumbnail: {
+        width: 60,
+        height: 60,
+        borderRadius: 5,
+        resizeMode: 'cover',
+    },
+    removeProofButton: {
+        position: 'absolute',
+        top: -8,
+        right: -8,
+        backgroundColor: 'white',
+        borderRadius: 15,
     },
 });
 

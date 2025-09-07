@@ -181,7 +181,7 @@ const NewBorrowAssetScreen = () => {
                 Alert.alert("Success", "Your borrowing request has been submitted successfully!");
                 router.replace('/borrowed-assets');
             } else {
-                Alert.alert("Error", response?.error || response?.message || "Could not submit your request.");
+                Alert.alert("Error", response?.error || response?.message || "Could not submit your request due to unresolved issues. On Hold/Deactivated");
             }
         } catch (error: any) {
             console.error("Error saving transaction:", error);

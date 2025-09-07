@@ -15,7 +15,7 @@
   "jest": {
     "preset": "jest-expo"
   },
-   "expo": {
+  "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {
         "listUnknownPackages": false

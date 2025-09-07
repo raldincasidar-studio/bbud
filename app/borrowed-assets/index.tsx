@@ -19,19 +19,21 @@ import {
     View,
 } from 'react-native';
 
-const STATUS_CONFIG: { [key: string]: { color: string; icon: keyof typeof MaterialCommunityIcons.glyphMap } } = {
-  Pending:    { color: '#78909C', icon: 'clock-outline' },
-  Processing: { color: '#42A5F5', icon: 'cogs' },
-  Approved:   { color: '#FF7043', icon: 'check-circle-outline' },
-  Returned:   { color: '#66BB6A', icon: 'check-all' },
-  Overdue:    { color: '#EF5350', icon: 'alert-octagon-outline' },
-  Lost:       { color: '#212121', icon: 'help-rhombus-outline' },
-  Damaged:    { color: '#FFB300', icon: 'alert-decagram-outline' },
-  Resolved:   { color: '#26A69A', icon: 'handshake-outline' },
-  Rejected:   { color: '#E57373', icon: 'cancel' },
+// Unified configuration for borrowed asset statuses (colors and icons)
+const borrowedStatusConfig: { [key: string]: { colorName: string, icon: string, hexColor: string } } = {
+  'All':        { colorName: 'primary', icon: 'filter-variant', hexColor: '#0F00D7' }, // Your app's primary blue
+  'Pending':    { colorName: 'blue-grey', icon: 'clock-outline', hexColor: '#607D8B' },
+  'Processing': { colorName: 'blue', icon: 'cogs', hexColor: '#2196F3' },
+  'Approved':   { colorName: 'orange', icon: 'check-circle-outline', hexColor: '#25f56aff' },
+  'Returned':   { colorName: 'green-darken-1', icon: 'check-all', hexColor: '#4CAF50' },
+  'Overdue':    { colorName: 'red-darken-2', icon: 'alert-octagon-outline', hexColor: '#D32F2F' },
+  'Lost':       { colorName: 'black', icon: 'help-rhombus-outline', hexColor: '#000000' },
+  'Damaged':    { colorName: 'amber-darken-4', icon: 'alert-decagram-outline', hexColor: '#FF8F00' },
+  'Resolved':   { colorName: 'teal', icon: 'handshake-outline', hexColor: '#009688' },
+  'Rejected':   { colorName: 'red-lighten-1', icon: 'close-octagon-outline', hexColor: '#EF5350' },
 };
 
-const STATUS_FILTER_OPTIONS = Object.keys(STATUS_CONFIG);
+const STATUS_FILTER_OPTIONS = Object.keys(borrowedStatusConfig); // Use keys from the new config
 
 const BorrowedAssetsScreen = () => {
     const router = useRouter();
@@ -40,36 +42,52 @@ const BorrowedAssetsScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     
-    // --- NEW: State for filters ---
+    // --- State for filters ---
     const [searchKey, setSearchKey] = useState('');
-    const [statusFilter, setStatusFilter] = useState<string[]>([]); // Array for multi-select
+    const [statusFilter, setStatusFilter] = useState('All'); // Changed to single string for single selection
     
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 15;
 
-    // --- REVISED: Data Fetching Function ---
-    const fetchBorrowedItems = async (page = 1, isInitialLoad = false) => {
-        if (page === 1 && !refreshing) setIsLoading(true);
-
-        let currentUserId = userData?._id;
-        if (!currentUserId && isInitialLoad) {
-            try {
-                const storedData = await AsyncStorage.getItem('userData');
-                if (storedData) {
-                    const parsed = JSON.parse(storedData);
-                    setUserData(parsed);
-                    currentUserId = parsed._id;
+    // Initial data load effect
+    useEffect(() => {
+        const loadUserDataAndFetch = async () => {
+            let currentUserId = userData?._id;
+            if (!currentUserId) {
+                try {
+                    const storedData = await AsyncStorage.getItem('userData');
+                    if (storedData) {
+                        const parsed = JSON.parse(storedData);
+                        setUserData(parsed);
+                        currentUserId = parsed._id;
+                    }
+                } catch (e) {
+                    console.error("Error loading user data from AsyncStorage:", e);
                 }
-            } catch (e) { /* handle error */ }
-        }
-        
+            }
+            if (currentUserId) {
+                fetchBorrowedItems(1, true, currentUserId); // Pass currentUserId to fetch
+            } else {
+                setIsLoading(false); // Stop loading if no user data found
+            }
+        };
+        loadUserDataAndFetch();
+    }, []); // Run only once on mount
+
+    // --- REVISED: Data Fetching Function ---
+    const fetchBorrowedItems = async (page = 1, isInitialLoad = false, userIdOverride?: string) => {
+        const currentUserId = userIdOverride || userData?._id;
+
         if (!currentUserId) {
             setIsLoading(false);
             setRefreshing(false);
-            // Optionally show an alert or redirect
+            Alert.alert("Authentication Error", "Please log in to view your borrowed items.");
+            router.replace('/login'); // Redirect to login
             return;
         }
+
+        if (page === 1 && !refreshing && !isInitialLoad) setIsLoading(true); // Only show loader for explicit new fetches
 
         try {
             const params: any = {
@@ -78,19 +96,16 @@ const BorrowedAssetsScreen = () => {
                 itemsPerPage: itemsPerPage,
                 sortBy: 'created_at',
                 sortOrder: 'desc',
-                byResidentId: currentUserId
+                byResidentId: currentUserId // Ensure resident ID is always sent
             };
-            // Add status filter if any are selected
-            if (statusFilter.length > 0) {
-                params.status = statusFilter.join(',');
+            
+            // Add status filter if it's not 'All'
+            if (statusFilter !== 'All') {
+                params.status = statusFilter;
             }
             
-            // The API must be able to filter by the borrower's ID on this main endpoint
-            // This is a more robust approach than a separate endpoint.
-            // params.borrower_resident_id = currentUserId; 
-            
-            // Based on the provided API, there's a specific endpoint for this.
-            // Let's use that for clarity, but the above approach is also valid.
+            // Assuming your /api/borrowed-assets endpoint handles `byResidentId` as a query param
+            // and `status` as a query param correctly.
             const response = await apiRequest('GET', `/api/borrowed-assets?${new URLSearchParams(params).toString()}`);
 
             if (response && response.transactions) {
@@ -110,11 +125,6 @@ const BorrowedAssetsScreen = () => {
         }
     };
     
-    // Initial data load effect
-    useEffect(() => {
-        fetchBorrowedItems(1, true);
-    }, [userData]); // Run when userData is first set
-
     // Filter change effect
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -127,12 +137,12 @@ const BorrowedAssetsScreen = () => {
 
     useFocusEffect(useCallback(() => {
         if (userData?._id) fetchBorrowedItems(1);
-    }, [userData]));
+    }, [userData, searchKey, statusFilter])); // Dependencies updated
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         fetchBorrowedItems(1);
-    }, [userData, searchKey, statusFilter]);
+    }, [userData, searchKey, statusFilter]); // Dependencies updated
 
     const handleLoadMore = () => {
         if (!isLoading && !refreshing && borrowedItems.length < totalItems) {
@@ -140,16 +150,18 @@ const BorrowedAssetsScreen = () => {
         }
     };
 
-    const handleStatusFilterToggle = (status: string) => {
-        setStatusFilter(prev => {
-            const isSelected = prev.includes(status);
-            if (isSelected) {
-                return prev.filter(s => s !== status); // Remove status
-            } else {
-                return [...prev, status]; // Add status
-            }
-        });
+    // Helper to get status color
+    const getStatusColor = (status: string) => {
+        const config = borrowedStatusConfig[status];
+        return config ? config.hexColor : '#757575'; // Default grey
     };
+
+    // Helper to get status icon
+    const getStatusIcon = (status: string) => {
+        const config = borrowedStatusConfig[status];
+        return config ? config.icon : 'help-circle-outline'; // Default icon
+    };
+
 
     const formatDate = (dateString?: string, includeTime = true) => {
         if (!dateString) return 'N/A';
@@ -171,10 +183,11 @@ const BorrowedAssetsScreen = () => {
         <TouchableOpacity style={styles.itemContainer} onPress={() => router.push(`/borrowed-assets/${item._id}`)}>
             <View style={styles.itemHeader}>
                 <View style={styles.itemHeaderLeft}>
-                    <MaterialCommunityIcons name={STATUS_CONFIG[item.status]?.icon || 'help-circle-outline'} size={24} color={STATUS_CONFIG[item.status]?.color || '#757575'} />
+                    {/* Dynamic icon and color */}
+                    <MaterialCommunityIcons name={getStatusIcon(item.status)} size={24} color={getStatusColor(item.status)} style={{ marginRight: 8 }} />
                     <Text style={styles.itemTitle} numberOfLines={1}>{item.item_borrowed}</Text>
                 </View>
-                <View style={[styles.statusBadge, { backgroundColor: STATUS_CONFIG[item.status]?.color || '#757575' }]}>
+                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
                     <Text style={styles.statusText}>{item.status}</Text>
                 </View>
             </View>
@@ -213,16 +226,28 @@ const BorrowedAssetsScreen = () => {
                 
                 <View>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipContainer}>
-                        {STATUS_FILTER_OPTIONS.map(status => (
-                            <TouchableOpacity
-                                key={status}
-                                style={[styles.chip, statusFilter.includes(status) && styles.chipActive]}
-                                onPress={() => handleStatusFilterToggle(status)}
-                            >
-                                <MaterialCommunityIcons name={STATUS_CONFIG[status]?.icon || 'help-circle'} size={16} color={statusFilter.includes(status) ? 'white' : STATUS_CONFIG[status]?.color} style={{ marginRight: 6 }} />
-                                <Text style={[styles.chipText, statusFilter.includes(status) && styles.chipTextActive]}>{status}</Text>
-                            </TouchableOpacity>
-                        ))}
+                        {STATUS_FILTER_OPTIONS.map(status => {
+                            const config = borrowedStatusConfig[status];
+                            const isActive = statusFilter === status; // Check if this status is active
+                            const bgColor = isActive ? config.hexColor : 'white';
+                            const borderColor = isActive ? config.hexColor : '#E0E0E0'; // Consistent border for inactive
+                            const textColor = isActive ? 'white' : '#555'; // Dark grey for inactive text
+                            const iconColor = isActive ? 'white' : '#555'; // Dark grey for inactive icon
+
+                            return (
+                                <TouchableOpacity
+                                    key={status}
+                                    style={[
+                                        styles.chip,
+                                        { backgroundColor: bgColor, borderColor: borderColor }
+                                    ]}
+                                    onPress={() => setStatusFilter(status)} // Set single active status
+                                >
+                                    <MaterialCommunityIcons name={config.icon} size={16} color={iconColor} style={{ marginRight: 6 }} />
+                                    <Text style={[styles.chipText, { color: textColor }]}>{status}</Text>
+                                </TouchableOpacity>
+                            );
+                        })}
                     </ScrollView>
                 </View>
 
@@ -262,22 +287,38 @@ const styles = StyleSheet.create({
     searchIcon: { marginRight: 8, },
     searchInput: { flex: 1, height: 45, fontSize: 16, },
     chipContainer: { paddingVertical: 5, paddingBottom: 15, },
-    chip: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: '#E8EAF6', marginRight: 8, borderWidth: 1, borderColor: '#C5CAE9' },
-    chipActive: { backgroundColor: '#5E76FF', borderColor: '#3D5AFE', },
-    chipText: { fontSize: 14, fontWeight: '600', color: '#3F51B5' },
-    chipTextActive: { color: 'white', },
+    chip: { // Adjusted for dynamic colors
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        marginRight: 8,
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 1,
+    },
+    // chipActive is replaced by inline style
+    chipText: { // Text color handled inline
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    // chipTextActive is replaced by inline style
     loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     loadingText: { marginTop: 10, fontSize: 16, color: '#555' },
     list: { flex: 1, marginTop: 5, },
     itemContainer: { backgroundColor: 'white', padding: 15, borderRadius: 10, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, borderWidth: 1, borderColor: '#E8E8E8' },
     itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, },
     itemHeaderLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 },
-    itemTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginLeft: 8 },
+    itemTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginLeft: 8 }, // Text color explicitly black
     statusBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 15 },
     statusText: { color: 'white', fontSize: 12, fontWeight: 'bold', },
     itemContent: { borderTopWidth: 1, borderColor: '#F0F0F0', paddingTop: 10 },
-    itemDetail: { fontSize: 14, color: '#666', marginBottom: 4 },
-    detailLabel: { fontWeight: '600', color: '#333' },
+    itemDetail: { fontSize: 14, color: '#666', marginBottom: 4 }, // Dark grey
+    detailLabel: { fontWeight: '600', color: '#333' }, // Black
     emptyStateContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, marginTop: 50 },
     emptyStateText: { fontSize: 18, fontWeight: '600', color: '#555', textAlign: 'center', marginBottom: 8 },
     emptyStateSubText: { fontSize: 14, color: '#777', textAlign: 'center' },
