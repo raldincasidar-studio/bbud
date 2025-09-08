@@ -276,7 +276,7 @@ const NewComplaintScreen = () => {
                 Alert.alert("Success", response.message || "Complaint submitted successfully!");
                 router.replace('/complaints');
             } else {
-                Alert.alert("Error", response?.error || response?.message || "Could not submit complaint.");
+                Alert.alert("Error", response?.error || response?.message || "Could not submit complaint. Account maybe On Hold / Deactivated.");
             }
         } catch (error) { console.error("Error submitting complaint:", error); Alert.alert("Error", "An unexpected error occurred.");
         } finally { setIsSaving(false); }
