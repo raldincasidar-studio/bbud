@@ -233,16 +233,25 @@ export default function SignupScreen() {
             case 'years_at_current_address': if (isRequired(value)) error = 'Years at address is required.'; else if (!/^\d+$/.test(value)) error = 'Must be a valid number.'; break;
             case 'proof_of_residency_base64': if (isRequired(value)) error = 'Proof of residency is required.'; break;
             case 'password':
-                // Check if the current state being validated is for the head (has confirmPassword)
-                if ('confirmPassword' in state && isRequired(value)) {
-                    error = 'Password is required.';
-                }
-                // Check if the current state being validated is for a member (has email field, but not confirmPassword)
-                else if ('email' in state && !('confirmPassword' in state) && (state as Member).email && isRequired(value)) {
-                    error = 'Password is required for account creation if an email is provided.';
-                }
-                else if (value && value.length < 6) {
-                    error = 'Password must be at least 6 characters.';
+                const passwordValue = String(value); // Ensure value is a string
+                // Determine if password is required based on context
+                const isHeadPassword = 'confirmPassword' in state;
+                const isMemberPasswordOptionalButProvided = 'email' in state && !isHeadPassword && (state as Member).email;
+
+                if (isRequired(passwordValue)) {
+                    if (isHeadPassword) {
+                        error = 'Password is required.';
+                    } else if (isMemberPasswordOptionalButProvided) {
+                        error = 'Password is required for account creation if an email is provided.';
+                    }
+                } else if (passwordValue) { // Only apply complex rules if password is not empty
+                    // Password must be at least 8 characters, contain at least one uppercase letter,
+                    // one lowercase letter, one number, and one special character.
+                    // Special characters included: @$!%*?&
+                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                    if (!passwordRegex.test(passwordValue)) {
+                        error = 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @$!%*?&).';
+                    }
                 }
                 break;
             case 'confirmPassword':
