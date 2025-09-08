@@ -26,7 +26,7 @@ interface UserData {
     first_name: string;
     middle_name?: string | null;
     last_name?: string;
-    suffix?: string | null; // ADDED SUFFIX HERE
+    suffix?: string | null;
     email: string;
     sex?: string;
     date_of_birth?: string;
@@ -91,10 +91,10 @@ export default function SettingsScreen() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    
+
     const [formState, setFormState] = useState<Partial<UserData & { newPassword?: string; confirmNewPassword?: string }>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
-    
+
     const [originalFormState, setOriginalFormState] = useState({});
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false); // This state is not currently used for a DatePicker component.
     const [showPassword, setShowPassword] = useState(false);
@@ -103,13 +103,23 @@ export default function SettingsScreen() {
     const getValidationError = (field: string, value: any, currentState: typeof formState): string => {
         const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim());
         const isInvalidName = (val: string) => !/^[a-zA-Z'.\-\s]+$/.test(val); // Re-using from signup.tsx
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
         switch (field) {
             case 'first_name': return isRequired(value) ? 'First name is required.' : '';
             case 'last_name': return isRequired(value) ? 'Last name is required.' : '';
-            case 'suffix': // ADDED SUFFIX VALIDATION
+            case 'suffix':
                 if (value && isInvalidName(value)) {
                     return 'Suffix cannot contain numbers.';
+                }
+                return '';
+            case 'email':
+                if (isRequired(value)) {
+                    return 'Email is required.';
+                }
+                if (!emailRegex.test(value.trim())) {
+                    return 'Please enter a valid email address (e.g., juan@example.com).';
                 }
                 return '';
             case 'contact_number': return value && !/^\d{11}$/.test(value) ? 'Enter a valid 11-digit number.' : '';
@@ -124,12 +134,25 @@ export default function SettingsScreen() {
             case 'years_at_current_address': return isRequired(value) ? 'Years at address is required.' : !/^\d+$/.test(String(value)) ? 'Must be a valid number.' : '';
             case 'pwd_id': return currentState.is_pwd && isRequired(value) ? 'PWD ID Number is required.' : '';
             case 'senior_citizen_id': return currentState.is_senior_citizen && isRequired(value) ? 'Senior Citizen ID is required.' : '';
-            case 'newPassword': return value && value.length < 8 ? 'Password must be at least 8 characters long.' : '';
-            case 'confirmNewPassword': return currentState.newPassword && value !== currentState.newPassword ? 'Passwords do not match.' : '';
+            case 'newPassword':
+                if (value && !passwordRegex.test(value)) { // Only validate if a new password is provided
+                    return 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @$!%*?&).';
+                }
+                return '';
+            case 'confirmNewPassword':
+                if (currentState.newPassword) { // Only validate if newPassword is provided
+                    if (isRequired(value)) {
+                        return 'Please confirm your new password.';
+                    }
+                    if (value !== currentState.newPassword) {
+                        return 'New passwords do not match.';
+                    }
+                }
+                return '';
             default: return '';
         }
     };
-    
+
     // Form input handler with real-time validation
     const handleInputChange = (field: keyof typeof formState, value: any) => {
         setFormState(prev => {
@@ -148,12 +171,19 @@ export default function SettingsScreen() {
             });
 
             // If newPassword is changed, re-validate confirmNewPassword
-            if (field === 'newPassword') {
+            if (field === 'newPassword' || field === 'confirmNewPassword') {
                 const confirmError = getValidationError('confirmNewPassword', newState.confirmNewPassword, newState);
                  setErrors(currentErrors => {
                     const newErrors = { ...currentErrors };
                     if (confirmError) newErrors.confirmNewPassword = confirmError;
                     else delete newErrors.confirmNewPassword;
+                    return newErrors;
+                });
+                const newPasswordError = getValidationError('newPassword', newState.newPassword, newState);
+                 setErrors(currentErrors => {
+                    const newErrors = { ...currentErrors };
+                    if (newPasswordError) newErrors.newPassword = newPasswordError;
+                    else delete newErrors.newPassword;
                     return newErrors;
                 });
             }
@@ -169,8 +199,8 @@ export default function SettingsScreen() {
             if (storedData) {
                 const parsedData: UserData = JSON.parse(storedData);
                 const dob = parsedData.date_of_birth ? new Date(parsedData.date_of_birth).toISOString().split('T')[0] : '';
-                const initialData = { 
-                    ...parsedData, 
+                const initialData = {
+                    ...parsedData,
                     date_of_birth: dob,
                     suffix: parsedData.suffix || null, // Ensure suffix is initialized as null if not present
                 };
@@ -191,7 +221,7 @@ export default function SettingsScreen() {
     useEffect(() => {
         loadUserData();
     }, [loadUserData]);
-    
+
     const pickImage = async (field: keyof UserData) => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
@@ -214,12 +244,14 @@ export default function SettingsScreen() {
 
         const validationErrors: Record<string, string> = {};
         const fieldsToValidate: (keyof typeof formState)[] = [
-            'first_name', 'last_name', 'suffix', // ADDED SUFFIX TO VALIDATION LIST
-            'contact_number', 'date_of_birth', 'sex', 
+            'first_name', 'last_name', 'suffix',
+            'email', // ADDED EMAIL TO VALIDATION LIST
+            'contact_number', 'date_of_birth', 'sex',
             'civil_status', 'citizenship', 'occupation_status', 'address_house_number',
             'address_street', 'address_subdivision_zone', 'years_at_current_address',
         ];
 
+        // Only validate password fields if newPassword is provided by the user
         if (formState.newPassword) {
             fieldsToValidate.push('newPassword', 'confirmNewPassword');
         }
@@ -234,22 +266,21 @@ export default function SettingsScreen() {
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length > 0) {
-            Alert.alert("Validation Error", "Please fix the errors shown on the form.");
+            Alert.alert("Validation Error", "Please fix the errors shown on the form before saving.");
             return;
         }
-        
+
         setIsSaving(true);
         try {
-            const payload: any = { ...formState }; // suffix will be included here
+            const payload: any = { ...formState };
             if (payload.years_at_current_address) {
                 payload.years_at_current_address = parseInt(payload.years_at_current_address, 10);
             }
-            delete payload.confirmNewPassword;
+            delete payload.confirmNewPassword; // Don't send confirmNewPassword to the backend
 
             const response = await apiRequest('PUT', `/api/residents/${formState._id}`, payload);
 
             if (response && response.resident) {
-                // Ensure to parse original stored data, merge, and then stringify again
                 const storedUserData = JSON.parse(await AsyncStorage.getItem('userData') || '{}');
                 const updatedUserData = { ...storedUserData, ...response.resident };
                 await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
@@ -289,7 +320,7 @@ export default function SettingsScreen() {
 
                 <ScrollView style={styles.contentScrollView} contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="handled">
                     <Text style={styles.sectionTitle}>Personal Information</Text>
-                    {/* First Name */}
+                    {/* First Name (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>First Name *</Text>
                         <TextInput
@@ -300,7 +331,7 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.first_name} />
                     </View>
 
-                    {/* Middle Name */}
+                    {/* Middle Name (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Middle Name</Text>
                         <TextInput
@@ -310,7 +341,7 @@ export default function SettingsScreen() {
                         />
                     </View>
 
-                    {/* Last Name */}
+                    {/* Last Name (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Last Name *</Text>
                         <TextInput
@@ -321,10 +352,10 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.last_name} />
                     </View>
 
-                    {/* NEW: Suffix field */}
+                    {/* Suffix field (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Suffix</Text>
-                        <View style={[styles.pickerWrapper, !!errors.suffix && styles.inputError]}>
+                        <View style={[styles.pickerWrapper, styles.pickerWrapperDisabled, !!errors.suffix && styles.inputError]}>
                             <Picker
                                 selectedValue={formState.suffix}
                                 enabled={false}
@@ -339,11 +370,10 @@ export default function SettingsScreen() {
                         </View>
                         <ErrorMessage error={errors.suffix} />
                     </View>
-                    {/* END NEW: Suffix field */}
 
                     {/* Email (editable) */}
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Email Address</Text>
+                        <Text style={styles.label}>Email Address *</Text>
                         <TextInput
                             style={[styles.textInput, !!errors.email && styles.inputError]}
                             value={formState.email}
@@ -358,7 +388,7 @@ export default function SettingsScreen() {
 
                     {/* Contact Number (editable) */}
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Contact Number</Text>
+                        <Text style={styles.label}>Contact Number *</Text>
                         <TextInput
                             style={[styles.textInput, !!errors.contact_number && styles.inputError]}
                             value={formState.contact_number || ''}
@@ -371,7 +401,7 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.contact_number} />
                     </View>
 
-                    {/* Date of Birth */}
+                    {/* Date of Birth (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Date of Birth *</Text>
                         <TouchableOpacity
@@ -385,7 +415,7 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.date_of_birth} />
                     </View>
 
-                    {/* Sex */}
+                    {/* Sex (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Sex *</Text>
                         <View style={[styles.pickerWrapper, styles.pickerWrapperDisabled, !!errors.sex && styles.inputError]}>
@@ -403,7 +433,7 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.sex} />
                     </View>
 
-                    {/* Civil Status */}
+                    {/* Civil Status (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Civil Status *</Text>
                         <View style={[styles.pickerWrapper, styles.pickerWrapperDisabled, !!errors.civil_status && styles.inputError]}>
@@ -423,7 +453,7 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.civil_status} />
                     </View>
 
-                    {/* Citizenship */}
+                    {/* Citizenship (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Citizenship *</Text>
                         <TextInput
@@ -435,7 +465,7 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.citizenship} />
                     </View>
 
-                    {/* Occupation Status */}
+                    {/* Occupation Status (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Occupation Status *</Text>
                         <View style={[styles.pickerWrapper, styles.pickerWrapperDisabled, !!errors.occupation_status && styles.inputError]}>
@@ -456,18 +486,9 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.occupation_status} />
                     </View>
 
-                    {/* Proof of Residency */}
+                    {/* Proof of Residency (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Proof of Residency</Text>
-                        {/* The TouchableOpacity for upload is commented out in your original code,
-                            so I'm keeping it that way, but if you wanted to allow update:
-                        <TouchableOpacity
-                            style={styles.imagePickerButton}
-                            onPress={() => pickImage('proof_of_residency_base64')}
-                        >
-                            <Text style={styles.imagePickerButtonText}>Upload New Proof</Text>
-                        </TouchableOpacity>
-                        */}
                         {formState.proof_of_residency_base64 && (
                             <Image
                                 source={{ uri: formState.proof_of_residency_base64 }}
@@ -535,6 +556,10 @@ export default function SettingsScreen() {
                             </TouchableOpacity>
                         </View>
                         <ErrorMessage error={errors.newPassword} />
+                        {/* Add helper text for password requirements */}
+                        {formState.newPassword && !errors.newPassword &&
+                            <Text style={styles.helperText}>Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @$!%*?&).</Text>
+                        }
                     </View>
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Confirm New Password</Text>
@@ -581,11 +606,11 @@ const styles = StyleSheet.create({
     inputGroup: { marginBottom: 12 },
     label: { fontSize: 14, color: '#424242', marginBottom: 6, fontWeight: '500' },
     textInput: { backgroundColor: 'white', borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 14 : 10, fontSize: 15, color: '#000' },
-    textInputDisabled: { backgroundColor: '#E0E0E0', color: '#757575', borderColor: '#C0C0C0' }, // Added disabled style
+    textInputDisabled: { backgroundColor: '#E0E0E0', color: '#757575', borderColor: '#C0C0C0' },
     pickerWrapper: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, backgroundColor: 'white' },
-    pickerWrapperDisabled: { backgroundColor: '#E0E0E0', borderColor: '#C0C0C0' }, // Added disabled style for picker wrapper
+    pickerWrapperDisabled: { backgroundColor: '#E0E0E0', borderColor: '#C0C0C0' },
     pickerText: { color: '#000' },
-    pickerTextDisabled: { color: '#757575' }, // Added disabled style for picker text
+    pickerTextDisabled: { color: '#757575' },
     pickerPlaceholder: { color: '#A9A9A9' },
     datePickerButton: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, padding: 14, backgroundColor: 'white' },
     datePickerText: { fontSize: 15, color: '#000' },
@@ -598,14 +623,13 @@ const styles = StyleSheet.create({
     conditionalContainer: { marginTop: 15, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0' },
     imagePickerButton: { backgroundColor: '#E8EAF6', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 10 },
     imagePickerButtonText: { color: '#3F51B5', fontWeight: 'bold' },
-    buttonDisabledAppearance: { backgroundColor: '#E0E0E0', borderColor: '#C0C0C0' }, // For disabled TouchableOpacity
+    buttonDisabledAppearance: { backgroundColor: '#E0E0E0', borderColor: '#C0C0C0' },
     proofImagePreview: { width: 100, height: 100, borderRadius: 8, marginTop: 10, alignSelf: 'center' },
     actionButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 8, marginTop: 10, elevation: 2 },
     saveButton: { backgroundColor: '#4CAF50' },
     logoutButton: { backgroundColor: '#D32F2F', marginTop: 20 },
     actionButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
     buttonDisabled: { backgroundColor: '#A5D6A7' },
-    // Styles for validation
     inputError: {
         borderColor: '#D32F2F',
     },
@@ -614,4 +638,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 4,
     },
+    helperText: {
+        fontSize: 12,
+        color: '#616161',
+        marginTop: 5,
+        marginLeft: 5,
+    }
 });
