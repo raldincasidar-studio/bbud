@@ -421,7 +421,7 @@ const NewDocumentRequestScreen = () => {
                 Alert.alert("Success", "Document request submitted successfully!");
                 router.replace('/request-document');
             } else {
-                Alert.alert("Error", response?.error || response?.message || "Could not submit the request.");
+                Alert.alert("Error", response?.error || response?.message || "Could not submit the request. Check status On Hold / Deactivated.");
             }
         } catch (error: any) {
             console.error("Error saving document request:", error);
