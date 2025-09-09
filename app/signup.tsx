@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { Try } from 'expo-router/build/views/Try';
 import React, { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
@@ -476,16 +477,17 @@ export default function SignupScreen() {
     };
     
     const handleRegister = async () => {
+        // --- All validation logic remains the same ---
         const fieldsToValidate: (keyof Head)[] = [
-            'first_name', 'last_name', 'email', 'contact_number', 'date_of_birth', 
+            'first_name', 'last_name', 'email', 'contact_number', 'date_of_birth',
             'sex', 'civil_status', 'citizenship', 'occupation_status',
-            'address_house_number', 'address_street', 'address_subdivision_zone', 
+            'address_house_number', 'address_street', 'address_subdivision_zone',
             'years_at_current_address', 'proof_of_residency_base64', 'password', 'confirmPassword'
         ];
         if (formData.is_voter) fieldsToValidate.push('voter_id_number');
         if (formData.is_pwd) fieldsToValidate.push('pwd_id');
         if (formData.is_senior_citizen) fieldsToValidate.push('senior_citizen_id');
-        
+
         let hasErrors = false;
         const newErrors: Partial<Record<keyof Head, string>> = {};
 
@@ -496,7 +498,7 @@ export default function SignupScreen() {
                 newErrors[field] = error;
             }
         });
-        
+
         // Validate suffix for head
         const suffixError = validateField('suffix', formData.suffix, formData, members, formData.email);
         if (suffixError) {
@@ -508,30 +510,69 @@ export default function SignupScreen() {
 
         const headAge = calculateAge(formData.date_of_birth);
         if (headAge === null || headAge < 15) {
-            Alert.alert("Validation Error", "Household Head must be at least 15 years old to register."); return;
+            Alert.alert("Validation Error", "Household Head must be at least 15 years old to register.");
+            return;
         }
-        if (hasErrors) { Alert.alert("Validation Error", "Please correct the errors on the form before submitting."); return; }
+        if (hasErrors) {
+            Alert.alert("Validation Error", "Please correct the errors on the form before submitting.");
+            return;
+        }
 
         setIsSaving(true);
         try {
             const payload: any = { ...formData, household_members_to_create: members };
             delete payload.confirmPassword;
-            // Remove relationship_to_head, other_relationship, and proof fields from head payload, as they are not applicable to the head's registration payload
+            // Remove relationship_to_head, other_relationship, and proof fields from head payload
             delete payload.relationship_to_head;
             delete payload.other_relationship;
             delete payload.proof_of_relationship_type;
             delete payload.proof_of_relationship_base64;
 
-            const response = await apiRequest('POST', '/api/residents', payload);
-            if (response && (response.message || response.resident)) {
-                Alert.alert('Registration Successful', 'Your household has been registered and is pending for approval by the Baranggay Secretary.', [{ text: 'OK', onPress: () => router.replace('/login') }]);
-            } else {
-                Alert.alert('Registration Failed', response?.message || response?.error || 'An unknown error occurred.');
+            try {
+                const response = await apiRequest('POST', '/api/residents', payload);
+
+                console.log(response);
+
+                if (!response || !response.message) {
+                    throw new Error('Registration failed. Please try again.');
+                }
+
+                // This part only runs if the API call was successful
+                Alert.alert(
+                    'Registration Successful',
+                    'Your household has been registered and is pending for approval by the Baranggay Secretary.',
+                    [{ text: 'OK', onPress: () => router.replace('/login') }]
+                );
+            } catch (error) {
+                Alert.alert("Registration Failed", "An error occurred during registration. Please try again.");
             }
+
         } catch (error: any) {
-            console.error("Registration Error:", error.response?.data || error.message);
-            const errorMessage = error.response?.data?.message || error.response?.data?.error || 'An unexpected error occurred. Please try again.';
-            Alert.alert('Registration Error', errorMessage);
+            // --- FIX STARTS HERE ---
+            // This 'catch' block will now handle API errors thrown by the 'apiRequest' helper.
+            // The original error occurs because the helper function was likely passing the entire 'error' object
+            // to Alert.alert, which expects a string for the message.
+            console.error("Registration failed:", error);
+
+            let errorMessage = "An unknown error occurred during registration. Please try again.";
+
+            // Attempt to extract a user-friendly message from the API response
+            if (error.response && error.response.data) {
+                if (typeof error.response.data.message === 'string') {
+                    // Use the 'message' field if it exists and is a string
+                    errorMessage = error.response.data.message;
+                } else if (typeof error.response.data === 'object' && error.response.data !== null) {
+                    // If the response is an object of errors (e.g., from form validation), format it.
+                    const messages = Object.values(error.response.data).flat();
+                    if (messages.length > 0) {
+                        errorMessage = messages.join('\n');
+                    }
+                }
+            }
+            
+            // Display the extracted string message in the Alert.
+            Alert.alert("Registration Failed", errorMessage || "An unknown error occurred during registration. Please try again.");
+            // --- FIX ENDS HERE ---
         } finally {
             setIsSaving(false);
         }
