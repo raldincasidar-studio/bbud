@@ -3,7 +3,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { Try } from 'expo-router/build/views/Try';
 import React, { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
@@ -61,6 +60,41 @@ interface ProofRequirement {
     displayInfo: string;
 }
 
+// Maps the display label of a relationship to the key used in RELATIONSHIP_PROOF_CONFIG
+const getProofConfigKey = (relationshipLabel: string): string => {
+    switch (relationshipLabel) {
+        case "Son":
+        case "Daughter":
+            return "Child";
+        case "Father":
+        case "Mother":
+            return "Parent";
+        case "Brother":
+        case "Sister":
+            return "Sibling";
+        case "Grandfather":
+        case "Grandmother":
+        case "Grandchild":
+        case "Uncle":
+        case "Aunt":
+        case "Cousin":
+        case "Nephew":
+        case "Niece":
+        case "In-law":
+            return "Other Relative";
+        case "Household Help/Kasambahay":
+            return "House Helper";
+        case "Spouse":
+            return "Spouse";
+        case "Other Relative": // Keep this if user directly selects "Other Relative"
+            return "Other Relative";
+        case "Other": // "Other" relationships generally fall under "Other Relative" for proof purposes
+            return "Other Relative";
+        default:
+            return relationshipLabel; // Fallback, though should be covered
+    }
+};
+
 const RELATIONSHIP_PROOF_CONFIG: { [key: string]: ProofRequirement } = {
     Child: {
         allowedProofValues: ["PSA Birth Certificate", "Adoption Certificate", "Baptismal Certificate"],
@@ -78,29 +112,53 @@ const RELATIONSHIP_PROOF_CONFIG: { [key: string]: ProofRequirement } = {
         allowedProofValues: ["PSA Birth Certificate", "Affidavit of Siblinghood"],
         displayInfo: 'Primary proof: PSA Birth Certificates of both parties. Optional supporting: Affidavit of Siblinghood.',
     },
-    'Other Relative': {
+    'Other Relative': { // This will now cover many specific family relations from the new list
         allowedProofValues: ["PSA Birth Certificate", "Valid ID Card", "Affidavit of Relationship"],
         displayInfo: 'Primary proof: PSA Birth Certificate(s) or Valid ID Card. Optional supporting: Affidavit of Relationship.',
     },
-    'House Helper': {
+    'House Helper': { // Renamed from "House Helper" to "Household Help/Kasambahay" in UI
         allowedProofValues: ALL_POSSIBLE_PROOF_DOCUMENTS.map(doc => doc.value),
         displayInfo: 'Any of the above-mentioned documents may be accepted as available.',
     },
 };
 
-const RELATIONSHIPS_REQUIRING_PROOF = Object.keys(RELATIONSHIP_PROOF_CONFIG);
+// This array now contains the keys that require proof from RELATIONSHIP_PROOF_CONFIG
+const RELATIONSHIPS_REQUIRING_PROOF_KEYS = Object.keys(RELATIONSHIP_PROOF_CONFIG);
 // --- End Proof of Relationship Configuration ---
 
 // --- Suffix Options ---
 const suffixOptions = ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V', 'VI'];
 
+// --- Relationship Picker Options ---
+const relationshipPickerOptions = [
+    { label: "Select Relationship*", value: "" },
+    { label: "Spouse", value: "Spouse" },
+    { label: "Son", value: "Son" },
+    { label: "Daughter", value: "Daughter" },
+    { label: "Father", value: "Father" },
+    { label: "Mother", value: "Mother" },
+    { label: "Brother", value: "Brother" },
+    { label: "Sister", value: "Sister" },
+    { label: "Grandfather", value: "Grandfather" },
+    { label: "Grandmother", value: "Grandmother" },
+    { label: "Grandchild", value: "Grandchild" },
+    { label: "Uncle", value: "Uncle" },
+    { label: "Aunt", value: "Aunt" },
+    { label: "Cousin", value: "Cousin" },
+    { label: "Nephew", value: "Nephew" },
+    { label: "Niece", value: "Niece" },
+    { label: "In-law", value: "In-law" },
+    { label: "Household Help/Kasambahay", value: "Household Help/Kasambahay" },
+    { label: "Other", value: "Other" },
+];
+
 
 // --- Initial State Definitions ---
 
 const initialMemberState = {
-    first_name: '', middle_name: '', last_name: '', suffix: null as string | null, // ADDED SUFFIX
+    first_name: '', middle_name: '', last_name: '', suffix: null as string | null,
     sex: '',
-    date_of_birth: null as string | null, civil_status: '', citizenship: 'Filipino',
+    date_of_birth: null as string | null, civil_status: '', citizenship: 'Filipino', other_citizenship: '', // ADDED other_citizenship
     occupation_status: '', contact_number: '', relationship_to_head: '',
     other_relationship: '', email: '', password: '', is_voter: false, voter_id_number: '',
     voter_registration_proof_base64: null as string | null, is_pwd: false, pwd_id: '',
@@ -157,7 +215,7 @@ export default function SignupScreen() {
 
     const [formData, setFormData] = useState<Head>(initialHeadState);
     const [errors, setErrors] = useState<Partial<Record<keyof Head, string>>>({});
-    
+
     const [members, setMembers] = useState<Member[]>([]);
     const [isMemberModalVisible, setMemberModalVisible] = useState(false);
     const [currentMember, setCurrentMember] = useState<Member>(initialMemberState);
@@ -203,7 +261,17 @@ export default function SignupScreen() {
             case 'citizenship':
                 if (isRequired(value)) {
                     error = 'Citizenship is required.';
-                } else if (containsNumber(value)) {
+                } else if (value === 'Other') {
+                    // If citizenship is 'Other', then 'other_citizenship' must be provided
+                    if (isRequired((state as Member | Head).other_citizenship)) {
+                        error = 'Please specify your citizenship.';
+                    }
+                }
+                break;
+            case 'other_citizenship': // Validate the 'Other' citizenship text input
+                if ((state as Member | Head).citizenship === 'Other' && isRequired(value)) {
+                    error = 'Please specify your citizenship.';
+                } else if (value && containsNumber(value)) {
                     error = 'Numbers are not allowed in citizenship.';
                 }
                 break;
@@ -267,12 +335,14 @@ export default function SignupScreen() {
             case 'relationship_to_head': if (isRequired(value)) error = 'Relationship is required.'; break;
             case 'other_relationship': if ((state as Member).relationship_to_head === 'Other' && isRequired(value)) error = 'Please specify the relationship.'; break;
             case 'proof_of_relationship_type': // This will be validated outside this function generally, but for consistency
-                if (RELATIONSHIPS_REQUIRING_PROOF.includes((state as Member).relationship_to_head) && isRequired(value)) {
+                const proofRelKey = getProofConfigKey((state as Member).relationship_to_head);
+                if (RELATIONSHIPS_REQUIRING_PROOF_KEYS.includes(proofRelKey) && isRequired(value)) {
                     error = 'Please select a proof document type.';
                 }
                 break;
             case 'proof_of_relationship_base64': // This will be validated outside this function generally, but for consistency
-                if (RELATIONSHIPS_REQUIRING_PROOF.includes((state as Member).relationship_to_head) && isRequired(value)) {
+                const proofRelKeyImage = getProofConfigKey((state as Member).relationship_to_head);
+                if (RELATIONSHIPS_REQUIRING_PROOF_KEYS.includes(proofRelKeyImage) && isRequired(value)) {
                     error = 'An image of the proof document is required.';
                 }
                 break;
@@ -284,12 +354,19 @@ export default function SignupScreen() {
         }
         return error;
     };
-    
+
     const handleInputChange = useCallback((name: keyof Head, value: any) => {
         setFormData(prev => {
-            const newState = { ...prev, [name]: value };
+            let newState = { ...prev, [name]: value };
+
+            // Special handling for citizenship
+            if (name === 'citizenship' && value !== 'Other') {
+                newState.other_citizenship = ''; // Clear other_citizenship if not 'Other'
+            }
+
             const error = validateField(name, value, newState, members, newState.email, null);
             setErrors(currentErrors => ({ ...currentErrors, [name]: error || undefined }));
+
             if (name === 'password') {
                 const confirmError = validateField('confirmPassword', newState.confirmPassword, newState);
                 setErrors(currentErrors => ({ ...currentErrors, confirmPassword: confirmError || undefined }));
@@ -304,7 +381,7 @@ export default function SignupScreen() {
     const handleMemberInputChange = useCallback((name: keyof Member, value: any) => {
         setCurrentMember(prev => {
             let newState = { ...prev, [name]: value };
-            
+
             // Relationship change specific logic
             if (name === 'relationship_to_head') {
                 // Reset proof related fields when relationship changes
@@ -320,6 +397,16 @@ export default function SignupScreen() {
                 const otherRelError = validateField('other_relationship', value, newState, members, formData.email, editingMemberIndex);
                 setMemberErrors(currentErrors => ({ ...currentErrors, other_relationship: otherRelError || undefined }));
             }
+
+            // Citizenship change specific logic
+            if (name === 'citizenship' && value !== 'Other') {
+                newState.other_citizenship = ''; // Clear other_citizenship if not 'Other'
+                setMemberErrors(currentErrors => ({ ...currentErrors, other_citizenship: undefined }));
+            } else if (name === 'other_citizenship' && newState.citizenship === 'Other') {
+                const otherCitizenshipError = validateField('other_citizenship', value, newState, members, formData.email, editingMemberIndex);
+                setMemberErrors(currentErrors => ({ ...currentErrors, other_citizenship: otherCitizenshipError || undefined }));
+            }
+
 
             // Age-related special classification resets
             if (name === 'date_of_birth') {
@@ -347,10 +434,10 @@ export default function SignupScreen() {
             return newState;
         });
     }, [members, formData.email, editingMemberIndex]);
-    
+
     const handleConfirmDate = (date: Date) => {
         const formattedDate = date.toISOString().split('T')[0];
-        if (datePickerTarget === 'head') { handleInputChange('date_of_birth', formattedDate); } 
+        if (datePickerTarget === 'head') { handleInputChange('date_of_birth', formattedDate); }
         else { handleMemberInputChange('date_of_birth', formattedDate); }
         hideDatePicker();
     };
@@ -389,10 +476,15 @@ export default function SignupScreen() {
             'first_name', 'last_name', 'date_of_birth', 'relationship_to_head',
             'sex', 'civil_status', 'citizenship', 'occupation_status'
         ];
-        
+
         // Conditional validation for 'Other' relationship
         if (currentMember.relationship_to_head === 'Other') {
             fieldsToValidate.push('other_relationship');
+        }
+
+        // Conditional validation for 'Other' citizenship
+        if (currentMember.citizenship === 'Other') {
+            fieldsToValidate.push('other_citizenship');
         }
 
         let hasErrors = false;
@@ -435,15 +527,17 @@ export default function SignupScreen() {
         }
 
         // --- Proof of Relationship Validation ---
-        const requiresProof = RELATIONSHIPS_REQUIRING_PROOF.includes(currentMember.relationship_to_head);
+        const relationshipConfigKey = getProofConfigKey(currentMember.relationship_to_head);
+        const requiresProof = RELATIONSHIPS_REQUIRING_PROOF_KEYS.includes(relationshipConfigKey);
+
         if (requiresProof) {
-            const relationshipConfig = RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head];
+            const relationshipConfig = RELATIONSHIP_PROOF_CONFIG[relationshipConfigKey];
 
             if (!currentMember.proof_of_relationship_type) {
                 newErrors.proof_type = 'Please select a proof document type.';
                 hasErrors = true;
             } else if (!relationshipConfig.allowedProofValues.includes(currentMember.proof_of_relationship_type)) {
-                newErrors.proof_type = `"${currentMember.proof_of_relationship_type}" is not a valid proof document for a ${currentMember.relationship_to_head}. Please choose from the allowed options.`;
+                newErrors.proof_type = `"${currentMember.proof_of_relationship_type}" is not a valid proof document for this relationship. Please choose from the allowed options.`;
                 hasErrors = true;
             }
 
@@ -465,7 +559,7 @@ export default function SignupScreen() {
             Alert.alert('Validation Error', 'Please fix the errors shown in the form.');
             return;
         }
-        
+
         if (editingMemberIndex !== null) {
             const updatedMembers = [...members];
             updatedMembers[editingMemberIndex] = currentMember;
@@ -475,7 +569,7 @@ export default function SignupScreen() {
         }
         setMemberModalVisible(false);
     };
-    
+
     const handleRegister = async () => {
         // --- All validation logic remains the same ---
         const fieldsToValidate: (keyof Head)[] = [
@@ -487,6 +581,7 @@ export default function SignupScreen() {
         if (formData.is_voter) fieldsToValidate.push('voter_id_number');
         if (formData.is_pwd) fieldsToValidate.push('pwd_id');
         if (formData.is_senior_citizen) fieldsToValidate.push('senior_citizen_id');
+        if (formData.citizenship === 'Other') fieldsToValidate.push('other_citizenship'); // Validate other citizenship for head
 
         let hasErrors = false;
         const newErrors: Partial<Record<keyof Head, string>> = {};
@@ -528,6 +623,20 @@ export default function SignupScreen() {
             delete payload.proof_of_relationship_type;
             delete payload.proof_of_relationship_base64;
 
+            // If head's citizenship is not 'Other', ensure other_citizenship is null/empty for payload
+            if (payload.citizenship !== 'Other') {
+                payload.other_citizenship = null;
+            }
+
+            // For members, if citizenship is not 'Other', ensure other_citizenship is null/empty
+            payload.household_members_to_create = payload.household_members_to_create.map((member: Member) => {
+                if (member.citizenship !== 'Other') {
+                    return { ...member, other_citizenship: null };
+                }
+                return member;
+            });
+
+
             try {
                 const response = await apiRequest('POST', '/api/residents', payload);
 
@@ -548,10 +657,6 @@ export default function SignupScreen() {
             }
 
         } catch (error: any) {
-            // --- FIX STARTS HERE ---
-            // This 'catch' block will now handle API errors thrown by the 'apiRequest' helper.
-            // The original error occurs because the helper function was likely passing the entire 'error' object
-            // to Alert.alert, which expects a string for the message.
             console.error("Registration failed:", error);
 
             let errorMessage = "An unknown error occurred during registration. Please try again.";
@@ -569,15 +674,14 @@ export default function SignupScreen() {
                     }
                 }
             }
-            
+
             // Display the extracted string message in the Alert.
             Alert.alert("Registration Failed", errorMessage || "An unknown error occurred during registration. Please try again.");
-            // --- FIX ENDS HERE ---
         } finally {
             setIsSaving(false);
         }
     };
-    
+
     // --- Other handlers ---
     const showDatePicker = (target: 'head' | 'member') => { setDatePickerTarget(target); setDatePickerVisibility(true); };
     const hideDatePicker = () => setDatePickerVisibility(false);
@@ -586,7 +690,7 @@ export default function SignupScreen() {
     const handleRemoveMember = (indexToRemove: number) => { Alert.alert( "Remove Member", "Are you sure you want to remove this member?", [{ text: "Cancel", style: "cancel" }, { text: "Remove", onPress: () => setMembers(p => p.filter((_, i) => i !== indexToRemove)), style: "destructive" }] ); };
     const headAge = calculateAge(formData.date_of_birth);
     const memberAge = calculateAge(currentMember.date_of_birth);
-    
+
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={styles.header}>
@@ -604,7 +708,7 @@ export default function SignupScreen() {
                     <TextInput style={[styles.textInput, !!errors.middle_name && styles.inputError]} placeholder="Middle Name" placeholderTextColor="#A9A9A9" value={formData.middle_name} onChangeText={(v) => handleInputChange('middle_name', v)} /><ErrorMessage error={errors.middle_name} />
                     <Text style={styles.label}>Last Name*</Text>
                     <TextInput style={[styles.textInput, !!errors.last_name && styles.inputError]} placeholder="Last Name*" placeholderTextColor="#A9A9A9" value={formData.last_name} onChangeText={(v) => handleInputChange('last_name', v)} /><ErrorMessage error={errors.last_name} />
-                    
+
                     {/* NEW: Suffix field for Head */}
                     <Text style={styles.label}>Suffix</Text>
                     <View style={styles.pickerWrapper}>
@@ -633,14 +737,54 @@ export default function SignupScreen() {
                     <View style={[styles.pickerWrapper, !!errors.sex && styles.inputError]}><Picker selectedValue={formData.sex} onValueChange={(v) => handleInputChange('sex', v)} style={[styles.pickerText, !formData.sex && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Sex*" value="" enabled={false} /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View><ErrorMessage error={errors.sex} />
                     <Text style={styles.label}>Civil Status*</Text>
                     <View style={[styles.pickerWrapper, !!errors.civil_status && styles.inputError]}><Picker selectedValue={formData.civil_status} onValueChange={(v) => handleInputChange('civil_status', v)} style={[styles.pickerText, !formData.civil_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Civil Status*" value="" enabled={false} /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View><ErrorMessage error={errors.civil_status} />
+
+                    {/* UPDATED: Citizenship Dropdown */}
                     <Text style={styles.label}>Citizenship*</Text>
-                    <TextInput style={[styles.textInput, !!errors.citizenship && styles.inputError]} placeholder="Citizenship*" placeholderTextColor="#A9A9A9" value={formData.citizenship} onChangeText={(v) => handleInputChange('citizenship', v)} /><ErrorMessage error={errors.citizenship} />
+                    <View style={[styles.pickerWrapper, !!errors.citizenship && styles.inputError]}>
+                        <Picker
+                            selectedValue={formData.citizenship}
+                            onValueChange={(v) => handleInputChange('citizenship', v)}
+                            style={[styles.pickerText, !formData.citizenship && styles.pickerPlaceholder]}
+                            itemStyle={{ color: 'black' }}
+                        >
+                            <Picker.Item label="Filipino" value="Filipino" />
+                            <Picker.Item label="Other" value="Other" />
+                        </Picker>
+                    </View>
+                    <ErrorMessage error={errors.citizenship} />
+                    {formData.citizenship === 'Other' && (
+                        <>
+                            <Text style={styles.label}>Specify Citizenship*</Text>
+                            <TextInput
+                                style={[styles.textInput, !!errors.other_citizenship && styles.inputError]}
+                                placeholder="e.g., American, Japanese"
+                                placeholderTextColor="#A9A9A9"
+                                value={formData.other_citizenship}
+                                onChangeText={(v) => handleInputChange('other_citizenship', v)}
+                            />
+                            <ErrorMessage error={errors.other_citizenship} />
+                        </>
+                    )}
+                    {/* END UPDATED: Citizenship Dropdown */}
+
                     <Text style={styles.label}>Occupation Status*</Text>
-                    <View style={[styles.pickerWrapper, !!errors.occupation_status && styles.inputError]}><Picker selectedValue={formData.occupation_status} onValueChange={(v) => handleInputChange('occupation_status', v)} style={[styles.pickerText, !formData.occupation_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={errors.occupation_status} />
-                    
+                    <View style={[styles.pickerWrapper, !!errors.occupation_status && styles.inputError]}>
+                        <Picker selectedValue={formData.occupation_status} onValueChange={(v) => handleInputChange('occupation_status', v)} style={[styles.pickerText, !formData.occupation_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}>
+                            <Picker.Item label="Select Occupation Status*" value="" enabled={false} />
+                            <Picker.Item label="Student" value="Student" />
+                            <Picker.Item label="Labor force" value="Labor force" />
+                            <Picker.Item label="Unemployed" value="Unemployed" />
+                            <Picker.Item label="Out of School Youth" value="Out of School Youth" />
+                            <Picker.Item label="Retired" value="Retired" />
+                            <Picker.Item label="Not Applicable" value="Not Applicable" />
+                        </Picker>
+                    </View>
+                    <ErrorMessage error={errors.occupation_status} />
+
                     <Text style={styles.sectionTitle}>Address Information</Text>
-                    <Text style={styles.label}>House No. / Building No.*</Text>
-                    <TextInput style={[styles.textInput, !!errors.address_house_number && styles.inputError]} placeholder="House No. / Building No.*" placeholderTextColor="#A9A9A9" value={formData.address_house_number} onChangeText={(v) => handleInputChange('address_house_number', v)} /><ErrorMessage error={errors.address_house_number} />
+                    {/* RENAMED: House Number/Lot/Block */}
+                    <Text style={styles.label}>House Number/Lot/Block*</Text>
+                    <TextInput style={[styles.textInput, !!errors.address_house_number && styles.inputError]} placeholder="House Number/Lot/Block*" placeholderTextColor="#A9A9A9" value={formData.address_house_number} onChangeText={(v) => handleInputChange('address_house_number', v)} /><ErrorMessage error={errors.address_house_number} />
                     <Text style={styles.label}>Street*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_street && styles.inputError]} placeholder="Street*" placeholderTextColor="#A9A9A9" value={formData.address_street} onChangeText={(v) => handleInputChange('address_street', v)} /><ErrorMessage error={errors.address_street} />
                     <Text style={styles.label}>Subdivision / Zone / Sitio / Purok*</Text>
@@ -665,7 +809,7 @@ export default function SignupScreen() {
                     <View style={[styles.passwordContainer, !!errors.password && styles.inputError]}><TextInput style={styles.passwordInput} placeholder="Password*" placeholderTextColor="#A9A9A9" secureTextEntry={!showHeadPassword} value={formData.password} onChangeText={(v) => handleInputChange('password', v)} /><TouchableOpacity onPress={() => setShowHeadPassword(!showHeadPassword)} style={styles.eyeIcon}><Ionicons name={showHeadPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#888" /></TouchableOpacity></View><ErrorMessage error={errors.password} />
                     <Text style={styles.label}>Confirm Password*</Text>
                     <View style={[styles.passwordContainer, !!errors.confirmPassword && styles.inputError]}><TextInput style={styles.passwordInput} placeholder="Confirm Password*" placeholderTextColor="#A9A9A9" secureTextEntry={!showHeadPassword} value={formData.confirmPassword} onChangeText={(v) => handleInputChange('confirmPassword', v)} /><TouchableOpacity onPress={() => setShowHeadPassword(!showHeadPassword)} style={styles.eyeIcon}><Ionicons name={showHeadPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#888" /></TouchableOpacity></View><ErrorMessage error={errors.confirmPassword} />
-                    
+
                     <Text style={styles.subHeader}>Step 2: Household Members</Text>
                     {members.map((member, index) => (
                         <View key={index} style={styles.memberCard}>
@@ -674,6 +818,7 @@ export default function SignupScreen() {
                                 <Text style={styles.memberTitle}>{`${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name}${member.suffix ? ' ' + member.suffix : ''}`}</Text>
                                 <View style={{flexDirection: 'row'}}><TouchableOpacity onPress={() => openEditMemberModal(index)} style={{marginRight: 15}}><Ionicons name="pencil-outline" size={22} color="#0F00D7" /></TouchableOpacity><TouchableOpacity onPress={() => handleRemoveMember(index)}><Ionicons name="trash-bin-outline" size={22} color="#D32F2F" /></TouchableOpacity></View>
                             </View>
+                            {/* Display the actual relationship label selected */}
                             <Text style={styles.memberDetailText}>Relationship: {member.relationship_to_head === 'Other' ? member.other_relationship : member.relationship_to_head}</Text>
                             <Text style={styles.memberDetailText}>Age: {calculateAge(member.date_of_birth)}</Text>
                         </View>
@@ -697,7 +842,7 @@ export default function SignupScreen() {
                             <TextInput style={[styles.modalInput, !!memberErrors.middle_name && styles.inputError]} placeholder="Middle Name" placeholderTextColor="#A9A9A9" value={currentMember.middle_name} onChangeText={(v) => handleMemberInputChange('middle_name', v)} /><ErrorMessage error={memberErrors.middle_name} />
                             <Text style={styles.label}>Last Name*</Text>
                             <TextInput style={[styles.modalInput, !!memberErrors.last_name && styles.inputError]} placeholder="Last Name*" placeholderTextColor="#A9A9A9" value={currentMember.last_name} onChangeText={(v) => handleMemberInputChange('last_name', v)} /><ErrorMessage error={memberErrors.last_name} />
-                            
+
                             {/* NEW: Suffix field for Member */}
                             <Text style={styles.label}>Suffix</Text>
                             <View style={styles.pickerWrapperSmall}>
@@ -718,26 +863,76 @@ export default function SignupScreen() {
 
                             <Text style={styles.label}>Date of Birth*</Text>
                             <TouchableOpacity style={[styles.datePickerButtonModal, !!memberErrors.date_of_birth && styles.inputError]} onPress={() => showDatePicker('member')}><Text style={currentMember.date_of_birth ? styles.datePickerButtonText : styles.datePickerPlaceholderText}>{currentMember.date_of_birth || 'Date of Birth*'}</Text></TouchableOpacity><ErrorMessage error={memberErrors.date_of_birth} />
+
+                            {/* UPDATED: Relationship to Head Dropdown */}
                             <Text style={styles.label}>Relationship to Head*</Text>
-                            <View style={[styles.pickerWrapperSmall, !!memberErrors.relationship_to_head && styles.inputError]}><Picker selectedValue={currentMember.relationship_to_head} onValueChange={(v) => handleMemberInputChange('relationship_to_head', v)} style={[styles.pickerText, !currentMember.relationship_to_head && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Relationship*" value="" enabled={false} /><Picker.Item label="Child" value="Child" /><Picker.Item label="Spouse" value="Spouse" /><Picker.Item label="Parent" value="Parent" /><Picker.Item label="Sibling" value="Sibling" /><Picker.Item label="Other Relative" value="Other Relative" /><Picker.Item label="House Helper" value="House Helper" /><Picker.Item label="Other" value="Other" /></Picker></View><ErrorMessage error={memberErrors.relationship_to_head} />
+                            <View style={[styles.pickerWrapperSmall, !!memberErrors.relationship_to_head && styles.inputError]}>
+                                <Picker selectedValue={currentMember.relationship_to_head} onValueChange={(v) => handleMemberInputChange('relationship_to_head', v)} style={[styles.pickerText, !currentMember.relationship_to_head && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}>
+                                    {relationshipPickerOptions.map((option) => (
+                                        <Picker.Item key={option.value} label={option.label} value={option.value} enabled={option.enabled ?? true} />
+                                    ))}
+                                </Picker>
+                            </View>
+                            <ErrorMessage error={memberErrors.relationship_to_head} />
                             {currentMember.relationship_to_head === 'Other' && (<><Text style={styles.label}>Specify Relationship*</Text><TextInput style={[styles.modalInput, !!memberErrors.other_relationship && styles.inputError]} placeholder="Please specify relationship*" placeholderTextColor="#A9A9A9" value={currentMember.other_relationship} onChangeText={(v) => handleMemberInputChange('other_relationship', v)} /><ErrorMessage error={memberErrors.other_relationship} /></>)}
+                            {/* END UPDATED: Relationship to Head Dropdown */}
+
                             <Text style={styles.label}>Sex*</Text>
                             <View style={[styles.pickerWrapperSmall, !!memberErrors.sex && styles.inputError]}><Picker selectedValue={currentMember.sex} onValueChange={(v) => handleMemberInputChange('sex', v)} style={[styles.pickerText, !currentMember.sex && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Sex*" value="" enabled={false} /><Picker.Item label="Male" value="Male" /><Picker.Item label="Female" value="Female" /></Picker></View><ErrorMessage error={memberErrors.sex} />
                             <Text style={styles.label}>Civil Status*</Text>
                             <View style={[styles.pickerWrapperSmall, !!memberErrors.civil_status && styles.inputError]}><Picker selectedValue={currentMember.civil_status} onValueChange={(v) => handleMemberInputChange('civil_status', v)} style={[styles.pickerText, !currentMember.civil_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Civil Status*" value="" enabled={false} /><Picker.Item label="Single" value="Single" /><Picker.Item label="Married" value="Married" /><Picker.Item label="Widowed" value="Widowed" /><Picker.Item label="Separated" value="Separated" /></Picker></View><ErrorMessage error={memberErrors.civil_status} />
+
+                            {/* UPDATED: Citizenship Dropdown for Member */}
                             <Text style={styles.label}>Citizenship*</Text>
-                            <TextInput style={[styles.modalInput, !!memberErrors.citizenship && styles.inputError]} placeholder="Citizenship*" placeholderTextColor="#A9A9A9" value={currentMember.citizenship} onChangeText={(v) => handleMemberInputChange('citizenship', v)} /><ErrorMessage error={memberErrors.citizenship} />
+                            <View style={[styles.pickerWrapperSmall, !!memberErrors.citizenship && styles.inputError]}>
+                                <Picker
+                                    selectedValue={currentMember.citizenship}
+                                    onValueChange={(v) => handleMemberInputChange('citizenship', v)}
+                                    style={[styles.pickerText, !currentMember.citizenship && styles.pickerPlaceholder]}
+                                    itemStyle={{ color: 'black' }}
+                                >
+                                    <Picker.Item label="Filipino" value="Filipino" />
+                                    <Picker.Item label="Other" value="Other" />
+                                </Picker>
+                            </View>
+                            <ErrorMessage error={memberErrors.citizenship} />
+                            {currentMember.citizenship === 'Other' && (
+                                <>
+                                    <Text style={styles.label}>Specify Citizenship*</Text>
+                                    <TextInput
+                                        style={[styles.modalInput, !!memberErrors.other_citizenship && styles.inputError]}
+                                        placeholder="e.g., American, Japanese"
+                                        placeholderTextColor="#A9A9A9"
+                                        value={currentMember.other_citizenship}
+                                        onChangeText={(v) => handleMemberInputChange('other_citizenship', v)}
+                                    />
+                                    <ErrorMessage error={memberErrors.other_citizenship} />
+                                </>
+                            )}
+                            {/* END UPDATED: Citizenship Dropdown for Member */}
+
                             <Text style={styles.label}>Occupation Status*</Text>
-                            <View style={[styles.pickerWrapperSmall, !!memberErrors.occupation_status && styles.inputError]}><Picker selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)} style={[styles.pickerText, !currentMember.occupation_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}><Picker.Item label="Select Occupation Status*" value="" enabled={false} /><Picker.Item label="Student" value="Student" /><Picker.Item label="Labor force" value="Labor force" /><Picker.Item label="Unemployed" value="Unemployed" /><Picker.Item label="Out of School Youth" value="Out of School Youth" /><Picker.Item label="Retired" value="Retired" /></Picker></View><ErrorMessage error={memberErrors.occupation_status} />
+                            <View style={[styles.pickerWrapperSmall, !!memberErrors.occupation_status && styles.inputError]}>
+                                <Picker selectedValue={currentMember.occupation_status} onValueChange={(v) => handleMemberInputChange('occupation_status', v)} style={[styles.pickerText, !currentMember.occupation_status && styles.pickerPlaceholder]} itemStyle={{ color: 'black' }}>
+                                    <Picker.Item label="Select Occupation Status*" value="" enabled={false} />
+                                    <Picker.Item label="Student" value="Student" />
+                                    <Picker.Item label="Labor force" value="Labor force" />
+                                    <Picker.Item label="Unemployed" value="Unemployed" />
+                                    <Picker.Item label="Out of School Youth" value="Out of School Youth" />
+                                    <Picker.Item label="Retired" value="Retired" />
+                                    <Picker.Item label="Not Applicable" value="Not Applicable" />
+                                </Picker>
+                            </View>
+                            <ErrorMessage error={memberErrors.occupation_status} />
 
                             {/* --- Proof of Relationship Section for Members --- */}
-                            {RELATIONSHIPS_REQUIRING_PROOF.includes(currentMember.relationship_to_head) && (
+                            {RELATIONSHIPS_REQUIRING_PROOF_KEYS.includes(getProofConfigKey(currentMember.relationship_to_head)) && (
                                 <View style={styles.proofSection}>
                                     <Text style={styles.modalSectionTitle}>Proof of Relationship</Text>
-                                    {RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head]?.displayInfo && (
-                                        <Text style={styles.labelInfo}>{RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head].displayInfo}</Text>
+                                    {RELATIONSHIP_PROOF_CONFIG[getProofConfigKey(currentMember.relationship_to_head)]?.displayInfo && (
+                                        <Text style={styles.labelInfo}>{RELATIONSHIP_PROOF_CONFIG[getProofConfigKey(currentMember.relationship_to_head)].displayInfo}</Text>
                                     )}
-                                    
+
                                     <Text style={styles.label}>Proof Document Type*</Text>
                                     <View style={[styles.pickerWrapperSmall, !!memberErrors.proof_type && styles.inputError]}>
                                         <Picker
@@ -750,9 +945,9 @@ export default function SignupScreen() {
                                             style={!currentMember.proof_of_relationship_type ? styles.pickerPlaceholder : {}}
                                         >
                                             <Picker.Item label="Select Proof Document Type*" value={null} enabled={false} />
-                                            {currentMember.relationship_to_head && RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head] &&
+                                            {currentMember.relationship_to_head && RELATIONSHIP_PROOF_CONFIG[getProofConfigKey(currentMember.relationship_to_head)] &&
                                                 ALL_POSSIBLE_PROOF_DOCUMENTS
-                                                    .filter(option => RELATIONSHIP_PROOF_CONFIG[currentMember.relationship_to_head].allowedProofValues.includes(option.value))
+                                                    .filter(option => RELATIONSHIP_PROOF_CONFIG[getProofConfigKey(currentMember.relationship_to_head)].allowedProofValues.includes(option.value))
                                                     .map(option => (
                                                         <Picker.Item key={option.value} label={option.label} value={option.value} />
                                                     ))
