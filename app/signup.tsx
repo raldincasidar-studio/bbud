@@ -134,8 +134,12 @@ type Member = typeof initialMemberState;
 
 const initialHeadState = {
     ...initialMemberState, relationship_to_head: '', other_relationship: '', password: '',
-    confirmPassword: '', address_house_number: '', address_street: '', address_subdivision_zone: '',
-    address_city_municipality: 'Manila City', years_at_current_address: '',
+    confirmPassword: '', address_house_number: '', 
+    address_unit_room_apt_number: '', // NEW FIELD
+    address_street: '', address_subdivision_zone: '',
+    address_city_municipality: 'Manila City', 
+    type_of_household: null as string | null, // NEW FIELD
+    years_at_current_address: '',
     proof_of_residency_base64: [] as string[],
     authorization_letter_base64: null as string | null,
     proof_of_relationship_type: null,
@@ -214,6 +218,8 @@ export default function SignupScreen() {
         const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim()) || (Array.isArray(val) && val.length === 0);
         const isEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
         const containsNumber = (val: string) => /\d/.test(val);
+        // Updated regex to allow alphanumeric, spaces, hyphens, and slashes for unit numbers
+        const isInvalidUnitRoomApt = (val: string) => !/^[a-zA-Z0-9\s\-\/]*$/.test(val); 
         const isInvalidName = (val: string) => !/^[a-zA-Z'.\-\s]+$/.test(val);
 
         switch (fieldName) {
@@ -253,7 +259,14 @@ export default function SignupScreen() {
                 }
                 break;
             case 'contact_number': if (isRequired(value)) error = 'Contact number is required.'; else if (!/^\d{11}$/.test(value)) error = 'Must be a valid 11-digit number.'; break;
-            case 'address_house_number': case 'address_street': case 'address_subdivision_zone': if (isRequired(value)) error = 'This address field is required.'; break;
+            case 'address_house_number': case 'address_street': case 'address_subdivision_zone': 
+            if (isRequired(value)) error = 'This address field is required.'; break;
+            case 'address_unit_room_apt_number': // NEW FIELD: Optional, only validate format if provided
+                if (value && isInvalidUnitRoomApt(value)) error = 'Only alphanumeric characters, spaces, hyphens, and slashes are allowed.'; 
+                break;
+            case 'type_of_household': // NEW FIELD: Now optional
+                // No validation added if it's optional
+                break;
             case 'years_at_current_address': if (isRequired(value)) error = 'Years at address is required.'; else if (!/^\d+$/.test(value)) error = 'Must be a valid number.'; break;
             case 'proof_of_residency_base64':
                 if (isRequired(value)) error = 'At least one proof of residency document is required.';
@@ -519,13 +532,14 @@ export default function SignupScreen() {
     };
 
     const handleRegister = async () => {
-        // --- All validation logic remains the same (truncated for brevity) ---
         const fieldsToValidate: (keyof Head)[] = [
             'first_name', 'last_name', 'email', 'contact_number', 'date_of_birth',
             'sex', 'civil_status', 'citizenship', 'occupation_status',
             'address_house_number', 'address_street', 'address_subdivision_zone',
             'years_at_current_address', 'proof_of_residency_base64', 'password', 'confirmPassword'
         ];
+        // NOTE: 'type_of_household' and 'address_unit_room_apt_number' are now optional, so they are not in this list.
+
         if (formData.is_voter) fieldsToValidate.push('voter_id_number');
         if (formData.is_pwd) fieldsToValidate.push('pwd_id');
         if (formData.is_senior_citizen) fieldsToValidate.push('senior_citizen_id');
@@ -544,6 +558,10 @@ export default function SignupScreen() {
 
         const suffixError = validateField('suffix', formData.suffix, formData, members, formData.email);
         if (suffixError) { hasErrors = true; newErrors.suffix = suffixError; }
+
+        // Validate address_unit_room_apt_number if provided (optional field validation)
+        const unitRoomAptNumError = validateField('address_unit_room_apt_number', formData.address_unit_room_apt_number, formData, members, formData.email);
+        if (unitRoomAptNumError) { hasErrors = true; newErrors.address_unit_room_apt_number = unitRoomAptNumError; }
 
         if (formData.authorization_letter_base64) {
             const authLetterError = validateField('authorization_letter_base64', formData.authorization_letter_base64, formData);
@@ -624,6 +642,9 @@ export default function SignupScreen() {
                         if (typeof data.message === 'string') {
                             title = 'Validation Error';
                             errorMessage = data.message;
+                            // The backend may return specific messages for the optional fields
+                            // However, since they're optional on the frontend, we don't *force* a display error for them here
+                            // unless it's a different kind of backend validation issue (e.g. invalid format if entered)
                         }
                         // Add more specific handling for other backend validation errors if they differ
                     } else if (typeof data.message === 'string') {
@@ -753,14 +774,46 @@ export default function SignupScreen() {
                     <ErrorMessage error={errors.occupation_status} />
 
                     <Text style={styles.sectionTitle}>Address Information</Text>
+                    
+                    {/* NEW FIELD: Unit/Room/Apartment number - FIRST IN ADDRESS */}
+                    <Text style={styles.label}>Unit/Room/Apartment number (Optional)</Text>
+                    <TextInput
+                        style={[styles.textInput, !!errors.address_unit_room_apt_number && styles.inputError]}
+                        placeholder="Unit/Room/Apartment number"
+                        placeholderTextColor="#A9A9A9"
+                        value={formData.address_unit_room_apt_number}
+                        onChangeText={(v) => handleInputChange('address_unit_room_apt_number', v)}
+                    /><ErrorMessage error={errors.address_unit_room_apt_number} />
+
+                    
+
                     <Text style={styles.label}>House Number/Lot/Block*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_house_number && styles.inputError]} placeholder="House Number/Lot/Block*" placeholderTextColor="#A9A9A9" value={formData.address_house_number} onChangeText={(v) => handleInputChange('address_house_number', v)} /><ErrorMessage error={errors.address_house_number} />
                     <Text style={styles.label}>Street*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_street && styles.inputError]} placeholder="Street*" placeholderTextColor="#A9A9A9" value={formData.address_street} onChangeText={(v) => handleInputChange('address_street', v)} /><ErrorMessage error={errors.address_street} />
                     <Text style={styles.label}>Subdivision / Zone / Sitio / Purok*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_subdivision_zone && styles.inputError]} placeholder="Subdivision / Zone / Sitio / Purok*" placeholderTextColor="#A9A9A9" value={formData.address_subdivision_zone} onChangeText={(v) => handleInputChange('address_subdivision_zone', v)} /><ErrorMessage error={errors.address_subdivision_zone} />
+                    
+                    {/* NEW FIELD: Type of Household - SECOND IN ADDRESS */}
+                    <Text style={styles.label}>Type of Household (Optional)</Text>
+                    <View style={[styles.pickerWrapper, !!errors.type_of_household && styles.inputError]}>
+                        <Picker
+                            selectedValue={formData.type_of_household}
+                            onValueChange={(v) => handleInputChange('type_of_household', v as string | null)}
+                            style={[styles.pickerText, !formData.type_of_household && styles.pickerPlaceholder]}
+                            itemStyle={{ color: 'black' }}
+                        >
+                            <Picker.Item label="Select Type of Household (Optional)" value={null} />
+                            <Picker.Item label="Owner" value="Owner" />
+                            <Picker.Item label="Tenant/Border" value="Tenant/Border" />
+                            <Picker.Item label="Sharer" value="Sharer" />
+                        </Picker>
+                    </View>
+                    <ErrorMessage error={errors.type_of_household} />
+
                     <Text style={styles.label}>City/Municipality</Text>
                     <TextInput style={[styles.textInput, styles.textInputDisabled]} value={formData.address_city_municipality} editable={false} />
+                    
                     <Text style={styles.label}>Years at Current Address*</Text>
                     <TextInput style={[styles.textInput, !!errors.years_at_current_address && styles.inputError]} placeholder="Years at Current Address*" placeholderTextColor="#A9A9A9" keyboardType="numeric" value={formData.years_at_current_address} onChangeText={(v) => handleInputChange('years_at_current_address', v)} /><ErrorMessage error={errors.years_at_current_address} />
 
