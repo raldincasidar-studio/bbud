@@ -38,7 +38,9 @@ interface UserData {
     address_street?: string;
     address_subdivision_zone?: string;
     years_at_current_address?: number | null;
-    proof_of_residency_base64?: string | null;
+    // --- FIX: Changed type to string[] ---
+    proof_of_residency_base64?: string[]; // This should now be an array
+    // --- END FIX ---
     is_voter?: boolean;
     voter_id_number?: string | null;
     voter_registration_proof_base64?: string | null;
@@ -78,6 +80,7 @@ const ToggleSection = ({ label, value, onValueChange, idLabel, idValue, onIdChan
                 <TouchableOpacity style={[styles.imagePickerButton, disabled && styles.buttonDisabledAppearance]} onPress={onProofPress} disabled={disabled}>
                     <Text style={styles.imagePickerButtonText}>{proofValue ? 'Change Proof' : 'Upload Proof'}</Text>
                 </TouchableOpacity>
+                {/* ProofValue for toggle sections is typically a single image base64 string */}
                 {proofValue && <Image source={{ uri: proofValue }} style={styles.proofImagePreview} />}
             </View>
         )}
@@ -101,7 +104,7 @@ export default function SettingsScreen() {
 
     // Pure validation function without state side-effects
     const getValidationError = (field: string, value: any, currentState: typeof formState): string => {
-        const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim());
+        const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim()) || (Array.isArray(val) && val.length === 0);
         const isInvalidName = (val: string) => !/^[a-zA-Z'.\-\s]+$/.test(val); // Re-using from signup.tsx
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -203,6 +206,10 @@ export default function SettingsScreen() {
                     ...parsedData,
                     date_of_birth: dob,
                     suffix: parsedData.suffix || null, // Ensure suffix is initialized as null if not present
+                    // Ensure proof_of_residency_base64 is an array, even if empty or null from storage initially
+                    proof_of_residency_base64: Array.isArray(parsedData.proof_of_residency_base64)
+                        ? parsedData.proof_of_residency_base64
+                        : (parsedData.proof_of_residency_base64 ? [parsedData.proof_of_residency_base64] : []),
                 };
                 setFormState(initialData);
                 setOriginalFormState(initialData);
@@ -235,6 +242,7 @@ export default function SettingsScreen() {
 
         if (!result.canceled && result.assets?.[0]?.base64) {
             const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+            // This is for single image fields. For proof_of_residency_base64, it's handled below.
             handleInputChange(field, base64Image);
         }
     };
@@ -486,16 +494,27 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.occupation_status} />
                     </View>
 
-                    {/* Proof of Residency (Read-only) */}
+                    {/* Proof of Residency (Read-only) - FIX IMPLEMENTED HERE */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Proof of Residency</Text>
-                        {formState.proof_of_residency_base64 && (
-                            <Image
-                                source={{ uri: formState.proof_of_residency_base64 }}
-                                style={styles.proofImagePreview}
-                            />
+                        {formState.proof_of_residency_base64 && formState.proof_of_residency_base64.length > 0 ? (
+                            <View style={styles.imagePreviewContainer}>
+                                {formState.proof_of_residency_base64.map((uri, index) => (
+                                    <View key={index} style={styles.imagePreviewWrapper}>
+                                        <Image
+                                            source={{ uri }}
+                                            style={styles.proofImagePreview}
+                                        />
+                                        {/* If you wanted to allow removing, you'd add a button here, similar to signup.tsx */}
+                                    </View>
+                                ))}
+                            </View>
+                        ) : (
+                            <Text style={styles.noProofText}>No proof of residency uploaded.</Text>
                         )}
+                        <ErrorMessage error={errors.proof_of_residency_base64} />
                     </View>
+
 
                     {/* Special Classifications (disabled) */}
                     <Text style={styles.sectionTitle}>Special Classifications</Text>
@@ -643,5 +662,25 @@ const styles = StyleSheet.create({
         color: '#616161',
         marginTop: 5,
         marginLeft: 5,
+    },
+    // --- ADDED NEW STYLES FROM signup.tsx ---
+    imagePreviewContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        marginTop: 10,
+        marginBottom: 15,
+        gap: 10, // Added for spacing between images
+    },
+    imagePreviewWrapper: {
+        position: 'relative',
+    },
+    noProofText: {
+        textAlign: 'center',
+        color: '#888',
+        fontStyle: 'italic',
+        marginTop: 10,
+        fontSize: 14,
     }
+    // --- END NEW STYLES ---
 });

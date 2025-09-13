@@ -1,12 +1,13 @@
+// plugins/axios.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, { AxiosRequestConfig } from 'axios'; // Import AxiosRequestConfig
-import { Alert } from 'react-native';
+import axios, { AxiosRequestConfig } from 'axios'; // Import AxiosError
+import { Alert } from 'react-native'; // Keep Alert for unauthorized, but remove others
 
 // Axios instance with base URL
 const apiClient = axios.create({
   // baseURL: 'https://b-bud-new.vercel.app', // Your actual API URL
-  baseURL: 'https://184143e2cd6f.ngrok-free.app', // Your ngrok URL is correct here
-  timeout: 10000,
+  baseURL: 'https://6a6962e7b5a6.ngrok-free.app', // Your ngrok URL is correct here
+  timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Content-Type': 'application/json',
   },
@@ -49,50 +50,32 @@ export default async function apiRequest(method: string, path: string, requestPa
 
     return response.data;
   } catch (error) {
-    // Check for a response from the server
+    // FIX: Re-throw the error so the caller can handle specific backend messages.
+    // Remove generic alerts from here to centralize error display in the component.
+
     if (axios.isAxiosError(error) && error.response) { // Use axios.isAxiosError for type narrowing
       const { status, data } = error.response;
-
-      let errorMessage = 'An unexpected error occurred.'; // Default message
-
-      if (data) {
-        // Prioritize the 'message' field from the backend
-        if (typeof data.message === 'string') {
-          errorMessage = data.message;
-        }
-        // If 'message' is an object (common for validation errors), parse it
-        else if (typeof data.message === 'object' && data.message !== null) {
-          const messages = Object.values(data.message).flat();
-          if (messages.length > 0) {
-            errorMessage = messages.join('\n');
-          }
-        }
-        // Fallback to checking the 'error' field if 'message' isn't a useful string
-        else if (typeof data.error === 'string') {
-          errorMessage = data.error;
-        }
-      }
 
       if (status === 401) {
         await AsyncStorage.removeItem('userData');
         Alert.alert('Unauthorized', 'Session expired. Please log in again.');
-        // Optionally, navigate the user to the login screen here (e.g., router.replace('/login'))
+        // IMPORTANT: Re-throw or return a specific error here so the calling component can react
+        throw error; // Re-throw the original AxiosError
       } else {
-        // For all other server errors, show the safely parsed message
-        Alert.alert('Error', errorMessage);
+        // For all other server errors, re-throw the AxiosError
+        // The calling component will then parse `error.response.data` for details.
+        throw error; 
       }
     } else if (axios.isAxiosError(error) && error.request) {
-      // The request was made but no response was received
+      // The request was made but no response was received (e.g., network down, server not running)
       console.error('AXIOS NETWORK ERROR ON:', path, error.request);
-      Alert.alert('Network Error', 'Could not connect to the server. Please check your internet connection.');
+      // Throw a custom error for network issues, or re-throw the original error
+      throw new Error('Network Error: Could not connect to the server. Please check your internet connection or try again later.');
     } else {
       // Something happened in setting up the request that triggered an Error
-      console.error('AXIOS SETUP ERROR ON:', path, error?.message); // Use optional chaining for error.message
-      Alert.alert('Error', 'An unexpected error occurred.');
+      console.error('AXIOS SETUP ERROR ON:', path, error?.message);
+      // Throw a custom error for setup issues
+      throw new Error('Request Setup Error: An unexpected error occurred while preparing your request.');
     }
-
-    // Returning null indicates to the caller that the request failed.
-    // The error is handled here, so we don't re-throw it.
-    return null;
   }
 }
