@@ -35,10 +35,13 @@ interface UserData {
     occupation_status?: string;
     contact_number?: string | null;
     address_house_number?: string;
+    address_unit_room_apt_number?: string; // NEW FIELD
     address_street?: string;
     address_subdivision_zone?: string;
+    address_city_municipality?: string; // Added this to UserData if not already present, as it's shown in UI
+    type_of_household?: string | null; // NEW FIELD
     years_at_current_address?: number | null;
-    proof_of_residency_base64?: string | null;
+    proof_of_residency_base64?: string[]; // This should now be an array
     is_voter?: boolean;
     voter_id_number?: string | null;
     voter_registration_proof_base64?: string | null;
@@ -78,6 +81,7 @@ const ToggleSection = ({ label, value, onValueChange, idLabel, idValue, onIdChan
                 <TouchableOpacity style={[styles.imagePickerButton, disabled && styles.buttonDisabledAppearance]} onPress={onProofPress} disabled={disabled}>
                     <Text style={styles.imagePickerButtonText}>{proofValue ? 'Change Proof' : 'Upload Proof'}</Text>
                 </TouchableOpacity>
+                {/* ProofValue for toggle sections is typically a single image base64 string */}
                 {proofValue && <Image source={{ uri: proofValue }} style={styles.proofImagePreview} />}
             </View>
         )}
@@ -101,8 +105,10 @@ export default function SettingsScreen() {
 
     // Pure validation function without state side-effects
     const getValidationError = (field: string, value: any, currentState: typeof formState): string => {
-        const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim());
+        const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim()) || (Array.isArray(val) && val.length === 0);
         const isInvalidName = (val: string) => !/^[a-zA-Z'.\-\s]+$/.test(val); // Re-using from signup.tsx
+        // Regex for address_unit_room_apt_number: alphanumeric, spaces, hyphens, and slashes
+        const isInvalidUnitRoomApt = (val: string) => !/^[a-zA-Z0-9\s\-\/]*$/.test(val); 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -129,8 +135,15 @@ export default function SettingsScreen() {
             case 'citizenship': return isRequired(value) ? 'Citizenship is required.' : '';
             case 'occupation_status': return isRequired(value) ? 'Occupation status is required.' : '';
             case 'address_house_number': return isRequired(value) ? 'House/Bldg number is required.' : '';
+            case 'address_unit_room_apt_number': // NEW FIELD: Optional, but validate format if provided
+                if (value && isInvalidUnitRoomApt(value)) {
+                    return 'Only alphanumeric characters, spaces, hyphens, and slashes are allowed.';
+                }
+                return '';
             case 'address_street': return isRequired(value) ? 'Street is required.' : '';
             case 'address_subdivision_zone': return isRequired(value) ? 'Subdivision/Zone/Sitio is required.' : '';
+            case 'type_of_household': // NEW FIELD: Optional, no validation added here
+                return '';
             case 'years_at_current_address': return isRequired(value) ? 'Years at address is required.' : !/^\d+$/.test(String(value)) ? 'Must be a valid number.' : '';
             case 'pwd_id': return currentState.is_pwd && isRequired(value) ? 'PWD ID Number is required.' : '';
             case 'senior_citizen_id': return currentState.is_senior_citizen && isRequired(value) ? 'Senior Citizen ID is required.' : '';
@@ -203,6 +216,12 @@ export default function SettingsScreen() {
                     ...parsedData,
                     date_of_birth: dob,
                     suffix: parsedData.suffix || null, // Ensure suffix is initialized as null if not present
+                    address_unit_room_apt_number: parsedData.address_unit_room_apt_number || '', // NEW FIELD
+                    type_of_household: parsedData.type_of_household || null, // NEW FIELD
+                    // Ensure proof_of_residency_base64 is an array, even if empty or null from storage initially
+                    proof_of_residency_base64: Array.isArray(parsedData.proof_of_residency_base64)
+                        ? parsedData.proof_of_residency_base64
+                        : (parsedData.proof_of_residency_base64 ? [parsedData.proof_of_residency_base64] : []),
                 };
                 setFormState(initialData);
                 setOriginalFormState(initialData);
@@ -235,6 +254,7 @@ export default function SettingsScreen() {
 
         if (!result.canceled && result.assets?.[0]?.base64) {
             const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+            // This is for single image fields. For proof_of_residency_base64, it's handled below.
             handleInputChange(field, base64Image);
         }
     };
@@ -245,10 +265,12 @@ export default function SettingsScreen() {
         const validationErrors: Record<string, string> = {};
         const fieldsToValidate: (keyof typeof formState)[] = [
             'first_name', 'last_name', 'suffix',
-            'email', // ADDED EMAIL TO VALIDATION LIST
+            'email',
             'contact_number', 'date_of_birth', 'sex',
-            'civil_status', 'citizenship', 'occupation_status', 'address_house_number',
-            'address_street', 'address_subdivision_zone', 'years_at_current_address',
+            'civil_status', 'citizenship', 'occupation_status', 
+            'address_house_number', 'address_unit_room_apt_number', // NEW FIELD
+            'address_street', 'address_subdivision_zone', 'type_of_household', // NEW FIELD
+            'years_at_current_address',
         ];
 
         // Only validate password fields if newPassword is provided by the user
@@ -486,16 +508,120 @@ export default function SettingsScreen() {
                         <ErrorMessage error={errors.occupation_status} />
                     </View>
 
-                    {/* Proof of Residency (Read-only) */}
+                    <Text style={styles.sectionTitle}>Address Information</Text>
+
+                    {/* NEW FIELD: Unit/Room/Apartment number (Read-only) */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Unit/Room/Apartment number</Text>
+                        <TextInput
+                            style={[styles.textInput, styles.textInputDisabled, !!errors.address_unit_room_apt_number && styles.inputError]}
+                            value={formState.address_unit_room_apt_number || ''}
+                            editable={false}
+                            placeholderTextColor="#A9A9A9"
+                        />
+                        <ErrorMessage error={errors.address_unit_room_apt_number} />
+                    </View>
+
+                    {/* House Number (Read-only) */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>House Number/Lot/Block *</Text>
+                        <TextInput
+                            style={[styles.textInput, styles.textInputDisabled, !!errors.address_house_number && styles.inputError]}
+                            value={formState.address_house_number}
+                            editable={false}
+                            placeholderTextColor="#A9A9A9"
+                        />
+                        <ErrorMessage error={errors.address_house_number} />
+                    </View>
+
+                    {/* Street (Read-only) */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Street *</Text>
+                        <TextInput
+                            style={[styles.textInput, styles.textInputDisabled, !!errors.address_street && styles.inputError]}
+                            value={formState.address_street}
+                            editable={false}
+                            placeholderTextColor="#A9A9A9"
+                        />
+                        <ErrorMessage error={errors.address_street} />
+                    </View>
+
+                    {/* Subdivision / Zone / Sitio / Purok (Read-only) */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Subdivision / Zone / Sitio / Purok *</Text>
+                        <TextInput
+                            style={[styles.textInput, styles.textInputDisabled, !!errors.address_subdivision_zone && styles.inputError]}
+                            value={formState.address_subdivision_zone}
+                            editable={false}
+                            placeholderTextColor="#A9A9A9"
+                        />
+                        <ErrorMessage error={errors.address_subdivision_zone} />
+                    </View>
+
+                    {/* NEW FIELD: Type of Household (Read-only) */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Type of Household</Text>
+                        <View style={[styles.pickerWrapper, styles.pickerWrapperDisabled, !!errors.type_of_household && styles.inputError]}>
+                            <Picker
+                                selectedValue={formState.type_of_household}
+                                enabled={false} // 🔒 disable picker
+                                style={[styles.pickerText, styles.pickerTextDisabled, !formState.type_of_household && styles.pickerPlaceholder]}
+                                itemStyle={{ color: '#757575' }}
+                            >
+                                <Picker.Item label="Select Type of Household..." value={null} />
+                                <Picker.Item label="Owner" value="Owner" />
+                                <Picker.Item label="Tenant/Border" value="Tenant/Border" />
+                                <Picker.Item label="Sharer" value="Sharer" />
+                            </Picker>
+                        </View>
+                        <ErrorMessage error={errors.type_of_household} />
+                    </View>
+
+                     {/* City/Municipality (Read-only) */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>City/Municipality</Text>
+                        <TextInput
+                            style={[styles.textInput, styles.textInputDisabled]}
+                            value={formState.address_city_municipality}
+                            editable={false}
+                            placeholderTextColor="#A9A9A9"
+                        />
+                    </View>
+
+
+                    {/* Years at Current Address (Read-only) */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Years at Current Address *</Text>
+                        <TextInput
+                            style={[styles.textInput, styles.textInputDisabled, !!errors.years_at_current_address && styles.inputError]}
+                            value={formState.years_at_current_address?.toString() || ''}
+                            editable={false}
+                            placeholderTextColor="#A9A9A9"
+                        />
+                        <ErrorMessage error={errors.years_at_current_address} />
+                    </View>
+
+                    {/* Proof of Residency (Read-only) - FIX IMPLEMENTED HERE */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Proof of Residency</Text>
-                        {formState.proof_of_residency_base64 && (
-                            <Image
-                                source={{ uri: formState.proof_of_residency_base64 }}
-                                style={styles.proofImagePreview}
-                            />
+                        {formState.proof_of_residency_base64 && formState.proof_of_residency_base64.length > 0 ? (
+                            <View style={styles.imagePreviewContainer}>
+                                {formState.proof_of_residency_base64.map((uri, index) => (
+                                    <View key={index} style={styles.imagePreviewWrapper}>
+                                        <Image
+                                            source={{ uri }}
+                                            style={styles.proofImagePreview}
+                                        />
+                                        {/* If you wanted to allow removing, you'd add a button here, similar to signup.tsx */}
+                                    </View>
+                                ))}
+                            </View>
+                        ) : (
+                            <Text style={styles.noProofText}>No proof of residency uploaded.</Text>
                         )}
+                        <ErrorMessage error={errors.proof_of_residency_base64} />
                     </View>
+
 
                     {/* Special Classifications (disabled) */}
                     <Text style={styles.sectionTitle}>Special Classifications</Text>
@@ -643,5 +769,25 @@ const styles = StyleSheet.create({
         color: '#616161',
         marginTop: 5,
         marginLeft: 5,
+    },
+    // --- ADDED NEW STYLES FROM signup.tsx ---
+    imagePreviewContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        marginTop: 10,
+        marginBottom: 15,
+        gap: 10, // Added for spacing between images
+    },
+    imagePreviewWrapper: {
+        position: 'relative',
+    },
+    noProofText: {
+        textAlign: 'center',
+        color: '#888',
+        fontStyle: 'italic',
+        marginTop: 10,
+        fontSize: 14,
     }
+    // --- END NEW STYLES ---
 });
