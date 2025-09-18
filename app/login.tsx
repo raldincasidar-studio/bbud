@@ -172,9 +172,9 @@ export default function LoginScreen() { // Renamed component
             <TouchableOpacity onPress={() => router.push('/forgot-password/request')}>
               <Text style={styles.footerLink}>Forgot Password?</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('/activate-account/request')}>
+            {/* <TouchableOpacity onPress={() => router.push('/activate-account/request')}>
               <Text style={styles.footerLink}>Activate Account</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </>
         ) : (
           <>

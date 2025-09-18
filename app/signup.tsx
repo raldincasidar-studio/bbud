@@ -174,7 +174,7 @@ const ToggleSection = ({ label, value, onValueChange, idLabel, idValue, onIdChan
     </View>
 );
 
-// NEW: AI Validation Loading Modal Component
+// NEW: Ai Validation Loading Modal Component
 const AiValidationLoadingModal = ({ isVisible }: { isVisible: boolean }) => (
     <Modal
         animationType="fade"
@@ -192,6 +192,43 @@ const AiValidationLoadingModal = ({ isVisible }: { isVisible: boolean }) => (
     </Modal>
 );
 
+// NEW: Password Checklist Component
+const PasswordChecklist = ({ password }: { password: string }) => {
+    const minLength = password.length >= 8;
+    const hasLowercase = /[a-z]/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password); // Adjusted regex for common special characters
+
+    const characterTypeCount = [hasLowercase, hasUppercase, hasNumber, hasSpecialChar].filter(Boolean).length;
+    const hasThreeOfFour = characterTypeCount >= 3;
+
+    const renderCheckItem = (isValid: boolean, text: string) => (
+        <View style={styles.passwordChecklistItem}>
+            <Ionicons name={isValid ? "checkmark-circle" : "ellipse-outline"} size={16} color={isValid ? "#4CAF50" : "#A9A9A9"} style={{marginRight: 8}} />
+            <Text style={[styles.passwordChecklistText, isValid ? styles.validCheck : styles.invalidCheck]}>{text}</Text>
+        </View>
+    );
+
+    return (
+        <View style={styles.passwordChecklistContainer}>
+            <Text style={styles.passwordChecklistTitle}>Your password must contain:</Text>
+            {renderCheckItem(minLength, 'At least 8 characters')}
+            <View style={styles.passwordChecklistItem}>
+                <Ionicons name={hasThreeOfFour ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasThreeOfFour ? "#4CAF50" : "#A9A9A9"} style={{ marginRight: 8 }} />
+                <Text style={[styles.passwordChecklistText, hasThreeOfFour ? styles.validCheck : styles.invalidCheck]}>At least 3 of the following:</Text>
+            </View>
+            <View style={{ marginLeft: 30 }}> {/* Indent these items */}
+                {renderCheckItem(hasLowercase, 'Lower case letters (a-z)')}
+                {renderCheckItem(hasUppercase, 'Upper case letters (A-Z)')}
+                {renderCheckItem(hasNumber, 'Numbers (0-9)')}
+                {renderCheckItem(hasSpecialChar, 'Special characters (e.g. !@#$%^&*)')}
+            </View>
+        </View>
+    );
+};
+
+
 export default function SignupScreen() {
     const router = useRouter();
 
@@ -205,13 +242,18 @@ export default function SignupScreen() {
     const [editingMemberIndex, setEditingMemberIndex] = useState<number | null>(null);
 
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [datePickerTarget, setDatePickerTarget] = useState<'head' | 'member'>('head');
+    const [datePickerTarget, setDatePickerTarget] = useState<'head' | 'member'>('head'); // Corrected line
     const [isSaving, setIsSaving] = useState(false);
     // NEW: State for AI validation loading animation
     const [isAiValidating, setIsAiValidating] = useState(false); 
     const [showHeadPassword, setShowHeadPassword] = useState(false);
     const [showMemberPassword, setShowMemberPassword] = useState(false);
 
+
+    // --- Field Validation ---
+    // This useCallback hook memoizes the validation function to prevent unnecessary re-renders.
+    // It depends on `members` state because email validation needs to check for duplicates across the household.
+    // `editingMemberIndex` is included to correctly exclude the member being edited from the duplicate check.
 
     const validateField = useCallback((fieldName: keyof Head | keyof Member, value: any, state: Head | Member, allMembers: Member[] = [], headEmail: string = '', editingIndex: number | null = null) => {
         let error = '';
@@ -283,8 +325,9 @@ export default function SignupScreen() {
                     if (isHeadPassword) error = 'Password is required.';
                     else if (isMemberPasswordOptionalButProvided) error = 'Password is required for account creation if an email is provided.';
                 } else if (passwordValue) {
-                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                    if (!passwordRegex.test(passwordValue)) error = 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @$!%*?&).';
+                    // This regex implicitly checks all conditions. The UI checklist will break it down.
+                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/;
+                    if (!passwordRegex.test(passwordValue)) error = 'Password must meet all specified criteria.';
                 }
                 break;
             case 'confirmPassword':
@@ -382,6 +425,11 @@ export default function SignupScreen() {
     }, [members, formData.email, editingMemberIndex]);
 
     const handleConfirmDate = (date: Date) => {
+        // This function is called when a date is selected from the DateTimePickerModal.
+        // It formats the date into 'YYYY-MM-DD' format and updates the appropriate state
+        // based on whether the date was for the 'head' or a 'member'.
+        // The `datePickerTarget` state determines which part of the form is being updated.
+
         const formattedDate = date.toISOString().split('T')[0];
         if (datePickerTarget === 'head') { handleInputChange('date_of_birth', formattedDate); }
         else { handleMemberInputChange('date_of_birth', formattedDate); }
@@ -389,6 +437,13 @@ export default function SignupScreen() {
     };
 
     const pickImage = async (field: keyof Head | keyof Member, target: 'head' | 'member', isMultiple: boolean = false, proofTypeFieldName?: 'proof_type' | 'proof_image') => {
+        // Check for proof of residency limit before opening the picker
+        if (field === 'proof_of_residency_base64' && formData.proof_of_residency_base64.length >= 5) {
+            Alert.alert('Limit Reached', 'You can only upload a maximum of 5 proof of residency documents.');
+            return;
+        }
+
+
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
             Alert.alert('Permission Denied', 'Camera roll permissions are required.');
@@ -406,7 +461,15 @@ export default function SignupScreen() {
         if (!result.canceled && result.assets && result.assets.length > 0) {
             if (target === 'head') {
                 if (isMultiple && field === 'proof_of_residency_base64') {
-                    const newImages = result.assets.map(asset => `data:image/jpeg;base64,${asset.base64}`);
+                    const currentCount = formData.proof_of_residency_base64.length;
+                    const remainingSlots = 5 - currentCount;
+                    const canAddCount = Math.min(result.assets.length, remainingSlots);
+
+                    if (result.assets.length > remainingSlots) {
+                        Alert.alert('Limit Exceeded', `You can only add ${remainingSlots} more document(s). ${canAddCount} file(s) will be added.`);
+                    }
+
+                    const newImages = result.assets.slice(0, canAddCount).map(asset => `data:image/jpeg;base64,${asset.base64}`);
                     setFormData(prev => {
                         const updatedProofs = [...prev.proof_of_residency_base64, ...newImages];
                         const error = validateField('proof_of_residency_base64', updatedProofs, prev, members, prev.email, null);
@@ -636,7 +699,7 @@ export default function SignupScreen() {
                         if (typeof data.message === 'string') {
                             title = 'Proof of Residency Validation Failed';
                              errorMessage = 'Please check the fields or upload a valid proof of residency.';
-                            setErrors(current => ({ ...current, proof_of_residency_base64: errorMessage })); // Set error for proof field
+                            setErrors(current => ({ ...currentErrors, proof_of_residency_base64: errorMessage })); // Set error for proof field
                         }
                     } else if (status === 400 && data.error === 'Validation Error') {
                         if (typeof data.message === 'string') {
@@ -851,7 +914,7 @@ export default function SignupScreen() {
                                 <Image source={{ uri: formData.authorization_letter_base64 }} style={styles.previewImageSmall} />
                                 <TouchableOpacity onPress={() => handleInputChange('authorization_letter_base64', null)} style={styles.removeImageButton}>
                                     <Ionicons name="close-circle" size={24} color="#D32F2F" />
-                                </TouchableOpacity>
+                                ></TouchableOpacity>
                             </View>
                         </View>
                     )}
@@ -870,6 +933,8 @@ export default function SignupScreen() {
                     <View style={[styles.passwordContainer, !!errors.password && styles.inputError]}><TextInput style={styles.passwordInput} placeholder="Password*" placeholderTextColor="#A9A9A9" secureTextEntry={!showHeadPassword} value={formData.password} onChangeText={(v) => handleInputChange('password', v)} /><TouchableOpacity onPress={() => setShowHeadPassword(!showHeadPassword)} style={styles.eyeIcon}><Ionicons name={showHeadPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#888" /></TouchableOpacity></View><ErrorMessage error={errors.password} />
                     <Text style={styles.label}>Confirm Password*</Text>
                     <View style={[styles.passwordContainer, !!errors.confirmPassword && styles.inputError]}><TextInput style={styles.passwordInput} placeholder="Confirm Password*" placeholderTextColor="#A9A9A9" secureTextEntry={!showHeadPassword} value={formData.confirmPassword} onChangeText={(v) => handleInputChange('confirmPassword', v)} /><TouchableOpacity onPress={() => setShowHeadPassword(!showHeadPassword)} style={styles.eyeIcon}><Ionicons name={showHeadPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#888" /></TouchableOpacity></View><ErrorMessage error={errors.confirmPassword} />
+                    {/* NEW: Password Checklist for Household Head */}
+                    <PasswordChecklist password={formData.password} />
 
                     <Text style={styles.subHeader}>Step 2: Household Members</Text>
                     {members.map((member, index) => (
@@ -927,7 +992,7 @@ export default function SignupScreen() {
                                     {relationshipPickerOptions.map((option) => (
                                         <Picker.Item key={option.value} label={option.label} value={option.value} enabled={option.enabled ?? true} />
                                     ))}
-                                </Picker>
+                                ></Picker>
                             </View>
                             <ErrorMessage error={memberErrors.relationship_to_head} />
                             {currentMember.relationship_to_head === 'Other' && (<><Text style={styles.label}>Specify Relationship*</Text><TextInput style={[styles.modalInput, !!memberErrors.other_relationship && styles.inputError]} placeholder="Please specify relationship*" placeholderTextColor="#A9A9A9" value={currentMember.other_relationship} onChangeText={(v) => handleMemberInputChange('other_relationship', v)} /><ErrorMessage error={memberErrors.other_relationship} /></>)}
@@ -974,7 +1039,7 @@ export default function SignupScreen() {
                                     <Picker.Item label="Out of School Youth" value="Out of School Youth" />
                                     <Picker.Item label="Retired" value="Retired" />
                                     <Picker.Item label="Not Applicable" value="Not Applicable" />
-                                </Picker>
+                                ></Picker>
                             </View>
                             <ErrorMessage error={memberErrors.occupation_status} />
 
@@ -1021,7 +1086,10 @@ export default function SignupScreen() {
                             {(memberAge === null || memberAge >= 18) && <ToggleSection label="Is member a registered voter?" value={currentMember.is_voter} onValueChange={(v:boolean) => handleMemberInputChange('is_voter', v)} idLabel="Voter ID Number" idValue={currentMember.voter_id_number} onIdChange={(v:string) => handleMemberInputChange('voter_id_number', v)} error={memberErrors.voter_id_number} proofLabel="Upload Voter's Proof" proofValue={currentMember.voter_registration_proof_base64} onProofPress={() => pickImage('voter_registration_proof_base64', 'member', false)} />}
                             <ToggleSection label="Is member a PWD?" value={currentMember.is_pwd} onValueChange={(v:boolean) => handleMemberInputChange('is_pwd', v)} idLabel="PWD ID Number*" idValue={currentMember.pwd_id} onIdChange={(v:string) => handleMemberInputChange('pwd_id', v)} error={memberErrors.pwd_id} proofLabel="Upload PWD Card*" proofValue={currentMember.pwd_card_base64} onProofPress={() => pickImage('pwd_card_base64', 'member', false)} />
                             {(memberAge === null || memberAge >= 60) && <ToggleSection label="Is member a Senior Citizen?" value={currentMember.is_senior_citizen} onValueChange={(v:boolean) => handleMemberInputChange('is_senior_citizen', v)} idLabel="Senior Citizen ID*" idValue={currentMember.senior_citizen_id} onIdChange={(v:string) => handleMemberInputChange('senior_citizen_id', v)} error={memberErrors.senior_citizen_id} proofLabel="Upload Senior Citizen Card*" proofValue={currentMember.senior_citizen_card_base64} onProofPress={() => pickImage('senior_citizen_card_base64', 'member', false)} />}
-                            {memberAge !== null && memberAge >= 15 && (<View><Text style={styles.modalSectionTitle}>Create Account (Optional)</Text><Text style={styles.accountInfoText}>Member is {memberAge} years old. They can create their own account.</Text><TextInput style={[styles.modalInput, !!memberErrors.email && styles.inputError]} placeholder="Email" placeholderTextColor="#A9A9A9" keyboardType="email-address" autoCapitalize="none" value={currentMember.email} onChangeText={(v) => handleMemberInputChange('email', v)} /><ErrorMessage error={memberErrors.email} /><View style={[styles.passwordContainerModal, !!memberErrors.password && styles.inputError]}><TextInput style={styles.passwordInputModal} placeholder="Password" placeholderTextColor="#A9A9A9" secureTextEntry={!showMemberPassword} value={currentMember.password} onChangeText={(v) => handleMemberInputChange('password', v)} /><TouchableOpacity onPress={() => setShowMemberPassword(!showMemberPassword)} style={styles.eyeIcon}><Ionicons name={showMemberPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#888" /></TouchableOpacity></View><ErrorMessage error={memberErrors.password} /></View>)}
+                            {memberAge !== null && memberAge >= 15 && (<View><Text style={styles.modalSectionTitle}>Create Account (Optional)</Text><Text style={styles.accountInfoText}>Member is {memberAge} years old. They can create their own account.</Text><TextInput style={[styles.modalInput, !!memberErrors.email && styles.inputError]} placeholder="Email" placeholderTextColor="#A9A9A9" keyboardType="email-address" autoCapitalize="none" value={currentMember.email} onChangeText={(v) => handleMemberInputChange('email', v)} /><ErrorMessage error={memberErrors.email} /><View style={[styles.passwordContainerModal, !!memberErrors.password && styles.inputError]}><TextInput style={styles.passwordInputModal} placeholder="Password" placeholderTextColor="#A9A9A9" secureTextEntry={!showMemberPassword} value={currentMember.password} onChangeText={(v) => handleMemberInputChange('password', v)} /><TouchableOpacity onPress={() => setShowMemberPassword(!showMemberPassword)} style={styles.eyeIcon}><Ionicons name={showMemberPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#888" /></TouchableOpacity></View><ErrorMessage error={memberErrors.password} />
+                            {/* NEW: Password Checklist for Household Member */}
+                            <PasswordChecklist password={currentMember.password} />
+                            </View>)}
                             <View style={styles.modalActions}><TouchableOpacity style={[styles.modalButton, styles.modalButtonSave]} onPress={handleSaveMember}><Text style={styles.modalButtonText}>Save Member</Text></TouchableOpacity><TouchableOpacity style={[styles.modalButton, styles.modalButtonClose]} onPress={() => setMemberModalVisible(false)}><Text style={styles.modalButtonText}>Cancel</Text></TouchableOpacity></View>
                         </ScrollView>
                     </View>
@@ -1153,5 +1221,35 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         textAlign: 'center',
+    },
+    // NEW Password Checklist Styles
+    passwordChecklistContainer: {
+        backgroundColor: '#f9f9f9',
+        borderRadius: 8,
+        padding: 15,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+    },
+    passwordChecklistTitle: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#333',
+        marginBottom: 10,
+    },
+    passwordChecklistItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    passwordChecklistText: {
+        fontSize: 14,
+        color: '#555',
+    },
+    validCheck: {
+        color: '#4CAF50', // Green for valid
+    },
+    invalidCheck: {
+        color: '#A9A9A9', // Gray for invalid or not yet met
     },
 });
