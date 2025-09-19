@@ -458,6 +458,8 @@ const NewDocumentRequestScreen = () => {
     const [loggedInUserData, setLoggedInUserData] = useState<any>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingInitialData, setIsLoadingInitialData] = useState(true);
+    // NEW state for AI validation modal
+    const [showAiValidationModal, setShowAiValidationModal] = useState(false);
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerTarget, setDatePickerTarget] = useState('');
@@ -625,6 +627,8 @@ const NewDocumentRequestScreen = () => {
                 } else if (value === 'Certificate of Oneness') {
                     updatedForm.purpose = 'For records purposes'; // Default purpose for Oneness if not set
                 }
+                // For 'Certificate of Good Moral', 'Certificate of Solo Parent', 'Certificate of Residency',
+                // updatedForm.details will correctly remain an empty object from the `details: isRequestTypeChange ? {} : prev.details` line.
             }
 
             validateField(field, value);
@@ -713,7 +717,8 @@ const NewDocumentRequestScreen = () => {
             } else if (requestType === 'Barangay BADAC Certificate') {
                 Object.assign(fieldsToValidate, { 'details.badac_certificate': details.badac_certificate });
             }
-            // Certificate of Oneness has no specific 'details' fields based on admin code.
+            // Certificate of Oneness, Certificate of Good Moral, Certificate of Solo Parent, Certificate of Residency
+            // have no specific 'details' fields required, so they won't be explicitly added here for validation.
         }
 
         // Run all validations
@@ -733,22 +738,76 @@ const NewDocumentRequestScreen = () => {
         }
 
         setIsSaving(true);
+        // Show AI validation modal BEFORE sending the request
+        setShowAiValidationModal(true);
         try {
+            // --- UPDATED LOGIC FOR CONSTRUCTING PAYLOAD.DETAILS ---
+            let requestDetails: Record<string, any> = { ...form.details }; // Start with current form.details (which should be {} for most non-cohab types)
+
+            if (form.request_type === 'Certificate of Cohabitation') {
+                // For Cohabitation, explicitly add partner IDs and names
+                requestDetails = {
+                    ...requestDetails, // This would already contain cohabitation-specific fields from form.details
+                    male_partner_id: form.details.male_partner?._id || null,
+                    male_partner_name: form.details.male_partner ? `${form.details.male_partner.first_name} ${form.details.male_partner.last_name}` : null,
+                    female_partner_id: form.details.female_partner?._id || null,
+                    female_partner_name: form.details.female_partner ? `${form.details.female_partner.first_name} ${form.details.female_partner.last_name}` : null,
+                };
+                // Remove the complex Resident objects, leaving only their IDs/names and other fields
+                delete requestDetails.male_partner;
+                delete requestDetails.female_partner;
+            } else {
+                // For all other document types, ensure `requestDetails` is genuinely empty
+                // if `form.details` was intended to be empty.
+                // We'll filter out potential remnants from initial state or previous selections.
+                requestDetails = {}; // Start fresh for non-cohabitation types
+                if (form.request_type === 'Barangay Clearance') {
+                    requestDetails = {
+                        type_of_work: form.details.type_of_work,
+                        other_work: form.details.other_work,
+                        number_of_storeys: form.details.number_of_storeys,
+                        purpose_of_clearance: form.details.purpose_of_clearance,
+                    };
+                } else if (form.request_type === 'Barangay Business Clearance') {
+                    requestDetails = {
+                        business_name: form.details.business_name,
+                        nature_of_business: form.details.nature_of_business,
+                    };
+                } else if (form.request_type === 'Barangay Business Permit') {
+                    requestDetails = {
+                        business_name: form.details.business_name,
+                        business_address: form.details.business_address,
+                    };
+                } else if (form.request_type === 'Barangay Certification (First Time Jobseeker)') {
+                    requestDetails = {
+                        years_lived: form.details.years_lived,
+                        months_lived: form.details.months_lived,
+                    };
+                } else if (form.request_type === 'Certificate of Indigency') {
+                    requestDetails = {
+                        medical_educational_financial: form.details.medical_educational_financial,
+                    };
+                } else if (form.request_type === 'Barangay BADAC Certificate') {
+                    requestDetails = {
+                        badac_certificate: form.details.badac_certificate,
+                    };
+                } else if (form.request_type === 'Barangay Permit (for installations)') {
+                    requestDetails = {
+                        installation_construction_repair: form.details.installation_construction_repair,
+                        project_site: form.details.project_site,
+                    };
+                }
+                // For 'Certificate of Good Moral', 'Certificate of Solo Parent', 'Certificate of Residency', 'Certificate of Oneness'
+                // requestDetails will remain an empty object, which is the desired behavior.
+            }
+            // --- END UPDATED LOGIC ---
+
             const payload = {
                 requestor_resident_id: form.requestor_resident_id,
                 purpose: form.purpose,
                 request_type: form.request_type,
-                details: {
-                    ...form.details,
-                    male_partner_id: form.details.male_partner?._id || null, // Extract ID
-                    male_partner_name: form.details.male_partner ? `${form.details.male_partner.first_name} ${form.details.male_partner.last_name}` : null, // Extract name
-                    female_partner_id: form.details.female_partner?._id || null, // Extract ID
-                    female_partner_name: form.details.female_partner ? `${form.details.female_partner.first_name} ${form.details.female_partner.last_name}` : null, // Extract name
-                },
+                details: requestDetails, // Use the carefully constructed requestDetails
             };
-            // Clean up the `male_partner` and `female_partner` objects from `details` before sending
-            delete payload.details.male_partner;
-            delete payload.details.female_partner;
 
             const response = await apiRequest('POST', '/api/document-requests', payload);
             if (response && (response.message || response.requestId)) {
@@ -763,7 +822,11 @@ const NewDocumentRequestScreen = () => {
             const errorMessage = error.response?.data?.message || error.response?.data?.error || "An unexpected error occurred.";
             Alert.alert("Error", errorMessage);
         } finally {
-            setIsSaving(false);
+            // Optional: Add a small delay for better UX before hiding the modal
+            setTimeout(() => {
+                setIsSaving(false);
+                setShowAiValidationModal(false);
+            }, 1500); // Wait for 1.5 seconds before hiding
         }
     };
 
@@ -976,6 +1039,15 @@ const NewDocumentRequestScreen = () => {
                 {form.request_type === 'Certificate of Oneness' && (
                     <Text style={styles.label}>No specific additional details required for Certificate of Oneness.</Text>
                 )}
+                 {form.request_type === 'Certificate of Good Moral' && (
+                    <Text style={styles.label}>No specific additional details required for Certificate of Good Moral.</Text>
+                )}
+                 {form.request_type === 'Certificate of Solo Parent' && (
+                    <Text style={styles.label}>No specific additional details required for Certificate of Solo Parent.</Text>
+                )}
+                 {form.request_type === 'Certificate of Residency' && (
+                    <Text style={styles.label}>No specific additional details required for Certificate of Residency.</Text>
+                )}
 
                 {/* Purpose is conditionally required, but the field always exists */}
                 <View style={[styles.inputContainer, { paddingTop: 10 }]}>
@@ -1055,6 +1127,22 @@ const NewDocumentRequestScreen = () => {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+
+            {/* AI Validation Loading Modal */}
+            <Modal
+                transparent={true}
+                visible={showAiValidationModal}
+                animationType="fade"
+                onRequestClose={() => {}} // Disable closing with back button on Android
+            >
+                <View style={styles.aiValidationModalBackground}>
+                    <View style={styles.aiValidationModalContent}>
+                        <ActivityIndicator size="large" color="#0F00D7" />
+                        <Text style={styles.aiValidationModalTitle}>Please take a moment</Text>
+                        <Text style={styles.aiValidationModalParagraph}>Our AI is validating your document request.</Text>
+                    </View>
+                </View>
+            </Modal>
         </KeyboardAvoidingView>
     );
 };
@@ -1187,6 +1275,43 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
+    },
+    // Styles for AI Validation Modal
+    aiValidationModalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    aiValidationModalContent: {
+        backgroundColor: 'white',
+        paddingVertical: 30,
+        paddingHorizontal: 25,
+        borderRadius: 15,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 10,
+        marginHorizontal: 40,
+        minWidth: 280,
+    },
+    aiValidationModalTitle: {
+        marginTop: 20,
+        fontSize: 18,
+        textAlign: 'center',
+        color: '#333',
+        fontWeight: 'bold',
+        lineHeight: 24,
+        marginBottom: 5,
+    },
+    aiValidationModalParagraph: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: '#666',
+        fontWeight: 'normal',
+        lineHeight: 22,
     },
 });
 
