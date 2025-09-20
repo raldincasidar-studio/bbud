@@ -81,7 +81,8 @@ const MyRequestedDocumentsScreen = () => {
         try {
             const params: any = {
                 byResidentId: userData._id,
-                sortBy: 'date_of_request',
+                // Ensure this sortBy key matches what your backend expects for date sorting
+                sortBy: 'created_at', // Assuming backend uses 'created_at' for sorting
                 sortOrder: 'desc',
             };
 
@@ -94,6 +95,7 @@ const MyRequestedDocumentsScreen = () => {
                 params.status = statusFilter;
             }
             
+            // This is the correct endpoint for user-requested documents
             const response = await apiRequest('GET', `/api/document-requests?${new URLSearchParams(params).toString()}`,);
 
             if (response && response.requests) {
@@ -158,11 +160,19 @@ const MyRequestedDocumentsScreen = () => {
     const formatDate = (dateString: string) => {
         if (!dateString) return 'N/A';
         try {
-            return new Date(dateString).toLocaleString('en-US', {
+            // Ensure dateString is correctly parsed, handling ISO strings
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) { // Check for invalid date
+                return 'Invalid Date';
+            }
+            return date.toLocaleString('en-US', {
                 year: 'numeric', month: 'short', day: 'numeric',
                 hour: '2-digit', minute: '2-digit', hour12: true
             });
-        } catch (e) { return dateString; }
+        } catch (e) {
+            console.error("Error formatting date:", e);
+            return 'N/A'; // Return N/A if any error during parsing/formatting
+        }
     };
 
     const renderDocumentItem = ({ item }: { item: any }) => (
@@ -178,9 +188,10 @@ const MyRequestedDocumentsScreen = () => {
                     <Text style={styles.statusText}>{item.document_status}</Text>
                 </View>
             </View>
-            <Text style={styles.detailText} numberOfLines={1}>Purpose: {item.purpose_of_request}</Text>
+            <Text style={styles.detailText} numberOfLines={1}>Purpose: {item.purpose}</Text>
             <Text style={styles.detailText}>Ref #: {item.ref_no}</Text>
-            <Text style={styles.detailText}>Requested: {formatDate(item.date_of_request)}</Text>
+            {/* THIS IS THE CRUCIAL LINE: Using item.created_at */}
+            <Text style={styles.detailText}>Requested: {formatDate(item.created_at)}</Text>
         </TouchableOpacity>
     );
 
