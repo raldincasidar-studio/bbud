@@ -134,10 +134,10 @@ type Member = typeof initialMemberState;
 
 const initialHeadState = {
     ...initialMemberState, relationship_to_head: '', other_relationship: '', password: '',
-    confirmPassword: '', address_house_number: '', 
+    confirmPassword: '', address_house_number: '',
     address_unit_room_apt_number: '', // NEW FIELD
     address_street: '', address_subdivision_zone: '',
-    address_city_municipality: 'Manila City', 
+    address_city_municipality: 'Manila City',
     type_of_household: null as string | null, // NEW FIELD
     years_at_current_address: '',
     proof_of_residency_base64: [] as string[],
@@ -245,7 +245,7 @@ export default function SignupScreen() {
     const [datePickerTarget, setDatePickerTarget] = useState<'head' | 'member'>('head'); // Corrected line
     const [isSaving, setIsSaving] = useState(false);
     // NEW: State for AI validation loading animation
-    const [isAiValidating, setIsAiValidating] = useState(false); 
+    const [isAiValidating, setIsAiValidating] = useState(false);
     const [showHeadPassword, setShowHeadPassword] = useState(false);
     const [showMemberPassword, setShowMemberPassword] = useState(false);
 
@@ -261,7 +261,7 @@ export default function SignupScreen() {
         const isEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
         const containsNumber = (val: string) => /\d/.test(val);
         // Updated regex to allow alphanumeric, spaces, hyphens, and slashes for unit numbers
-        const isInvalidUnitRoomApt = (val: string) => !/^[a-zA-Z0-9\s\-\/]*$/.test(val); 
+        const isInvalidUnitRoomApt = (val: string) => !/^[a-zA-Z0-9\s\-\/]*$/.test(val);
         const isInvalidName = (val: string) => !/^[a-zA-Z'.\-\s]+$/.test(val);
 
         switch (fieldName) {
@@ -301,10 +301,10 @@ export default function SignupScreen() {
                 }
                 break;
             case 'contact_number': if (isRequired(value)) error = 'Contact number is required.'; else if (!/^\d{11}$/.test(value)) error = 'Must be a valid 11-digit number.'; break;
-            case 'address_house_number': case 'address_street': case 'address_subdivision_zone': 
+            case 'address_house_number': case 'address_street': case 'address_subdivision_zone':
             if (isRequired(value)) error = 'This address field is required.'; break;
             case 'address_unit_room_apt_number': // NEW FIELD: Optional, only validate format if provided
-                if (value && isInvalidUnitRoomApt(value)) error = 'Only alphanumeric characters, spaces, hyphens, and slashes are allowed.'; 
+                if (value && isInvalidUnitRoomApt(value)) error = 'Only alphanumeric characters, spaces, hyphens, and slashes are allowed.';
                 break;
             case 'type_of_household': // NEW FIELD: Now optional
                 // No validation added if it's optional
@@ -692,6 +692,19 @@ export default function SignupScreen() {
                             title = 'Email Already Registered';
                             errorMessage = data.message; // Use the exact backend message
                             setErrors(current => ({ ...current, email: errorMessage })); // Set specific error for email field
+                       } else if (typeof data.message === 'string' && data.message.includes('A primary household head with this name and main address already exists')) {
+                          title = 'Duplicate Primary User';
+                          errorMessage = data.message;
+                           // Highlight relevant fields for the duplicate primary user
+                           setErrors(current => ({
+                               ...current,
+                              first_name: errorMessage,
+                               last_name: errorMessage,
+                               address_house_number: errorMessage,
+                               address_street: errorMessage,
+                               address_subdivision_zone: errorMessage,
+                               address_city_municipality: errorMessage,
+                           }));
                         } else {
                             errorMessage = data.message || 'A conflict occurred. Please check your inputs.';
                         }
@@ -699,7 +712,7 @@ export default function SignupScreen() {
                         if (typeof data.message === 'string') {
                             title = 'Proof of Residency Validation Failed';
                              errorMessage = 'Please check the fields or upload a valid proof of residency.';
-                            setErrors(current => ({ ...currentErrors, proof_of_residency_base64: errorMessage })); // Set error for proof field
+                            setErrors(current => ({ ...current, proof_of_residency_base64: errorMessage })); // Set error for proof field
                         }
                     } else if (status === 400 && data.error === 'Validation Error') {
                         if (typeof data.message === 'string') {
@@ -721,14 +734,14 @@ export default function SignupScreen() {
                     }
                 } else if (error instanceof Error && error.message.includes('Network Error')) { // Custom network error from axios.js
                     title = 'Network Error';
-                    errorMessage = error.message; 
+                    errorMessage = error.message;
                 }
                 // Fallback for any other unexpected errors
                 else {
                     errorMessage = error.message || "An unknown error occurred during registration. Please try again.";
                 }
                 // --- END UPDATED ERROR HANDLING LOGIC ---
-                
+
                 Alert.alert(title, errorMessage);
             }
 
@@ -837,7 +850,7 @@ export default function SignupScreen() {
                     <ErrorMessage error={errors.occupation_status} />
 
                     <Text style={styles.sectionTitle}>Address Information</Text>
-                    
+
                     {/* NEW FIELD: Unit/Room/Apartment number - FIRST IN ADDRESS */}
                     <Text style={styles.label}>Unit/Room/Apartment number (Optional)</Text>
                     <TextInput
@@ -848,7 +861,7 @@ export default function SignupScreen() {
                         onChangeText={(v) => handleInputChange('address_unit_room_apt_number', v)}
                     /><ErrorMessage error={errors.address_unit_room_apt_number} />
 
-                    
+
 
                     <Text style={styles.label}>House Number/Lot/Block*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_house_number && styles.inputError]} placeholder="House Number/Lot/Block*" placeholderTextColor="#A9A9A9" value={formData.address_house_number} onChangeText={(v) => handleInputChange('address_house_number', v)} /><ErrorMessage error={errors.address_house_number} />
@@ -856,7 +869,7 @@ export default function SignupScreen() {
                     <TextInput style={[styles.textInput, !!errors.address_street && styles.inputError]} placeholder="Street*" placeholderTextColor="#A9A9A9" value={formData.address_street} onChangeText={(v) => handleInputChange('address_street', v)} /><ErrorMessage error={errors.address_street} />
                     <Text style={styles.label}>Subdivision / Zone / Sitio / Purok*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_subdivision_zone && styles.inputError]} placeholder="Subdivision / Zone / Sitio / Purok*" placeholderTextColor="#A9A9A9" value={formData.address_subdivision_zone} onChangeText={(v) => handleInputChange('address_subdivision_zone', v)} /><ErrorMessage error={errors.address_subdivision_zone} />
-                    
+
                     {/* NEW FIELD: Type of Household - SECOND IN ADDRESS */}
                     <Text style={styles.label}>Type of Household (Optional)</Text>
                     <View style={[styles.pickerWrapper, !!errors.type_of_household && styles.inputError]}>
@@ -876,7 +889,7 @@ export default function SignupScreen() {
 
                     <Text style={styles.label}>City/Municipality</Text>
                     <TextInput style={[styles.textInput, styles.textInputDisabled]} value={formData.address_city_municipality} editable={false} />
-                    
+
                     <Text style={styles.label}>Years at Current Address*</Text>
                     <TextInput style={[styles.textInput, !!errors.years_at_current_address && styles.inputError]} placeholder="Years at Current Address*" placeholderTextColor="#A9A9A9" keyboardType="numeric" value={formData.years_at_current_address} onChangeText={(v) => handleInputChange('years_at_current_address', v)} /><ErrorMessage error={errors.years_at_current_address} />
 
@@ -979,7 +992,7 @@ export default function SignupScreen() {
                                     {suffixOptions.map((option) => (
                                         <Picker.Item key={option} label={option} value={option} />
                                     ))}
-                                </Picker>
+                                ></Picker>
                             </View>
                             <ErrorMessage error={memberErrors.suffix} />
 
