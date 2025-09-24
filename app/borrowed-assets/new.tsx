@@ -2,11 +2,13 @@ import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
+import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Image,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -50,6 +52,18 @@ const NewBorrowAssetScreen = () => {
     const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(null);
     const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
     
+    // State for proofs, renamed to borrow_proof_image_base64 as per backend
+    const [borrow_proof_image_base64, setBorrow_proof_image_base64] = useState<string[]>([]);
+    // Using useRef to get the current state value inside saveTransaction without re-rendering issues
+    const borrowProofImageBase64Ref = useRef(borrow_proof_image_base64); 
+    useEffect(() => {
+        borrowProofImageBase64Ref.current = borrow_proof_image_base64;
+        console.log("borrow_proof_image_base64 state updated:", borrow_proof_image_base64.length, "items.");
+        if (borrow_proof_image_base64.length > 0) {
+            console.log("First proof in state:", borrow_proof_image_base64[0].substring(0, 50) + "...");
+        }
+    }, [borrow_proof_image_base64]);
+
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -148,6 +162,99 @@ const NewBorrowAssetScreen = () => {
         setDatePickerVisibility(false);
     };
 
+    const pickProof = async () => {
+        console.log("pickProof function called.");
+
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        console.log("Permission status:", status);
+
+        if (status !== 'granted') {
+            Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to select files.');
+            return;
+        }
+
+        console.log("Permissions granted, launching image library...");
+
+        let result;
+        try {
+            result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.All, // Allow all media types (images and videos)
+                allowsMultipleSelection: true,
+                quality: 0.7,
+                base64: true,
+            });
+            console.log("ImagePicker Result:", JSON.stringify(result, null, 2));
+        } catch (error) {
+            console.error("Error launching ImagePicker:", error);
+            Alert.alert("Error", "Failed to open file picker: " + (error as Error).message);
+            return;
+        }
+        
+        if (result.canceled) {
+            console.log("Image picker was canceled.");
+        } else if (result.assets && result.assets.length > 0) {
+            console.log("Assets found:", result.assets.length);
+
+            const newProofs = await Promise.all(result.assets.map(async (asset, index) => {
+                console.log(`--- Processing asset ${index + 1} ---`);
+                console.log("  Asset URI:", asset.uri);
+                console.log("  Asset MediaType (from Expo):", asset.mediaType); 
+                console.log("  Asset MimeType (from Expo):", asset.mimeType);
+                console.log("  Is asset.base64 a string?", typeof asset.base64 === 'string');
+                console.log("  Length of asset.base64:", asset.base64 ? asset.base64.length : 'N/A');
+
+                // Ensure base64 data is present and a valid string
+                if (asset.base64 && typeof asset.base64 === 'string' && asset.base64.length > 0) {
+                    let detectedMimeType = 'application/octet-stream'; // Default generic binary
+                    
+                    if (asset.mimeType) {
+                        detectedMimeType = asset.mimeType;
+                    } else if (asset.mediaType === ImagePicker.MediaType.Video) {
+                        detectedMimeType = 'video/mp4'; // Common video type
+                    } else { // Assume image, try to get from URI or default
+                        const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
+                        if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
+                            detectedMimeType = 'image/jpeg';
+                        } else if (fileExtension === 'png') {
+                            detectedMimeType = 'image/png';
+                        } else if (fileExtension === 'gif') {
+                            detectedMimeType = 'image/gif';
+                        } else {
+                            detectedMimeType = 'image/jpeg'; // Fallback for image
+                        }
+                    }
+
+                    const dataUri = `data:${detectedMimeType};base64,${asset.base64}`;
+                    console.log("  Generated data URI (first 50 chars):", dataUri.substring(0, 50));
+                    console.log("  Generated data URI (length):", dataUri.length);
+                    return dataUri;
+                } else {
+                    console.warn(`Asset ${index + 1} missing valid base64 data or empty string, skipping:`, asset.uri);
+                    console.warn("  Problematic asset.base64:", asset.base64);
+                    return null;
+                }
+            }));
+            
+            const proofsToAdd = newProofs.filter(Boolean) as string[]; // Filter out any nulls
+            console.log("Proofs successfully extracted and filtered (count):", proofsToAdd.length);
+            if (proofsToAdd.length > 0) {
+                console.log("First filtered proof (first 50 chars):", proofsToAdd[0].substring(0, 50));
+            }
+
+            setBorrow_proof_image_base64(prev => {
+                const updatedProofs = [...prev, ...proofsToAdd];
+                console.log("Proofs state AFTER setBorrow_proof_image_base64 (total count):", updatedProofs.length);
+                return updatedProofs;
+            });
+        } else if (!result.canceled && (!result.assets || result.assets.length === 0)) {
+            console.warn("User selected files, but no assets were returned or assets array is empty.");
+        }
+    };
+
+    const removeProof = (indexToRemove: number) => {
+        setBorrow_proof_image_base64(prev => prev.filter((_, index) => index !== indexToRemove));
+    };
+
     const saveTransaction = async () => {
         const fieldsToValidate = ['item_borrowed', 'quantity_borrowed', 'expected_return_date'];
         let hasErrors = false;
@@ -165,6 +272,11 @@ const NewBorrowAssetScreen = () => {
 
         setIsSaving(true);
         try {
+            console.log('Current borrow_proof_image_base64 state via ref before sending:', borrowProofImageBase64Ref.current.length, 'proofs');
+            if (borrowProofImageBase64Ref.current.length > 0) {
+                console.log('First proof in ref (first 50 chars):', borrowProofImageBase64Ref.current[0].substring(0, 50));
+            }
+
             const payload = {
                 borrower_resident_id: loggedInUser!._id,
                 borrower_display_name: loggedInUser!.name,
@@ -173,13 +285,25 @@ const NewBorrowAssetScreen = () => {
                 quantity_borrowed: parseInt(transaction.quantity_borrowed, 10),
                 expected_return_date: new Date(transaction.expected_return_date).toISOString(),
                 notes: transaction.notes.trim() || null,
+                // MODIFIED: Send only the first proof as a single string, or null,
+                // to match the expected format for the admin display.
+                borrow_proof_image_base64: borrowProofImageBase64Ref.current.length > 0
+                                            ? borrowProofImageBase64Ref.current[0]
+                                            : null,
             };
+            console.log('Borrow transaction payload being sent:', payload);
+            // Adjusted log to reflect the single string or null being sent
+            console.log('borrow_proof_image_base64 type in payload:', typeof payload.borrow_proof_image_base64);
+            if (typeof payload.borrow_proof_image_base64 === 'string') {
+                console.log('First proof in payload length (approx):', payload.borrow_proof_image_base64.length);
+            }
+
 
             const response = await apiRequest('POST', '/api/borrowed-assets', payload);
 
             if (response && (response.message || response.transaction?._id)) {
                 Alert.alert("Success", "Your borrowing request has been submitted successfully!");
-                router.replace('/borrowed-assets');
+                router.replace('/borrowed-assets'); // Navigate back to the list
             } else {
                 Alert.alert("Error", response?.error || response?.message || "Could not submit your request due to unresolved issues. On Hold/Deactivated");
             }
@@ -226,7 +350,7 @@ const NewBorrowAssetScreen = () => {
                                     key={item.name}
                                     label={`${item.name} (Available: ${item.available})`} 
                                     value={item.name}
-                                    enabled={item.available > 0}
+                                    enabled={item.available > 0} // Disable items with no stock
                                 />
                             ))}
                         </Picker>
@@ -239,10 +363,10 @@ const NewBorrowAssetScreen = () => {
                     <TextInput
                         style={[styles.textInput, !!errors.quantity_borrowed && styles.inputError]}
                         value={transaction.quantity_borrowed}
-                        onChangeText={(val) => handleInputChange('quantity_borrowed', val.replace(/[^0-9]/g, ''))}
+                        onChangeText={(val) => handleInputChange('quantity_borrowed', val.replace(/[^0-9]/g, ''))} // Only allow numbers
                         keyboardType="numeric"
                         placeholder="1"
-                        editable={!!transaction.item_borrowed}
+                        editable={!!transaction.item_borrowed} // Enable only if an item is selected
                     />
                     <ErrorMessage error={errors.quantity_borrowed} />
                 </View>
@@ -261,7 +385,7 @@ const NewBorrowAssetScreen = () => {
                     mode="date"
                     onConfirm={handleDateConfirm}
                     onCancel={() => setDatePickerVisibility(false)}
-                    minimumDate={new Date()}
+                    minimumDate={new Date()} // Prevent selecting past dates
                 />
 
                 <View style={styles.inputContainer}>
@@ -275,6 +399,43 @@ const NewBorrowAssetScreen = () => {
                         textAlignVertical="top"
                     />
                 </View>
+
+                {/* Proof of Borrowing Section */}
+                <Text style={styles.sectionTitle}>Proof of Borrowing</Text>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Attach Proof (Photos or Videos)</Text>
+                    <TouchableOpacity onPress={pickProof} style={styles.attachButton}>
+                        <MaterialCommunityIcons name="attachment" size={24} color="#5E76FF" />
+                        <Text style={styles.attachButtonText}>
+                            {borrow_proof_image_base64.length > 0
+                                ? `${borrow_proof_image_base64.length} File(s) Attached`
+                                : 'Select Files'}
+                        </Text>
+                    </TouchableOpacity>
+                    {borrow_proof_image_base64.length > 0 && (
+                        <ScrollView horizontal style={styles.proofsPreviewScroll}>
+                            <View style={styles.proofsPreviewContainer}>
+                                {borrow_proof_image_base64.map((base64String, index) => (
+                                    <View key={index} style={styles.proofPreviewItem}>
+                                        {/* Display thumbnail for images, icon for videos/unknown */}
+                                        {base64String.startsWith('data:image') ? (
+                                            <Image source={{ uri: base64String }} style={styles.proofThumbnail} />
+                                        ) : base64String.startsWith('data:video') ? (
+                                            <MaterialCommunityIcons name="video" size={40} color="#555" />
+                                        ) : (
+                                            // Fallback for unknown type or if something went wrong
+                                            <MaterialCommunityIcons name="file-question" size={40} color="#555" />
+                                        )}
+                                        <TouchableOpacity onPress={() => removeProof(index)} style={styles.removeProofButton}>
+                                            <MaterialCommunityIcons name="close-circle" size={20} color="red" />
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </View>
+                        </ScrollView>
+                    )}
+                </View>
+                {/* End Proof of Borrowing Section */}
 
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity onPress={saveTransaction} style={[styles.submitButton, isSaving && styles.buttonDisabled]} disabled={isSaving}>
@@ -317,6 +478,59 @@ const styles = StyleSheet.create({
         color: '#D32F2F',
         fontSize: 12,
         marginTop: 4,
+    },
+    // Styles for Proof of Borrowing
+    attachButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: '#5E76FF',
+        borderRadius: 8,
+        paddingVertical: 12,
+        backgroundColor: '#EBF0FF',
+    },
+    attachButtonText: {
+        fontSize: 16,
+        color: '#5E76FF',
+        fontWeight: '500',
+        marginLeft: 10,
+    },
+    proofsPreviewScroll: {
+        marginTop: 10,
+        maxHeight: 120, // Limit height of horizontal scroll
+    },
+    proofsPreviewContainer: {
+        flexDirection: 'row', // Ensure items lay out horizontally
+        alignItems: 'center',
+        // When ScrollView is horizontal, its direct child (this View) should ideally have its width determined by its content,
+        // rather than taking 100% of the ScrollView width and pushing content off-screen.
+        // flexWrap: 'wrap' is counterproductive for horizontal ScrollViews.
+    },
+    proofPreviewItem: {
+        flexDirection: 'column', // Align content vertically
+        alignItems: 'center',
+        marginRight: 10,
+        marginBottom: 10, // Gives some vertical spacing
+        padding: 5,
+        borderWidth: 1,
+        borderColor: '#EEE',
+        borderRadius: 8,
+        backgroundColor: '#F9F9F9',
+        position: 'relative',
+    },
+    proofThumbnail: {
+        width: 60,
+        height: 60,
+        borderRadius: 5,
+        resizeMode: 'cover',
+    },
+    removeProofButton: {
+        position: 'absolute',
+        top: -8,
+        right: -8,
+        backgroundColor: 'white',
+        borderRadius: 15,
     },
 });
 
