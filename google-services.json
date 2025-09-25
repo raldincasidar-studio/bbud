@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "919784082007",
+    "project_id": "b-bud-fcm",
+    "storage_bucket": "b-bud-fcm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919784082007:android:0c599cc3aaf8386c4af112",
+        "android_client_info": {
+          "package_name": "com.bbud.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCecLhlEtEWSey3gNPjGgA6XAD70229tGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
