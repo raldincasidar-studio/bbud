@@ -42,10 +42,10 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
             return null;
         }
 
-        // 4. Get the Expo Push Token
-        // Use the default experience ID. Replace with your own if you have a custom one.
-        const token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log('Expo Push Token:', token);
+        // 4. Get the native device push token (FCM token on Android)
+        // This is needed for sending notifications directly via FCM/APNs.
+        const token = (await Notifications.getDevicePushTokenAsync()).data;
+        console.log('Device Push Token:', token);
 
         // 5. Set Android-specific channel settings
         if (Platform.OS === 'android') {
