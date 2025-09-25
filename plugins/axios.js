@@ -1,12 +1,12 @@
 // plugins/axios.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, { AxiosRequestConfig } from 'axios'; // Import AxiosError
+import axios from 'axios'; // Import AxiosError
 import { Alert } from 'react-native'; // Keep Alert for unauthorized, but remove others
 
 // Axios instance with base URL
 const apiClient = axios.create({
-  // baseURL: 'https://b-bud-new.vercel.app', // Your actual API URL
-  baseURL: 'https://21a6562ce1e5.ngrok-free.app', // Your ngrok URL is correct here
+  baseURL: 'https://b-bud-new.vercel.app', // Your actual API URL
+//   baseURL: 'https://869813f7d00c.ngrok-free.app', // Your ngrok URL is correct here
   timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Content-Type': 'application/json',
@@ -29,9 +29,9 @@ apiClient.interceptors.request.use(async (config) => {
 
 
 // Updated apiRequest function
-export default async function apiRequest(method: string, path: string, requestPayload?: any, config: AxiosRequestConfig = {}) {
+export default async function apiRequest(method, path, requestPayload, config = {}) {
   try {
-    const requestConfig: AxiosRequestConfig = {
+    const requestConfig = {
       method,
       url: path,
       ...config, // Apply any additional config passed in (e.g., custom headers)

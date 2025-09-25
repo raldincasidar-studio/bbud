@@ -1,3 +1,4 @@
+import { registerForPushNotificationsAsync } from '@/lib/notifications'; // Import the new function
 import apiRequest from '@/plugins/axios'; // Adjust path
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For getting resident ID
@@ -43,6 +44,13 @@ const NotificationsScreen = () => {
         };
         loadResidentId();
     }, []);
+
+    // Effect to register for push notifications
+    useEffect(() => {
+        if (residentId) {
+            registerForPushNotificationsAsync();
+        }
+    }, [residentId]);
 
     const fetchNotifications = useCallback(async (page = 1, isRefreshing = false) => {
         if (!residentId) {
