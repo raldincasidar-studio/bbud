@@ -102,8 +102,8 @@ const relationshipPickerOptions = [
     { label: "Brother", value: "Brother" },
     { label: "Sister", value: "Sister" },
     { label: "Grandfather", value: "Grandfather" },
-    { label: "Grandmother", value: "Grandmother" },
-    { label: "Grandchild", value: "Grandchild" },
+    { label: "Grandmother", value: "Grandmother" }, // Corrected in previous step
+    { label: "Grandchild", value: "Grandchild" }, // Corrected in previous step
     { label: "Uncle", value: "Uncle" },
     { label: "Aunt", value: "Aunt" },
     { label: "Cousin", value: "Cousin" },
@@ -660,9 +660,35 @@ export default function SignupScreen() {
                 return member;
             });
 
+            // Normalize Head's name and address fields to lowercase for case-insensitive comparison on the backend
+            const submissionPayload = { ...payload };
+
+            submissionPayload.first_name = submissionPayload.first_name.toLowerCase();
+            if (submissionPayload.middle_name) {
+                submissionPayload.middle_name = submissionPayload.middle_name.toLowerCase();
+            } else {
+                submissionPayload.middle_name = null;
+            }
+            submissionPayload.last_name = submissionPayload.last_name.toLowerCase();
+            if (submissionPayload.suffix) {
+                submissionPayload.suffix = submissionPayload.suffix.toLowerCase();
+            } else {
+                submissionPayload.suffix = null;
+            }
+
+            submissionPayload.address_house_number = submissionPayload.address_house_number.toLowerCase();
+            if (submissionPayload.address_unit_room_apt_number) {
+                submissionPayload.address_unit_room_apt_number = submissionPayload.address_unit_room_apt_number.toLowerCase();
+            } else {
+                submissionPayload.address_unit_room_apt_number = null;
+            }
+            submissionPayload.address_street = submissionPayload.address_street.toLowerCase();
+            submissionPayload.address_subdivision_zone = submissionPayload.address_subdivision_zone.toLowerCase();
+            submissionPayload.address_city_municipality = submissionPayload.address_city_municipality.toLowerCase();
+
 
             try {
-                const response = await apiRequest('POST', '/api/residents', payload);
+                const response = await apiRequest('POST', '/api/residents', submissionPayload);
 
                 // If apiRequest returns null (e.g., due to a network error handled internally, though it now re-throws)
                 if (!response || !response.message) {

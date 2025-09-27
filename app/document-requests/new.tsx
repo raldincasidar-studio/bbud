@@ -503,8 +503,7 @@ const NewDocumentRequestScreen = () => {
                 if (isRequired(value)) error = 'Please select a document type.';
                 break;
             case 'purpose':
-                // Purpose is optional for Certificate of Oneness as per admin side
-                if (form.request_type !== 'Certificate of Oneness' && isRequired(value)) error = 'A purpose for the request is required.';
+                if (isRequired(value)) error = 'A purpose for the request is required.';
                 break;
             case 'details.male_partner': // Validating the resident object
                 if (form.request_type === 'Certificate of Cohabitation' && isRequired(value)) error = "Male partner is required.";
@@ -624,10 +623,9 @@ const NewDocumentRequestScreen = () => {
                     updatedForm.details = { badac_certificate: '' };
                 } else if (value === 'Barangay Permit (for installations)') {
                     updatedForm.details = { installation_construction_repair: '', project_site: '' };
-                } else if (value === 'Certificate of Oneness') {
-                    updatedForm.purpose = 'For records purposes'; // Default purpose for Oneness if not set
-                }
-                // For 'Certificate of Good Moral', 'Certificate of Solo Parent', 'Certificate of Residency',
+                } //else if (value === 'Certificate of Oneness') {
+                //     updatedForm.purpose = 'For records purposes'; 
+                // }  For 'Certificate of Good Moral', 'Certificate of Solo Parent', 'Certificate of Residency', 'Certificate of Oneness'
                 // updatedForm.details will correctly remain an empty object from the `details: isRequestTypeChange ? {} : prev.details` line.
             }
 
@@ -685,10 +683,7 @@ const NewDocumentRequestScreen = () => {
             request_type: form.request_type,
         };
 
-        // Purpose is required unless it's Certificate of Oneness
-        if (form.request_type !== 'Certificate of Oneness') {
-            fieldsToValidate.purpose = form.purpose;
-        }
+        fieldsToValidate.purpose = form.purpose;
 
         if (form.request_type) {
             const details = form.details;
@@ -832,6 +827,13 @@ const NewDocumentRequestScreen = () => {
 
     const renderDynamicFields = () => {
         if (!form.request_type) return null;
+
+        // Define a dynamic placeholder for the purpose field
+        let purposePlaceholder = "Be specific (e.g., For hospital application, For new job application)";
+        if (form.request_type === 'Certificate of Oneness') {
+            purposePlaceholder = "This Certificate of Oneness will be used as an official supporting document for school or administrative requirements, such as enrollment, scholarship applications, graduation clearance, employment needs, or for maintaining accurate personal records.";
+        }
+
 
         return (
             <View>
@@ -1053,11 +1055,11 @@ const NewDocumentRequestScreen = () => {
                 <View style={[styles.inputContainer, { paddingTop: 10 }]}>
                     <Text style={styles.label}>Purpose of this Request <Text style={styles.requiredStar}>*</Text></Text>
                     <TextInput
-                        placeholder="Be specific (e.g., For hospital application, For new job application)"
+                        placeholder={purposePlaceholder}
                         placeholderTextColor="#A9A9A9"
                         value={form.purpose}
                         onChangeText={(val) => handleFormChange('purpose', val)}
-                        style={[styles.textInput, { height: 100 }, !!errors.purpose && styles.inputError]}
+                        style={[styles.textInput, { height: 230 }, !!errors.purpose && styles.inputError]}
                         multiline
                         textAlignVertical="top"
                     />
