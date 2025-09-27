@@ -158,6 +158,7 @@ interface ResidentSearchAndSelectInputProps {
     onSelectResident: (resident: Resident | null) => void;
     error?: string;
     placeholder?: string;
+    restrictToMembersList?: Resident[]; // NEW PROP: List of residents to filter from instead of global search
 }
 
 const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> = ({
@@ -166,6 +167,7 @@ const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> 
     onSelectResident,
     error,
     placeholder = "Search for a resident...",
+    restrictToMembersList, // DESTRUCTURE NEW PROP
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Resident[]>([]);
@@ -175,7 +177,7 @@ const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> 
 
     // Debounced function for fetching residents
     const fetchResidents = useCallback(
-        debounce(async (query: string) => {
+        debounce(async (query: string, sourceList?: Resident[]) => { // ADD sourceList PARAMETER
             console.log(`[MOBILE SEARCH] fetchResidents called with query: "${query}"`);
             setApiError(null); // Clear previous API errors on new search
             setSearchResults([]); // Clear previous search results
@@ -187,36 +189,45 @@ const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> 
             }
             setIsLoading(true);
             try {
-                const response = await apiRequest('GET', '/api/residents/search', { q: query });
-                console.log('[MOBILE SEARCH] API response received:', JSON.stringify(response));
+                let results: Resident[] = [];
+                if (sourceList && sourceList.length > 0) { // If restrictToMembersList is provided and not empty
+                    console.log('[MOBILE SEARCH] Filtering from provided member list.');
+                    results = sourceList.filter(resident =>
+                        `${resident.first_name} ${resident.last_name}`.toLowerCase().includes(query.toLowerCase())
+                    );
+                } else { // Original behavior: API call for global search
+                    console.log('[MOBILE SEARCH] Performing global API search.');
+                    const response = await apiRequest('GET', '/api/residents/search', { q: query });
+                    console.log('[MOBILE SEARCH] API response received:', JSON.stringify(response));
 
-                if (response && Array.isArray(response.residents)) {
-                    const mappedResults: Resident[] = response.residents.map((r: any) => {
-                        return {
-                            _id: r._id,
-                            first_name: r.first_name || '', // Ensure strings are not null/undefined
-                            last_name: r.last_name || '',
-                            // Ensure birthdate is handled defensively, backend sends `date_of_birth` and aliases to `birthdate`
-                            birthdate: r.birthdate || r.date_of_birth,
-                            address_house_number: r.address_house_number || '',
-                            address_street: r.address_street || '',
-                            address_subdivision_zone: r.address_subdivision_zone || '',
-                            // Include other fields from backend response if needed for UI or logic
-                        };
-                    });
-                    setSearchResults(mappedResults);
-                    console.log(`[MOBILE SEARCH] Mapped ${mappedResults.length} results. First result:`, JSON.stringify(mappedResults[0]));
-                    if (mappedResults.length === 0) {
-                        setApiError("No residents found matching your search criteria.");
+                    if (response && Array.isArray(response.residents)) {
+                        results = response.residents.map((r: any) => {
+                            return {
+                                _id: r._id,
+                                first_name: r.first_name || '', // Ensure strings are not null/undefined
+                                last_name: r.last_name || '',
+                                // Ensure birthdate is handled defensively, backend sends `date_of_birth` and aliases to `birthdate`
+                                birthdate: r.birthdate || r.date_of_birth,
+                                address_house_number: r.address_house_number || '',
+                                address_street: r.address_street || '',
+                                address_subdivision_zone: r.address_subdivision_zone || '',
+                                // Include other fields from backend response if needed for UI or logic
+                            };
+                        });
+                    } else {
+                        console.log('[MOBILE SEARCH] Invalid API response or empty "residents" array. Clearing results.');
+                        // If the backend returns an error message in the response body, display it
+                        if (response && response.error) {
+                            setApiError(response.message || response.error);
+                        } else if (query.trim().length >= 2) {
+                            setApiError("No residents found matching your search criteria.");
+                        }
                     }
-                } else {
-                    console.log('[MOBILE SEARCH] Invalid API response or empty "residents" array. Clearing results.');
-                    // If the backend returns an error message in the response body, display it
-                    if (response && response.error) {
-                        setApiError(response.message || response.error);
-                    } else if (query.trim().length >= 2) {
-                        setApiError("No residents found matching your search criteria.");
-                    }
+                }
+
+                setSearchResults(results);
+                if (results.length === 0 && !apiError) {
+                    setApiError(sourceList && sourceList.length > 0 ? "No household members found matching your search criteria." : "No residents found matching your search criteria.");
                 }
             } catch (e: any) {
                 console.error("[MOBILE SEARCH] Error searching residents:", e);
@@ -252,6 +263,7 @@ const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> 
         console.log(`[MOBILE SEARCH useEffect] selectedResident: ${selectedResident ? selectedResident._id : 'null'}`);
         console.log(`[MOBILE SEARCH useEffect] isLoading: ${isLoading}, apiError: ${apiError}`);
         console.log(`[MOBILE SEARCH useEffect] searchResults.length: ${searchResults.length}`);
+        console.log(`[MOBILE SEARCH useEffect] restrictToMembersList.length: ${restrictToMembersList ? restrictToMembersList.length : 0}`);
 
         // Only fetch if no resident is currently selected and the query is long enough
         const shouldFetch = !selectedResident && searchQuery.trim().length >= 2;
@@ -259,7 +271,7 @@ const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> 
         if (Platform.OS === 'ios') {
             if (modalVisible && shouldFetch) {
                 console.log('[MOBILE SEARCH useEffect] iOS modal visible and should fetch, triggering fetchResidents.');
-                fetchResidents(searchQuery);
+                fetchResidents(searchQuery, restrictToMembersList); // PASS restrictToMembersList HERE
             } else if (!modalVisible) {
                 // If iOS modal is closed, clear results and errors
                 console.log('[MOBILE SEARCH useEffect] iOS modal not visible, clearing state.');
@@ -269,7 +281,7 @@ const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> 
         } else { // Android behavior
             if (shouldFetch) {
                 console.log('[MOBILE SEARCH useEffect] Android platform and should fetch, triggering fetchResidents.');
-                fetchResidents(searchQuery);
+                fetchResidents(searchQuery, restrictToMembersList); // PASS restrictToMembersList HERE
             } else {
                 // For Android, if conditions for fetch are not met, clear results/errors
                 console.log('[MOBILE SEARCH useEffect] Android platform, not fetching, clearing state.');
@@ -277,7 +289,7 @@ const ResidentSearchAndSelectInput: React.FC<ResidentSearchAndSelectInputProps> 
                 setApiError(null);
             }
         }
-    }, [searchQuery, modalVisible, selectedResident, fetchResidents]);
+    }, [searchQuery, modalVisible, selectedResident, fetchResidents, restrictToMembersList]); // ADD restrictToMembersList to dependencies
 
 
     const handleSelect = (resident: Resident) => {
@@ -466,6 +478,8 @@ const NewDocumentRequestScreen = () => {
 
     // NEW STATE: To store household members for the 'Requesting For' field
     const [householdMembers, setHouseholdMembers] = useState<Resident[]>([]);
+    // NEW STATE: For cohabitation partners search scope
+    const [cohabitationHouseholdMembers, setCohabitationHouseholdMembers] = useState<Resident[]>([]);
 
     useEffect(() => {
         const loadInitialDataAndHousehold = async () => {
@@ -481,34 +495,50 @@ const NewDocumentRequestScreen = () => {
                     // Fetch household members immediately after setting loggedInUserData
                     try {
                         const response = await apiRequest('GET', `/api/residents/${parsedUserData._id}/household-members`);
+                        
+                        let finalHouseholdMembers: Resident[] = [];
+
+                        // Always add the logged-in user themselves to the list, mapping birthdate explicitly
+                        finalHouseholdMembers.push({
+                            _id: parsedUserData._id,
+                            first_name: parsedUserData.first_name,
+                            last_name: parsedUserData.last_name,
+                            birthdate: parsedUserData.birthdate || parsedUserData.date_of_birth, // Ensure birthdate is mapped
+                            address_house_number: parsedUserData.address_house_number,
+                            address_street: parsedUserData.address_street,
+                            address_subdivision_zone: parsedUserData.address_subdivision_zone,
+                        });
+
                         if (response && Array.isArray(response.household_members)) {
-                            // Ensure the logged-in user is always in the list even if the API somehow misses them
-                            const selfIncluded = response.household_members.find(
-                                member => member._id === parsedUserData._id
-                            );
-                            if (!selfIncluded) {
-                                setHouseholdMembers([
-                                    { _id: parsedUserData._id, first_name: parsedUserData.first_name, last_name: parsedUserData.last_name },
-                                    ...response.household_members
-                                ]);
-                            } else {
-                                setHouseholdMembers(response.household_members);
-                            }
-                        } else {
-                            // Fallback: if no household members are returned or empty array, just include the logged-in user
-                            setHouseholdMembers([{
-                                _id: parsedUserData._id,
-                                first_name: parsedUserData.first_name,
-                                last_name: parsedUserData.last_name
-                            }]);
+                            // Add other household members from the API response, avoiding duplicates
+                            response.household_members.forEach((member: any) => { // Use 'any' for raw member data
+                                const mappedMember: Resident = {
+                                    _id: member._id,
+                                    first_name: member.first_name,
+                                    last_name: member.last_name,
+                                    birthdate: member.birthdate || member.date_of_birth, // Ensure mapping here too
+                                    address_house_number: member.address_house_number,
+                                    address_street: member.address_street,
+                                    address_subdivision_zone: member.address_subdivision_zone,
+                                };
+                                if (!finalHouseholdMembers.some(existing => existing._id === mappedMember._id)) {
+                                    finalHouseholdMembers.push(mappedMember);
+                                }
+                            });
                         }
+                        setHouseholdMembers(finalHouseholdMembers);
+
                     } catch (error) {
                         console.error("Failed to fetch household members:", error);
                         // On error, default to just the logged-in user
                         setHouseholdMembers([{
                             _id: parsedUserData._id,
                             first_name: parsedUserData.first_name,
-                            last_name: parsedUserData.last_name
+                            last_name: parsedUserData.last_name,
+                            birthdate: parsedUserData.birthdate || parsedUserData.date_of_birth, // Ensure birthdate is mapped
+                            address_house_number: parsedUserData.address_house_number,
+                            address_street: parsedUserData.address_street,
+                            address_subdivision_zone: parsedUserData.address_subdivision_zone,
                         }]);
                     }
 
@@ -525,6 +555,78 @@ const NewDocumentRequestScreen = () => {
         };
         loadInitialDataAndHousehold();
     }, []); // Empty dependency array means this runs once on mount
+
+    // NEW useEffect to fetch cohabitation household members for restricted search
+    useEffect(() => {
+        const fetchCohabitationHousehold = async () => {
+            if (form.request_type === 'Certificate of Cohabitation' && form.requestor_resident_id) {
+                try {
+                    const requestorId = form.requestor_resident_id;
+                    // Using the same endpoint, which now provides birthdate and address fields
+                    const response = await apiRequest('GET', `/api/residents/${requestorId}/household-members`);
+                    let fetchedMembers: Resident[] = [];
+
+                    if (response && Array.isArray(response.household_members)) {
+                        // Crucial change here: Map backend data to ensure 'birthdate' is always present
+                        fetchedMembers = response.household_members.map((member: any) => ({
+                            _id: member._id,
+                            first_name: member.first_name,
+                            last_name: member.last_name,
+                            birthdate: member.birthdate || member.date_of_birth, // Ensure birthdate is mapped
+                            address_house_number: member.address_house_number,
+                            address_street: member.address_street,
+                            address_subdivision_zone: member.address_subdivision_zone,
+                        }));
+                    }
+
+                    // Get the full resident object for the requestor from `householdMembers` state
+                    const requestorDetails = householdMembers.find(member => member._id === requestorId);
+
+                    let combinedMembersForSearch: Resident[] = [];
+                    if (requestorDetails) {
+                        // Ensure requestorDetails also has birthdate (this should already be correct from loadInitialDataAndHousehold)
+                        combinedMembersForSearch.push({
+                            _id: requestorDetails._id,
+                            first_name: requestorDetails.first_name,
+                            last_name: requestorDetails.last_name,
+                            birthdate: requestorDetails.birthdate, // Should be fine if loadInitialDataAndHousehold mapped it
+                            address_house_number: requestorDetails.address_house_number,
+                            address_street: requestorDetails.address_street,
+                            address_subdivision_zone: requestorDetails.address_subdivision_zone,
+                        });
+                    }
+                    // Add other household members, ensuring no duplicates with the requestor
+                    fetchedMembers.forEach(member => {
+                        if (!combinedMembersForSearch.some(existing => existing._id === member._id)) {
+                            combinedMembersForSearch.push(member);
+                        }
+                    });
+
+                    setCohabitationHouseholdMembers(combinedMembersForSearch);
+
+                } catch (error) {
+                    console.error("Failed to fetch cohabitation household members for search:", error);
+                    setCohabitationHouseholdMembers([]);
+                }
+            } else {
+                setCohabitationHouseholdMembers([]); // Clear when not cohabitation or no requestor
+                // Clear selected partners and their birthdates if document type changes from cohabitation
+                if (form.details.male_partner !== null || form.details.female_partner !== null) {
+                    setForm(prev => ({
+                        ...prev,
+                        details: {
+                            ...prev.details,
+                            male_partner: null,
+                            male_partner_birthdate: '',
+                            female_partner: null,
+                            female_partner_birthdate: '',
+                        }
+                    }));
+                }
+            }
+        };
+        fetchCohabitationHousehold();
+    }, [form.request_type, form.requestor_resident_id, householdMembers]); // Dependency on householdMembers is crucial here
 
     const validateField = (field: string, value: any): string => {
         let error = '';
@@ -885,7 +987,8 @@ const NewDocumentRequestScreen = () => {
                             selectedResident={form.details.male_partner}
                             onSelectResident={(resident) => handleDetailChange('male_partner', resident)}
                             error={errors['details.male_partner']}
-                            placeholder="Search for male partner..."
+                            placeholder="Search from household..."
+                            restrictToMembersList={cohabitationHouseholdMembers} // UPDATED: Pass restricted list
                         />
                         <DatePickerInput
                             label="Birthdate of Male Partner"
@@ -898,7 +1001,8 @@ const NewDocumentRequestScreen = () => {
                             selectedResident={form.details.female_partner}
                             onSelectResident={(resident) => handleDetailChange('female_partner', resident)}
                             error={errors['details.female_partner']}
-                            placeholder="Search for female partner..."
+                            placeholder="Search from household..."
+                            restrictToMembersList={cohabitationHouseholdMembers} // UPDATED: Pass restricted list
                         />
                         <DatePickerInput
                             label="Birthdate of Female Partner"
