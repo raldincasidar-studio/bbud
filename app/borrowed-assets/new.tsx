@@ -2,7 +2,8 @@ import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
-import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
+import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -32,6 +33,11 @@ interface LoggedInUser {
     name: string;
 }
 
+// Constants for attachment limits
+const MAX_ATTACHMENTS = 5;
+const MAX_FILE_SIZE_MB = 50; // 50MB per file (adjust as per your backend limits and mobile performance)
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 // Reusable component for displaying validation errors
 const ErrorMessage = ({ error }: { error?: string }) => {
     if (!error) return null;
@@ -52,17 +58,17 @@ const NewBorrowAssetScreen = () => {
     const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(null);
     const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
     
-    // State for proofs, renamed to borrow_proof_image_base64 as per backend
-    const [borrow_proof_image_base64, setBorrow_proof_image_base64] = useState<string[]>([]);
+    // MODIFIED: State for proofs, now an array of Base64 strings
+    const [borrow_proof_attachments_base64, setBorrow_proof_attachments_base64] = useState<string[]>([]);
     // Using useRef to get the current state value inside saveTransaction without re-rendering issues
-    const borrowProofImageBase64Ref = useRef(borrow_proof_image_base64); 
+    const borrowProofAttachmentsBase64Ref = useRef(borrow_proof_attachments_base64); 
     useEffect(() => {
-        borrowProofImageBase64Ref.current = borrow_proof_image_base64;
-        console.log("borrow_proof_image_base64 state updated:", borrow_proof_image_base64.length, "items.");
-        if (borrow_proof_image_base64.length > 0) {
-            console.log("First proof in state:", borrow_proof_image_base64[0].substring(0, 50) + "...");
+        borrowProofAttachmentsBase64Ref.current = borrow_proof_attachments_base64;
+        console.log("borrow_proof_attachments_base64 state updated:", borrow_proof_attachments_base64.length, "items.");
+        if (borrow_proof_attachments_base64.length > 0) {
+            console.log("First proof in state (first 50 chars):", borrow_proof_attachments_base64[0].substring(0, 50) + "...");
         }
-    }, [borrow_proof_image_base64]);
+    }, [borrow_proof_attachments_base64]);
 
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
@@ -165,6 +171,13 @@ const NewBorrowAssetScreen = () => {
     const pickProof = async () => {
         console.log("pickProof function called.");
 
+        const currentProofsCount = borrow_proof_attachments_base64.length;
+
+        if (currentProofsCount >= MAX_ATTACHMENTS) {
+            Alert.alert('Attachment Limit Reached', `You can attach a maximum of ${MAX_ATTACHMENTS} files as proof.`);
+            return;
+        }
+
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         console.log("Permission status:", status);
 
@@ -173,15 +186,16 @@ const NewBorrowAssetScreen = () => {
             return;
         }
 
-        console.log("Permissions granted, launching image library...");
+        console.log("Permissions granted, launching media library...");
 
         let result;
         try {
             result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.All, // Allow all media types (images and videos)
-                allowsMultipleSelection: true,
+                allowsMultipleSelection: true, // Allow selecting multiple files
                 quality: 0.7,
-                base64: true,
+                // We'll handle base64 manually for all types to ensure consistency and proper video handling
+                base64: false, 
             });
             console.log("ImagePicker Result:", JSON.stringify(result, null, 2));
         } catch (error) {
@@ -191,46 +205,103 @@ const NewBorrowAssetScreen = () => {
         }
         
         if (result.canceled) {
-            console.log("Image picker was canceled.");
+            console.log("Media picker was canceled.");
         } else if (result.assets && result.assets.length > 0) {
             console.log("Assets found:", result.assets.length);
 
-            const newProofs = await Promise.all(result.assets.map(async (asset, index) => {
+            const remainingSlots = MAX_ATTACHMENTS - currentProofsCount;
+            // Take only up to remaining slots, or fewer if user selected fewer
+            const selectedAssets = result.assets.slice(0, remainingSlots); 
+
+            if (result.assets.length > remainingSlots) {
+                Alert.alert(
+                    'Attachment Limit',
+                    `You selected ${result.assets.length} files, but only ${remainingSlots} more can be added. Only the first ${remainingSlots} files will be attached.`
+                );
+            }
+
+            const newProofs = await Promise.all(selectedAssets.map(async (asset, index) => {
                 console.log(`--- Processing asset ${index + 1} ---`);
                 console.log("  Asset URI:", asset.uri);
-                console.log("  Asset MediaType (from Expo):", asset.mediaType); 
+                console.log("  Asset MediaType (from Expo):", asset.mediaType);
                 console.log("  Asset MimeType (from Expo):", asset.mimeType);
-                console.log("  Is asset.base64 a string?", typeof asset.base64 === 'string');
-                console.log("  Length of asset.base64:", asset.base64 ? asset.base64.length : 'N/A');
 
-                // Ensure base64 data is present and a valid string
-                if (asset.base64 && typeof asset.base64 === 'string' && asset.base64.length > 0) {
-                    let detectedMimeType = 'application/octet-stream'; // Default generic binary
-                    
-                    if (asset.mimeType) {
-                        detectedMimeType = asset.mimeType;
-                    } else if (asset.mediaType === ImagePicker.MediaType.Video) {
-                        detectedMimeType = 'video/mp4'; // Common video type
-                    } else { // Assume image, try to get from URI or default
-                        const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
-                        if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
-                            detectedMimeType = 'image/jpeg';
-                        } else if (fileExtension === 'png') {
-                            detectedMimeType = 'image/png';
-                        } else if (fileExtension === 'gif') {
-                            detectedMimeType = 'image/gif';
-                        } else {
-                            detectedMimeType = 'image/jpeg'; // Fallback for image
-                        }
+                let base64Data: string | null = null;
+                let detectedMimeType = asset.mimeType || 'application/octet-stream'; // Default or from asset
+
+                if (!asset.uri) {
+                    console.error(`  [LOG] ERROR: Asset URI is missing for asset ${index + 1}. Skipping.`);
+                    return null;
+                }
+
+                try {
+                    const fileInfo = await FileSystem.getInfoAsync(asset.uri);
+                    console.log(`  [LOG] FileInfo for URI: ${JSON.stringify(fileInfo)}`);
+
+                    if (!fileInfo.exists) {
+                        console.error(`  [LOG] ERROR: File does not exist at URI: ${asset.uri}`);
+                        Alert.alert("Error", `File does not exist at path: ${asset.uri}`);
+                        return null;
                     }
 
-                    const dataUri = `data:${detectedMimeType};base64,${asset.base64}`;
-                    console.log("  Generated data URI (first 50 chars):", dataUri.substring(0, 50));
-                    console.log("  Generated data URI (length):", dataUri.length);
+                    if (fileInfo.isDirectory) {
+                        console.error(`  [LOG] ERROR: URI points to a directory, not a file: ${asset.uri}`);
+                        Alert.alert("Error", `URI points to a directory: ${asset.uri}`);
+                        return null;
+                    }
+
+                    if (fileInfo.size && fileInfo.size > MAX_FILE_SIZE_BYTES) {
+                        console.warn(`  [LOG] WARNING: File size (${(fileInfo.size / (1024 * 1024)).toFixed(2)} MB) exceeds ${MAX_FILE_SIZE_MB}MB limit. Skipping.`);
+                        Alert.alert("File Too Large", `The selected file "${asset.uri.split('/').pop()}" is ${(fileInfo.size / (1024 * 1024)).toFixed(2)} MB, which exceeds the ${MAX_FILE_SIZE_MB}MB limit. Please select a smaller file.`);
+                        return null; // Skip this asset if too large
+                    }
+
+                    base64Data = await FileSystem.readAsStringAsync(asset.uri, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    });
+                    console.log(`  [LOG] Manual base64 read completed for ${asset.mediaType}. Length: ${base64Data ? base64Data.length : '0'}`);
+                    
+                    if (!base64Data || base64Data.length === 0) {
+                        console.warn("  [LOG] Manual base64 read returned null or empty string.");
+                    }
+
+                    // Refine MIME type if not explicitly provided by ImagePicker or if it's a common video type
+                    if (!asset.mimeType) { 
+                        if (asset.mediaType === ImagePicker.MediaType.Video) {
+                            // Attempt to guess common video types by extension or default to mp4
+                            const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
+                            if (fileExtension === 'mov') detectedMimeType = 'video/quicktime';
+                            else if (fileExtension === 'avi') detectedMimeType = 'video/x-msvideo';
+                            else detectedMimeType = 'video/mp4'; // Common video type fallback
+                            console.log(`  [LOG] Detected video, setting mimeType to: ${detectedMimeType}`);
+                        } else if (asset.mediaType === ImagePicker.MediaType.Image) {
+                            const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
+                            if (fileExtension === 'jpg' || fileExtension === 'jpeg') detectedMimeType = 'image/jpeg';
+                            else if (fileExtension === 'png') detectedMimeType = 'image/png';
+                            else if (fileExtension === 'gif') detectedMimeType = 'image/gif';
+                            else if (fileExtension === 'webp') detectedMimeType = 'image/webp';
+                            else detectedMimeType = 'image/jpeg'; // General image fallback
+                            console.log(`  [LOG] Detected image, setting mimeType to: ${detectedMimeType}`);
+                        } else {
+                            console.log("  [LOG] Unknown media type, defaulting mimeType.");
+                        }
+                    } else {
+                        console.log(`  [LOG] Using existing asset.mimeType: ${asset.mimeType}`);
+                    }
+
+                } catch (readError: any) { // Explicitly type readError as any for easier access to .message
+                    console.error(`  [LOG] ERROR: Error reading file ${asset.uri} for base64 encoding:`, readError);
+                    Alert.alert("Error", `Could not read selected file: ${(readError as Error).message}`);
+                    return null; // Skip this asset if reading fails
+                }
+                
+                if (base64Data && base64Data.length > 0) {
+                    const dataUri = `data:${detectedMimeType};base64,${base64Data}`;
+                    console.log("  [LOG] Generated data URI (first 50 chars):", dataUri.substring(0, 50));
+                    console.log("  [LOG] Generated data URI (length):", dataUri.length);
                     return dataUri;
                 } else {
-                    console.warn(`Asset ${index + 1} missing valid base64 data or empty string, skipping:`, asset.uri);
-                    console.warn("  Problematic asset.base64:", asset.base64);
+                    console.warn(`  [LOG] Asset ${index + 1} still missing valid base64 data after processing (base64Data was null or empty). Skipping:`, asset.uri);
                     return null;
                 }
             }));
@@ -241,9 +312,9 @@ const NewBorrowAssetScreen = () => {
                 console.log("First filtered proof (first 50 chars):", proofsToAdd[0].substring(0, 50));
             }
 
-            setBorrow_proof_image_base64(prev => {
+            setBorrow_proof_attachments_base64(prev => {
                 const updatedProofs = [...prev, ...proofsToAdd];
-                console.log("Proofs state AFTER setBorrow_proof_image_base64 (total count):", updatedProofs.length);
+                console.log("Proofs state AFTER setBorrow_proof_attachments_base64 (total count):", updatedProofs.length);
                 return updatedProofs;
             });
         } else if (!result.canceled && (!result.assets || result.assets.length === 0)) {
@@ -251,8 +322,23 @@ const NewBorrowAssetScreen = () => {
         }
     };
 
+    // NEW: Function to remove a specific proof by index
     const removeProof = (indexToRemove: number) => {
-        setBorrow_proof_image_base64(prev => prev.filter((_, index) => index !== indexToRemove));
+        Alert.alert(
+            "Remove Attachment",
+            "Are you sure you want to remove this attachment?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Remove",
+                    style: "destructive",
+                    onPress: () => {
+                        setBorrow_proof_attachments_base64(prev => prev.filter((_, index) => index !== indexToRemove));
+                        Alert.alert("Removed", "Attachment removed successfully.");
+                    },
+                },
+            ]
+        );
     };
 
     const saveTransaction = async () => {
@@ -272,9 +358,10 @@ const NewBorrowAssetScreen = () => {
 
         setIsSaving(true);
         try {
-            console.log('Current borrow_proof_image_base64 state via ref before sending:', borrowProofImageBase64Ref.current.length, 'proofs');
-            if (borrowProofImageBase64Ref.current.length > 0) {
-                console.log('First proof in ref (first 50 chars):', borrowProofImageBase64Ref.current[0].substring(0, 50));
+            // MODIFIED: Use borrowProofAttachmentsBase64Ref.current (the array)
+            console.log('Current borrow_proof_attachments_base64 state via ref before sending:', borrowProofAttachmentsBase64Ref.current.length, 'proofs');
+            if (borrowProofAttachmentsBase64Ref.current.length > 0) {
+                console.log('First proof in ref (first 50 chars):', borrowProofAttachmentsBase64Ref.current[0].substring(0, 50));
             }
 
             const payload = {
@@ -285,17 +372,15 @@ const NewBorrowAssetScreen = () => {
                 quantity_borrowed: parseInt(transaction.quantity_borrowed, 10),
                 expected_return_date: new Date(transaction.expected_return_date).toISOString(),
                 notes: transaction.notes.trim() || null,
-                // MODIFIED: Send only the first proof as a single string, or null,
-                // to match the expected format for the admin display.
-                borrow_proof_image_base64: borrowProofImageBase64Ref.current.length > 0
-                                            ? borrowProofImageBase64Ref.current[0]
-                                            : null,
+                // MODIFIED: Send ALL proofs as an array of strings.
+                // The backend must be updated to handle an array of base64 strings.
+                borrow_proof_attachments_base64: borrowProofAttachmentsBase64Ref.current, // Send the entire array
             };
             console.log('Borrow transaction payload being sent:', payload);
-            // Adjusted log to reflect the single string or null being sent
-            console.log('borrow_proof_image_base64 type in payload:', typeof payload.borrow_proof_image_base64);
-            if (typeof payload.borrow_proof_image_base64 === 'string') {
-                console.log('First proof in payload length (approx):', payload.borrow_proof_image_base64.length);
+            // Adjusted log to reflect the array being sent
+            console.log('borrow_proof_attachments_base64 type in payload:', Array.isArray(payload.borrow_proof_attachments_base64) ? 'array' : typeof payload.borrow_proof_attachments_base64);
+            if (Array.isArray(payload.borrow_proof_attachments_base64) && payload.borrow_proof_attachments_base64.length > 0) {
+                console.log('First proof in payload length (approx):', payload.borrow_proof_attachments_base64[0].length);
             }
 
 
@@ -319,6 +404,8 @@ const NewBorrowAssetScreen = () => {
     if (isLoadingData) {
         return <View style={styles.loaderContainerFullPage}><ActivityIndicator size="large" color="#0F00D7" /><Text style={styles.loadingText}>Loading Form...</Text></View>;
     }
+
+    const isAttachButtonDisabled = borrow_proof_attachments_base64.length >= MAX_ATTACHMENTS;
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -404,18 +491,22 @@ const NewBorrowAssetScreen = () => {
                 <Text style={styles.sectionTitle}>Proof of Borrowing</Text>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Attach Proof (Photos or Videos)</Text>
-                    <TouchableOpacity onPress={pickProof} style={styles.attachButton}>
-                        <MaterialCommunityIcons name="attachment" size={24} color="#5E76FF" />
-                        <Text style={styles.attachButtonText}>
-                            {borrow_proof_image_base64.length > 0
-                                ? `${borrow_proof_image_base64.length} File(s) Attached`
-                                : 'Select Files'}
+                    <TouchableOpacity 
+                        onPress={pickProof} 
+                        style={[styles.attachButton, isAttachButtonDisabled && styles.buttonDisabled]}
+                        disabled={isAttachButtonDisabled}
+                    >
+                        <MaterialCommunityIcons name="attachment" size={24} color={isAttachButtonDisabled ? '#A9B4FF' : '#5E76FF'} />
+                        <Text style={[styles.attachButtonText, isAttachButtonDisabled && { color: '#A9B4FF' }]}>
+                            {borrow_proof_attachments_base64.length > 0
+                                ? `${borrow_proof_attachments_base64.length} / ${MAX_ATTACHMENTS} File(s) Attached`
+                                : `Select Files (Max ${MAX_ATTACHMENTS})`}
                         </Text>
                     </TouchableOpacity>
-                    {borrow_proof_image_base64.length > 0 && (
+                    {borrow_proof_attachments_base64.length > 0 && (
                         <ScrollView horizontal style={styles.proofsPreviewScroll}>
                             <View style={styles.proofsPreviewContainer}>
-                                {borrow_proof_image_base64.map((base64String, index) => (
+                                {borrow_proof_attachments_base64.map((base64String, index) => (
                                     <View key={index} style={styles.proofPreviewItem}>
                                         {/* Display thumbnail for images, icon for videos/unknown */}
                                         {base64String.startsWith('data:image') ? (
@@ -503,9 +594,6 @@ const styles = StyleSheet.create({
     proofsPreviewContainer: {
         flexDirection: 'row', // Ensure items lay out horizontally
         alignItems: 'center',
-        // When ScrollView is horizontal, its direct child (this View) should ideally have its width determined by its content,
-        // rather than taking 100% of the ScrollView width and pushing content off-screen.
-        // flexWrap: 'wrap' is counterproductive for horizontal ScrollViews.
     },
     proofPreviewItem: {
         flexDirection: 'column', // Align content vertically

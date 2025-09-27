@@ -355,9 +355,10 @@ const ViewComplaintScreen = () => {
                         </>
                     ) : (
                         <>
-                            <TouchableOpacity onPress={() => toggleEditMode(true)} style={{ marginRight: 15 }}>
+                            {/* uncomment to enable edit mode */}
+                            {/* <TouchableOpacity onPress={() => toggleEditMode(true)} style={{ marginRight: 15 }}>
                                 <MaterialCommunityIcons name="pencil-outline" size={26} color="white" />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity onPress={showDeleteConfirmation} disabled={isDeleting}>
                                 {isDeleting ? <ActivityIndicator size="small" color="white" /> : <MaterialCommunityIcons name="delete-outline" size={26} color="white" />}
                             </TouchableOpacity>

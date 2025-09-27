@@ -136,7 +136,7 @@ export default function LoginScreen() { // Renamed component
           <>
             <View style={styles.logoContainer}>
               <Image source={require('@/assets/images/logo.png')} style={styles.logo} />
-              <Text style={styles.appName}>BBud</Text>
+              <Text style={styles.appName}>B-Bud</Text>
               <Text style={styles.loginPrompt}>Please login to continue</Text>
             </View>
 
