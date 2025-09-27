@@ -11,6 +11,7 @@ import {
     Alert,
     Image,
     KeyboardAvoidingView,
+    Modal,
     Platform,
     ScrollView,
     StyleSheet,
@@ -54,13 +55,12 @@ const NewBorrowAssetScreen = () => {
         notes: '',
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [aiNotesError, setAiNotesError] = useState<string>('');
 
     const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(null);
     const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
     
-    // MODIFIED: State for proofs, now an array of Base64 strings
     const [borrow_proof_attachments_base64, setBorrow_proof_attachments_base64] = useState<string[]>([]);
-    // Using useRef to get the current state value inside saveTransaction without re-rendering issues
     const borrowProofAttachmentsBase64Ref = useRef(borrow_proof_attachments_base64); 
     useEffect(() => {
         borrowProofAttachmentsBase64Ref.current = borrow_proof_attachments_base64;
@@ -73,6 +73,8 @@ const NewBorrowAssetScreen = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    // Re-added: State for AI validation modal
+    const [isAiValidating, setIsAiValidating] = useState(false);
 
     const validateField = (fieldName: string, value: any, currentTransactionState: typeof transaction, currentInventory: InventoryItem[]): string => {
         let error = '';
@@ -96,6 +98,11 @@ const NewBorrowAssetScreen = () => {
                     error = 'Please select an expected return date.';
                 } else if (new Date(value) < new Date(new Date().setHours(0, 0, 0, 0))) {
                     error = 'Return date cannot be in the past.';
+                }
+                break;
+            case 'notes': // Added: Basic validation for notes field (must not be empty)
+                if (!value.trim()) {
+                    error = 'Please provide a reason or notes for borrowing.';
                 }
                 break;
         }
@@ -158,6 +165,11 @@ const NewBorrowAssetScreen = () => {
                 validateField('quantity_borrowed', newTransactionState.quantity_borrowed, newTransactionState, inventoryItems);
             }
 
+            // Clear AI notes error when the user types in the notes field
+            if (field === 'notes') {
+                setAiNotesError('');
+            }
+
             return newTransactionState;
         });
     };
@@ -167,6 +179,7 @@ const NewBorrowAssetScreen = () => {
         handleInputChange('expected_return_date', dateString);
         setDatePickerVisibility(false);
     };
+
 
     const pickProof = async () => {
         console.log("pickProof function called.");
@@ -267,14 +280,14 @@ const NewBorrowAssetScreen = () => {
 
                     // Refine MIME type if not explicitly provided by ImagePicker or if it's a common video type
                     if (!asset.mimeType) { 
-                        if (asset.mediaType === ImagePicker.MediaType.Video) {
+                        if (asset.mediaType === ImagePicker.MediaTypeOptions.Video) {
                             // Attempt to guess common video types by extension or default to mp4
                             const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
                             if (fileExtension === 'mov') detectedMimeType = 'video/quicktime';
                             else if (fileExtension === 'avi') detectedMimeType = 'video/x-msvideo';
                             else detectedMimeType = 'video/mp4'; // Common video type fallback
                             console.log(`  [LOG] Detected video, setting mimeType to: ${detectedMimeType}`);
-                        } else if (asset.mediaType === ImagePicker.MediaType.Image) {
+                        } else if (asset.mediaType === ImagePicker.MediaTypeOptions.Image) {
                             const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
                             if (fileExtension === 'jpg' || fileExtension === 'jpeg') detectedMimeType = 'image/jpeg';
                             else if (fileExtension === 'png') detectedMimeType = 'image/png';
@@ -322,7 +335,6 @@ const NewBorrowAssetScreen = () => {
         }
     };
 
-    // NEW: Function to remove a specific proof by index
     const removeProof = (indexToRemove: number) => {
         Alert.alert(
             "Remove Attachment",
@@ -342,11 +354,11 @@ const NewBorrowAssetScreen = () => {
     };
 
     const saveTransaction = async () => {
-        const fieldsToValidate = ['item_borrowed', 'quantity_borrowed', 'expected_return_date'];
+        const fieldsToValidate = ['item_borrowed', 'quantity_borrowed', 'expected_return_date', 'notes'];
         let hasErrors = false;
         
         fieldsToValidate.forEach(field => {
-            if (validateField(field, transaction[field], transaction, inventoryItems)) {
+            if (validateField(field, transaction[field as keyof typeof transaction], transaction, inventoryItems)) {
                 hasErrors = true;
             }
         });
@@ -356,9 +368,20 @@ const NewBorrowAssetScreen = () => {
             return;
         }
 
-        setIsSaving(true);
+        setAiNotesError(''); // Clear any previous AI error before starting validation
+
         try {
-            // MODIFIED: Use borrowProofAttachmentsBase64Ref.current (the array)
+            // NEW: Trigger AI validation modal
+            setIsAiValidating(true);
+            // Simulate AI "thinking" time for the frontend animation
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2-second AI validation
+
+            // NEW: Hide AI validation modal after simulated check
+            setIsAiValidating(false);
+            
+            // Now proceed with the actual saving process, which includes backend AI validation
+            setIsSaving(true); 
+
             console.log('Current borrow_proof_attachments_base64 state via ref before sending:', borrowProofAttachmentsBase64Ref.current.length, 'proofs');
             if (borrowProofAttachmentsBase64Ref.current.length > 0) {
                 console.log('First proof in ref (first 50 chars):', borrowProofAttachmentsBase64Ref.current[0].substring(0, 50));
@@ -371,18 +394,14 @@ const NewBorrowAssetScreen = () => {
                 item_borrowed: transaction.item_borrowed,
                 quantity_borrowed: parseInt(transaction.quantity_borrowed, 10),
                 expected_return_date: new Date(transaction.expected_return_date).toISOString(),
-                notes: transaction.notes.trim() || null,
-                // MODIFIED: Send ALL proofs as an array of strings.
-                // The backend must be updated to handle an array of base64 strings.
-                borrow_proof_attachments_base64: borrowProofAttachmentsBase64Ref.current, // Send the entire array
+                notes: transaction.notes.trim(), // Send the notes to the backend for AI validation
+                borrow_proof_attachments_base64: borrowProofAttachmentsBase64Ref.current,
             };
             console.log('Borrow transaction payload being sent:', payload);
-            // Adjusted log to reflect the array being sent
             console.log('borrow_proof_attachments_base64 type in payload:', Array.isArray(payload.borrow_proof_attachments_base64) ? 'array' : typeof payload.borrow_proof_attachments_base64);
             if (Array.isArray(payload.borrow_proof_attachments_base64) && payload.borrow_proof_attachments_base64.length > 0) {
                 console.log('First proof in payload length (approx):', payload.borrow_proof_attachments_base64[0].length);
             }
-
 
             const response = await apiRequest('POST', '/api/borrowed-assets', payload);
 
@@ -390,14 +409,24 @@ const NewBorrowAssetScreen = () => {
                 Alert.alert("Success", "Your borrowing request has been submitted successfully!");
                 router.replace('/borrowed-assets'); // Navigate back to the list
             } else {
+                // Handle cases where the backend explicitly returns an error message
                 Alert.alert("Error", response?.error || response?.message || "Could not submit your request due to unresolved issues. On Hold/Deactivated");
             }
         } catch (error: any) {
             console.error("Error saving transaction:", error);
             const errorMessage = error.response?.data?.message || error.response?.data?.error || "An unexpected error occurred.";
-            Alert.alert("Error", errorMessage);
+            
+            // If the backend specifically sends an AI validation error, display it for notes
+            if (error.response?.data?.error === 'Invalid notes/reason for borrowing.' && error.response?.data?.message) {
+                setAiNotesError(error.response.data.message);
+                Alert.alert("Validation Error", error.response.data.message);
+            } else {
+                Alert.alert("Error", errorMessage);
+            }
         } finally {
             setIsSaving(false);
+            // Ensure AI modal is hidden even if an error occurred during the simulated phase
+            setIsAiValidating(false); 
         }
     };
 
@@ -476,15 +505,16 @@ const NewBorrowAssetScreen = () => {
                 />
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Notes / Reason for Borrowing (Optional)</Text>
+                    <Text style={styles.label}>Notes / Reason for Borrowing <Text style={styles.requiredStar}>*</Text></Text>
                     <TextInput
                         placeholder="e.g., 'For a community event'"
                         value={transaction.notes}
                         onChangeText={(val) => handleInputChange('notes', val)}
-                        style={[styles.textInput, { height: 100 }]}
+                        style={[styles.textInput, { height: 100 }, (!!errors.notes || !!aiNotesError) && styles.inputError]}
                         multiline
                         textAlignVertical="top"
                     />
+                    <ErrorMessage error={errors.notes || aiNotesError} />
                 </View>
 
                 {/* Proof of Borrowing Section */}
@@ -529,11 +559,32 @@ const NewBorrowAssetScreen = () => {
                 {/* End Proof of Borrowing Section */}
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity onPress={saveTransaction} style={[styles.submitButton, isSaving && styles.buttonDisabled]} disabled={isSaving}>
-                        {isSaving ? <ActivityIndicator color="white" /> : <Text style={styles.submitButtonText}>Submit Request</Text>}
+                    <TouchableOpacity 
+                        onPress={saveTransaction} 
+                        style={[styles.submitButton, (isSaving || isAiValidating) && styles.buttonDisabled]} 
+                        disabled={isSaving || isAiValidating} // Disable if either is true
+                    >
+                        {(isSaving || isAiValidating) ? <ActivityIndicator color="white" /> : <Text style={styles.submitButtonText}>Submit Request</Text>}
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+
+            {/* Re-added: AI Validation Modal */}
+            <Modal
+                transparent={true}
+                animationType="fade"
+                visible={isAiValidating}
+                // onRequestClose prevents closing by back button on Android during AI check
+                onRequestClose={() => { /* Alert.alert("Please wait", "AI is validating your request."); */ }} 
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <ActivityIndicator size="large" color="#0F00D7" />
+                        <Text style={styles.modalText}>Please take a moment, our AI is validating your request...</Text>
+                    </View>
+                </View>
+            </Modal>
+            {/* End AI Validation Modal */}
         </KeyboardAvoidingView>
     );
 };
@@ -619,6 +670,32 @@ const styles = StyleSheet.create({
         right: -8,
         backgroundColor: 'white',
         borderRadius: 15,
+    },
+    // Re-added: Styles for AI Validation Modal
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 30,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        width: '80%', // Make the modal a bit narrower
+    },
+    modalText: {
+        marginTop: 15,
+        fontSize: 16,
+        color: '#333',
+        fontWeight: '500',
+        textAlign: 'center',
     },
 });
 

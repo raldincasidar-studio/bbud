@@ -464,28 +464,67 @@ const NewDocumentRequestScreen = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerTarget, setDatePickerTarget] = useState('');
 
+    // NEW STATE: To store household members for the 'Requesting For' field
+    const [householdMembers, setHouseholdMembers] = useState<Resident[]>([]);
+
     useEffect(() => {
-        const loadInitialData = async () => {
+        const loadInitialDataAndHousehold = async () => {
             setIsLoadingInitialData(true);
             try {
                 const storedUserDataString = await AsyncStorage.getItem('userData');
                 if (storedUserDataString) {
                     const parsedUserData = JSON.parse(storedUserDataString);
                     setLoggedInUserData(parsedUserData);
+                    // Set the logged-in user as the default requestor
                     setForm(prev => ({ ...prev, requestor_resident_id: parsedUserData._id }));
+
+                    // Fetch household members immediately after setting loggedInUserData
+                    try {
+                        const response = await apiRequest('GET', `/api/residents/${parsedUserData._id}/household-members`);
+                        if (response && Array.isArray(response.household_members)) {
+                            // Ensure the logged-in user is always in the list even if the API somehow misses them
+                            const selfIncluded = response.household_members.find(
+                                member => member._id === parsedUserData._id
+                            );
+                            if (!selfIncluded) {
+                                setHouseholdMembers([
+                                    { _id: parsedUserData._id, first_name: parsedUserData.first_name, last_name: parsedUserData.last_name },
+                                    ...response.household_members
+                                ]);
+                            } else {
+                                setHouseholdMembers(response.household_members);
+                            }
+                        } else {
+                            // Fallback: if no household members are returned or empty array, just include the logged-in user
+                            setHouseholdMembers([{
+                                _id: parsedUserData._id,
+                                first_name: parsedUserData.first_name,
+                                last_name: parsedUserData.last_name
+                            }]);
+                        }
+                    } catch (error) {
+                        console.error("Failed to fetch household members:", error);
+                        // On error, default to just the logged-in user
+                        setHouseholdMembers([{
+                            _id: parsedUserData._id,
+                            first_name: parsedUserData.first_name,
+                            last_name: parsedUserData.last_name
+                        }]);
+                    }
+
                 } else {
                     Alert.alert("Authentication Error", "Could not load user data. Please log in again.");
                     router.replace('/login');
                 }
             } catch (e) {
-                console.error("Failed to load initial data", e);
-                Alert.alert("Error", "Failed to load user data. Please try again later.");
+                console.error("Failed to load initial data or household members", e);
+                Alert.alert("Error", "Failed to load user data or household members. Please try again later.");
             } finally {
                 setIsLoadingInitialData(false);
             }
         };
-        loadInitialData();
-    }, []);
+        loadInitialDataAndHousehold();
+    }, []); // Empty dependency array means this runs once on mount
 
     const validateField = (field: string, value: any): string => {
         let error = '';
@@ -624,7 +663,7 @@ const NewDocumentRequestScreen = () => {
                 } else if (value === 'Barangay Permit (for installations)') {
                     updatedForm.details = { installation_construction_repair: '', project_site: '' };
                 } //else if (value === 'Certificate of Oneness') {
-                //     updatedForm.purpose = 'For records purposes'; 
+                //     updatedForm.purpose = 'For records purposes';
                 // }  For 'Certificate of Good Moral', 'Certificate of Solo Parent', 'Certificate of Residency', 'Certificate of Oneness'
                 // updatedForm.details will correctly remain an empty object from the `details: isRequestTypeChange ? {} : prev.details` line.
             }
@@ -1090,16 +1129,22 @@ const NewDocumentRequestScreen = () => {
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} keyboardShouldPersistTaps="handled">
                 <Text style={styles.sectionTitle}>Requestor Information</Text>
 
-                {/* The Requestor Picker is not for searching, but for selecting from already loaded user data */}
-                <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Requesting For <Text style={styles.requiredStar}>*</Text></Text>
-                    <TextInput
-                        style={styles.textInput}
-                        value={loggedInUserData ? `${loggedInUserData.first_name} ${loggedInUserData.last_name}` : ''}
-                        editable={false} // This field should be read-only as it's the logged-in user
-                        placeholderTextColor="#A9A9A9"
-                    />
-                </View>
+                {/* UPDATED: Replace TextInput with PickerInput for selecting requestor */}
+                <PickerInput
+                    label="Requesting For"
+                    value={form.requestor_resident_id}
+                    onValueChange={(itemValue) => handleFormChange('requestor_resident_id', itemValue)}
+                    items={[
+                        { label: 'Select Requestor *', value: '', enabled: false }, // Placeholder
+                        ...householdMembers.map(member => ({
+                            label: `${member.first_name} ${member.last_name}`,
+                            value: member._id
+                        }))
+                    ]}
+                    error={errors.requestor_resident_id}
+                    placeholder="Select Requestor *"
+                    required={true}
+                />
 
                 <Text style={styles.sectionTitle}>Document Details</Text>
 

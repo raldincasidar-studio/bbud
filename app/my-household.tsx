@@ -483,7 +483,7 @@ const MyHouseholdScreen = () => {
                     {isCurrentUser && " (You)"}
                     &nbsp;<Text style={{ color: "#b6b6b6ff" }}>{`#${member?._id.slice(-4)}`}</Text>
                 </Text>
-                <Text style={styles.memberDetail}>{member.relationship_to_head === 'Other' ? member.other_relationship : member.relationship_to_head || 'N/A'}</Text>
+                <Text style={styles.memberDetail}>{member.relationship_to_head === 'Other' ? member.other_relationship : member.relationship_to_head || 'Head'}</Text>
             </View>
         </View>
     );
