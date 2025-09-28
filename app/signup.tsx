@@ -935,7 +935,7 @@ export default function SignupScreen() {
                                     <TouchableOpacity onPress={() => removeProofOfResidencyImage(index)} style={styles.removeImageButton}>
                                         <Ionicons name="close-circle" size={24} color="#D32F2F" />
                                     </TouchableOpacity>
-                                </View>
+                                ></View>
                             ))}
                         </View>
                     )}
@@ -951,7 +951,7 @@ export default function SignupScreen() {
                     {formData.authorization_letter_base64 && (
                         <View style={styles.imagePreviewContainer}>
                              <View style={styles.imagePreviewWrapper}>
-                                <Image source={{ uri: formData.authorization_letter_base66 }} style={styles.previewImageSmall} />
+                                <Image source={{ uri: formData.authorization_letter_base64 }} style={styles.previewImageSmall} />
                                 <TouchableOpacity onPress={() => handleInputChange('authorization_letter_base64', null)} style={styles.removeImageButton}>
                                     <Ionicons name="close-circle" size={24} color="#D32F2F" />
                                 ></TouchableOpacity>
@@ -1119,7 +1119,7 @@ export default function SignupScreen() {
                                     </TouchableOpacity>
                                     {currentMember.proof_of_relationship_base64 && <Image source={{ uri: currentMember.proof_of_relationship_base64 }} style={styles.previewImageSmall} />}
                                     <ErrorMessage error={memberErrors.proof_image} />
-                                </View>
+                                ></View>
                             )}
 
                             <Text style={styles.modalSectionTitle}>Special Classifications</Text>
