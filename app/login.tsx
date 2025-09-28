@@ -24,7 +24,7 @@ export default function LoginScreen() { // Renamed component
       Alert.alert('Form Error', 'Please enter both email/contact number and password.'); return;
     }
     if (password.length < 6) {
-      Alert.alert('Form Error', 'Password must be at least 6 characters long.'); return;
+      Alert.alert('Form Error', 'Password must be at least 8 characters long.'); return;
     }
 
     setIsLoading(true);

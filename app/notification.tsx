@@ -207,7 +207,7 @@ const NotificationsScreen = () => {
                 <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.push('/portal')}>
                     <Ionicons name="arrow-back" size={28} color="white" />
                 </TouchableOpacity>
-                <Text style={styles.navbarTitle}>My Notifications</Text>
+                <Text style={styles.navbarTitle}>Announcements and Notifications</Text>
                 <View style={{width: 28}} />
             </View>
 
@@ -245,7 +245,7 @@ const NotificationsScreen = () => {
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#0F00D7' },
     navbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, paddingTop: Platform.OS === 'android' ? 40 : 50, backgroundColor: '#0F00D7'},
-    navbarTitle: { fontSize: 20, fontWeight: 'bold', color: 'white' },
+    navbarTitle: { fontSize: 20, fontWeight: 'bold', color: 'white', paddingLeft: 15 },
     container: { flex: 1, backgroundColor: '#F4F6F8', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 5, paddingHorizontal: 0 }, // No horizontal padding here
     // searchInput: { backgroundColor: 'white', marginHorizontal:15, paddingHorizontal: 15, paddingVertical: Platform.OS === 'ios' ? 14 : 10, borderRadius: 10, fontSize: 16, marginBottom: 15, borderWidth: 1, borderColor: '#E0E0E0' },
     loaderContainerFullPage: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F6F8' },

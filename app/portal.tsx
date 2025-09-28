@@ -126,8 +126,18 @@ export default function Index() {
         paddingTop: 40
       }}>
         <Image style={{ height: 50, width: 130, objectFit: 'contain' }} source={require('@/assets/images/logo-name.png')} />
-        {/* Updated Notification Icon with Number Badge */}
-        <TouchableOpacity onPress={() => router.push('/notification')} style={{ position: 'relative' }}>
+        
+        {/* Group for Settings and Notification Icons */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}> {/* Added gap for spacing between icons */}
+          {/* Settings Icon */}
+          <TouchableOpacity onPress={() => router.push('/settings')} style={{
+            padding: 10,
+          }}>
+            <MaterialCommunityIcons name="cog" size={30} color="#0F00D7" />
+          </TouchableOpacity>
+
+          {/* Notification Icon with Number Badge */}
+          <TouchableOpacity onPress={() => router.push('/notification')} style={{ position: 'relative' }}>
           <Image
             style={{ height: 30, objectFit: 'contain', width: 30 }}
             source={require('@/assets/images/notification.png')} // Always use the regular bell icon
@@ -140,7 +150,10 @@ export default function Index() {
             </View>
           )}
         </TouchableOpacity>
+        </View>
       </View>
+
+      
 
       {/* Content */}
       <View style={{
@@ -165,11 +178,7 @@ export default function Index() {
             color: '#7F7F7F',
           }}>{ user?.email || '...' }</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push('/settings')} style={{
-          padding: 10,
-        }}>
-          <MaterialCommunityIcons name="cog" size={30} color="#0F00D7" />
-        </TouchableOpacity>
+        
       </View>
       
 

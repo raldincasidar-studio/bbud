@@ -96,8 +96,18 @@ const NewBorrowAssetScreen = () => {
             case 'expected_return_date':
                 if (!value) {
                     error = 'Please select an expected return date.';
-                } else if (new Date(value) < new Date(new Date().setHours(0, 0, 0, 0))) {
-                    error = 'Return date cannot be in the past.';
+                } else {
+                    // Create a Date object from the YYYY-MM-DD string as if it's local time for comparison
+                    // Using `new Date(value)` directly can be unreliable across browsers/platforms for YYYY-MM-DD.
+                    // For safe comparison, parse it manually or compare date parts.
+                    const [year, month, day] = value.split('-').map(Number);
+                    const selectedDate = new Date(year, month - 1, day); // Month is 0-indexed
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // Normalize today to start of day for comparison
+                    
+                    if (selectedDate < today) {
+                        error = 'Return date cannot be in the past.';
+                    }
                 }
                 break;
             case 'notes': // Added: Basic validation for notes field (must not be empty)
@@ -174,8 +184,12 @@ const NewBorrowAssetScreen = () => {
         });
     };
 
+    // FIX: Format the date object into YYYY-MM-DD using local components
     const handleDateConfirm = (date: Date) => {
-        const dateString = date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+        const day = date.getDate().toString().padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`; // This will store "2025-09-30" if 30th Sep was picked
         handleInputChange('expected_return_date', dateString);
         setDatePickerVisibility(false);
     };
@@ -387,13 +401,22 @@ const NewBorrowAssetScreen = () => {
                 console.log('First proof in ref (first 50 chars):', borrowProofAttachmentsBase64Ref.current[0].substring(0, 50));
             }
 
+            // FIX: Generate borrow_datetime in local YYYY-MM-DDTHH:mm:ss format
+            const now = new Date();
+            const localBorrowDateTime = now.getFullYear() + '-' + 
+                                        (now.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                                        now.getDate().toString().padStart(2, '0') + 'T' +
+                                        now.getHours().toString().padStart(2, '0') + ':' +
+                                        now.getMinutes().toString().padStart(2, '0') + ':' +
+                                        now.getSeconds().toString().padStart(2, '0');
+
             const payload = {
                 borrower_resident_id: loggedInUser!._id,
                 borrower_display_name: loggedInUser!.name,
-                borrow_datetime: new Date().toISOString(),
+                borrow_datetime: localBorrowDateTime, // FIX: Use locally formatted string
                 item_borrowed: transaction.item_borrowed,
                 quantity_borrowed: parseInt(transaction.quantity_borrowed, 10),
-                expected_return_date: new Date(transaction.expected_return_date).toISOString(),
+                expected_return_date: transaction.expected_return_date, // FIX: Send the YYYY-MM-DD string directly
                 notes: transaction.notes.trim(), // Send the notes to the backend for AI validation
                 borrow_proof_attachments_base64: borrowProofAttachmentsBase64Ref.current,
             };
