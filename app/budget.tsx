@@ -1,7 +1,8 @@
 import apiRequest from '@/plugins/axios'; // Using your project's API helper
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker'; // Import Picker
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react'; // Import useRef
 import {
     ActivityIndicator,
     Alert,
@@ -21,7 +22,7 @@ interface BudgetItem {
   budgetName: string;
   category: string;
   amount: number;
-  date: string;
+  date: string; // Assuming date is a string, but will be parsed to Date for filtering
 }
 
 interface BudgetSection {
@@ -49,14 +50,94 @@ const BudgetScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // --- Filter States ---
+    const [selectedYearFilter, setSelectedYearFilter] = useState<string | null>(null);
+    const [selectedMonthFilter, setSelectedMonthFilter] = useState<string | null>(null);
+    const [selectedDayFilter, setSelectedDayFilter] = useState<string | null>(null);
+    const [availableYears, setAvailableYears] = useState<number[]>([]);
+
+    // Ref to prevent initial year filter from being set multiple times or overriding user clear
+    const hasInitialYearBeenSet = useRef(false);
+
+    // Generate month options (1-12) and their names
+    const monthOptions = Array.from({ length: 12 }, (_, i) => String(i + 1));
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    // Generate day options (1-31)
+    const dayOptions = Array.from({ length: 31 }, (_, i) => String(i + 1));
+
+
+    // Function to fetch distinct years from the backend for the year filter dropdown
+    const fetchDistinctYears = useCallback(async () => {
+        try {
+            const response = await apiRequest('GET', '/api/budgets/years');
+            if (response && response.years) {
+                const yearsSorted = response.years.sort((a: number, b: number) => b - a); // Sort descending
+                setAvailableYears(yearsSorted);
+            }
+        } catch (e) {
+            console.error("Error fetching distinct years:", e);
+            Alert.alert("Error", "Could not load available years for filtering.");
+        }
+    }, []); 
+
     const fetchBudgetSummary = useCallback(async () => {
-        if (!refreshing) setIsLoading(true);
+        if (!refreshing) {
+            setIsLoading(true); 
+        }
         setError(null);
 
         try {
-            const response = await apiRequest('GET', '/api/budgets', null, {
-                itemsPerPage: 9999,
-            });
+            const queryParams: {
+                itemsPerPage: number;
+                filterYear?: string;
+                start_date?: string;
+                end_date?: string;
+            } = {
+                itemsPerPage: 9999, 
+            };
+
+            // Apply filters based on precedence: Day > Month > Year
+            if (selectedYearFilter && selectedMonthFilter && selectedDayFilter) {
+                const yearNum = parseInt(selectedYearFilter);
+                const monthIndex = parseInt(selectedMonthFilter) - 1; // 0-indexed month
+                const dayNum = parseInt(selectedDayFilter);
+
+                const startDate = new Date(Date.UTC(yearNum, monthIndex, dayNum, 0, 0, 0, 0));
+                const endDate = new Date(Date.UTC(yearNum, monthIndex, dayNum, 23, 59, 59, 999));
+                
+                queryParams.start_date = startDate.toISOString();
+                queryParams.end_date = endDate.toISOString();
+            } 
+            else if (selectedYearFilter && selectedMonthFilter) {
+                const yearNum = parseInt(selectedYearFilter);
+                const monthIndex = parseInt(selectedMonthFilter) - 1; // 0-indexed month
+
+                const startDate = new Date(Date.UTC(yearNum, monthIndex, 1, 0, 0, 0, 0));
+                const endDate = new Date(Date.UTC(yearNum, monthIndex + 1, 0, 23, 59, 59, 999)); 
+
+                queryParams.start_date = startDate.toISOString();
+                queryParams.end_date = endDate.toISOString();
+            } 
+            else if (selectedYearFilter) {
+                queryParams.filterYear = selectedYearFilter;
+            }
+
+            console.log("Fetching budgets with parameters:", queryParams);
+
+            const url = '/api/budgets';
+            const params = new URLSearchParams();
+            for (const key in queryParams) {
+                if (queryParams[key] !== undefined && queryParams[key] !== null) {
+                    params.append(key, String(queryParams[key]));
+                }
+            }
+            const queryString = params.toString();
+            const fullUrl = queryString ? `${url}?${queryString}` : url;
+
+            const response = await apiRequest('GET', fullUrl, null, null); 
 
             if (response && response.budgets) {
                 const budgets: BudgetItem[] = response.budgets;
@@ -93,22 +174,43 @@ const BudgetScreen = () => {
             setIsLoading(false);
             setRefreshing(false);
         }
-    }, [refreshing]);
+    }, [refreshing, selectedYearFilter, selectedMonthFilter, selectedDayFilter]); 
 
+    // Effect to fetch available years on component mount
     useEffect(() => {
-        fetchBudgetSummary();
-    }, []);
+        fetchDistinctYears(); 
+    }, [fetchDistinctYears]); 
+
+    // Effect to set the initial year filter to the latest year if available, only once on first load
+    useEffect(() => {
+        if (!hasInitialYearBeenSet.current && availableYears.length > 0 && selectedYearFilter === null) {
+            setSelectedYearFilter(String(availableYears[0]));
+            hasInitialYearBeenSet.current = true; 
+        }
+    }, [availableYears, selectedYearFilter]); 
+
+    // This effect runs when filters or fetchBudgetSummary itself changes
+    useEffect(() => {
+        fetchBudgetSummary(); 
+    }, [fetchBudgetSummary]); 
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        fetchBudgetSummary();
+        fetchBudgetSummary(); 
     }, [fetchBudgetSummary]);
+
+    // Function to clear all applied filters
+    const handleClearFilters = () => {
+        setSelectedYearFilter(null);
+        setSelectedMonthFilter(null); 
+        setSelectedDayFilter(null);
+    };
 
     // --- Render Functions ---
     const renderItem = ({ item }: { item: BudgetItem }) => (
         <View style={styles.itemContainer}> 
             <Text style={styles.itemName} numberOfLines={1}>{item.budgetName}</Text>
-            <Text style={styles.itemAmount}>{formatCurrency(item.amount)}</Text>
+            <Text style={styles.itemAmount}>₱ {formatCurrency(item.amount)}</Text>
         </View>
     );
 
@@ -117,7 +219,7 @@ const BudgetScreen = () => {
             <Text style={styles.sectionHeaderText} ellipsizeMode="tail">
                 {section.title}
             </Text>
-            <Text style={styles.sectionHeaderTotal}>{formatCurrency(section.subTotal)}</Text>
+            <Text style={styles.sectionHeaderTotal}>₱ {formatCurrency(section.subTotal)}</Text>
         </View>
     );
   
@@ -164,10 +266,74 @@ const BudgetScreen = () => {
                 style={styles.container}
                 contentContainerStyle={{ paddingBottom: 60 }} 
                 ListHeaderComponent={() => (
-                    <Text style={styles.mainTitle}>Budget Management</Text>
+                    <View> 
+                        <Text style={styles.mainTitle}>Budget Management</Text>
+                        {/* Filter Controls */}
+                        <View style={styles.filterContainer}>
+                            <View style={styles.pickerWrapper}>
+                                <Text style={styles.filterLabel}>Year</Text>
+                                <Picker
+                                    selectedValue={selectedYearFilter}
+                                    style={styles.pickerStyle}
+                                    onValueChange={(itemValue) => {
+                                        setSelectedYearFilter(itemValue);
+                                        setSelectedMonthFilter(null); 
+                                        setSelectedDayFilter(null);
+                                    }}
+                                    itemStyle={styles.pickerItemStyle} 
+                                >
+                                    <Picker.Item label="All" value={null} />
+                                    {availableYears.map((year) => (
+                                        <Picker.Item key={year} label={String(year)} value={String(year)} />
+                                    ))}
+                                </Picker>
+                            </View>
+
+                            <View style={styles.pickerWrapper}>
+                                <Text style={styles.filterLabel}>Month</Text>
+                                <Picker
+                                    selectedValue={selectedMonthFilter} 
+                                    style={styles.pickerStyle}
+                                    onValueChange={(itemValue) => {
+                                        setSelectedMonthFilter(itemValue); 
+                                        setSelectedDayFilter(null); 
+                                    }}
+                                    itemStyle={styles.pickerItemStyle}
+                                    enabled={!!selectedYearFilter} 
+                                >
+                                    <Picker.Item label="All" value={null} />
+                                    {monthOptions.map((monthNum, index) => (
+                                        <Picker.Item key={monthNum} label={monthNames[index]} value={monthNum} />
+                                    ))}
+                                </Picker>
+                            </View>
+
+                            <View style={styles.pickerWrapper}>
+                                <Text style={styles.filterLabel}>Day</Text>
+                                <Picker
+                                    selectedValue={selectedDayFilter}
+                                    style={styles.pickerStyle}
+                                    onValueChange={(itemValue) => setSelectedDayFilter(itemValue)}
+                                    itemStyle={styles.pickerItemStyle}
+                                    enabled={!!selectedYearFilter && !!selectedMonthFilter} 
+                                >
+                                    <Picker.Item label="All" value={null} />
+                                    {dayOptions.map((dayNum) => (
+                                        <Picker.Item key={dayNum} label={dayNum} value={dayNum} />
+                                    ))}
+                                </Picker>
+                            </View>
+
+                            {/* Show Clear Filters button if any filter is active */}
+                            {(selectedYearFilter || selectedMonthFilter || selectedDayFilter) && (
+                                <TouchableOpacity onPress={handleClearFilters} style={styles.clearFiltersButton}>
+                                    <Text style={styles.clearFiltersButtonText}>Clear Filters</Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </View>
                 )}
                 ListFooterComponent={() => (
-                    // The footerContainer is now set to a column layout
                     <View style={styles.footerContainer}>
                         <Text style={styles.totalLabel}>Total Expenditures</Text>
                         <Text style={styles.totalAmount}>₱ {formatCurrency(totalExpenditures)}</Text>
@@ -271,22 +437,20 @@ const styles = StyleSheet.create({
         paddingTop: 18, 
         borderTopWidth: 2, 
         borderColor: '#0F00D7', 
-        flexDirection: 'column', // <--- CHANGED: Layout children in a column
-        // alignItems: 'flex-start', // <--- CHANGED: Align children to the start (left)
-        paddingBottom: 20, // Added some padding at the bottom of the footer
+        flexDirection: 'column', 
+        paddingBottom: 20, 
     },
     totalLabel: { 
         fontSize: 18, 
         fontWeight: 'bold', 
         color: '#0F00D7', 
-        marginBottom: 8, // <--- ADDED: Space between label and amount
+        marginBottom: 8, 
         alignSelf: 'flex-start',
     },
     totalAmount: { 
-        fontSize: 22, // <--- CHANGED: Slightly larger for emphasis
+        fontSize: 22, 
         fontWeight: 'bold', 
         color: '#0F00D7', 
-        // Removed textAlign: 'right' as it's not needed with column layout and flex-start alignment
         alignSelf: 'flex-end',
     },
     errorText: { 
@@ -306,7 +470,71 @@ const styles = StyleSheet.create({
         color: '#FFFFFF', 
         fontSize: 17, 
         fontWeight: 'bold', 
-    }
+    },
+    // Styles for filters (adjusted to align in column)
+    filterContainer: {
+        flexDirection: 'column', 
+        alignItems: 'stretch', 
+        paddingHorizontal: 15, 
+        paddingVertical: 10,
+        backgroundColor: '#FFFFFF', 
+        borderBottomLeftRadius: 20, 
+        borderBottomRightRadius: 20,
+        marginBottom: 10, 
+        ...Platform.select({ 
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 3,
+            },
+            android: {
+                elevation: 3,
+            },
+        }),
+    },
+    pickerWrapper: {
+        width: '100%', 
+        marginBottom: 15, 
+    },
+    filterLabel: {
+        fontSize: 13, 
+        color: '#666', 
+        marginBottom: 6, 
+        marginLeft: 0, 
+        fontWeight: 'bold',
+        textAlign: 'left', 
+    },
+    pickerStyle: {
+        height: 55, // Increased height for better visibility
+        backgroundColor: '#F0F0F0', 
+        borderRadius: 8,
+        borderWidth: 1, 
+        borderColor: '#CCC',
+        color: '#333', 
+        overflow: 'hidden', 
+        paddingHorizontal: Platform.OS === 'android' ? 10 : 0, 
+    },
+    pickerItemStyle: {
+        fontSize: 14, 
+        color: 'black', 
+    },
+    clearFiltersButton: {
+        backgroundColor: '#E0E0E0',
+        paddingVertical: 12, // Adjusted padding to match new picker height visually
+        paddingHorizontal: 15, 
+        borderRadius: 8,
+        marginTop: 5, 
+        width: '100%', 
+        alignSelf: 'stretch', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+    },
+    clearFiltersButtonText: {
+        color: '#333',
+        fontSize: 14, 
+        fontWeight: 'bold',
+    },
 });
 
 export default BudgetScreen;

@@ -102,8 +102,8 @@ const relationshipPickerOptions = [
     { label: "Brother", value: "Brother" },
     { label: "Sister", value: "Sister" },
     { label: "Grandfather", value: "Grandfather" },
-    { label: "Grandmother", value: "Grandmother" },
-    { label: "Grandchild", value: "Grandchild" },
+    { label: "Grandmother", value: "Grandmother" }, // Corrected in previous step
+    { label: "Grandchild", value: "Grandchild" }, // Corrected in previous step
     { label: "Uncle", value: "Uncle" },
     { label: "Aunt", value: "Aunt" },
     { label: "Cousin", value: "Cousin" },
@@ -660,9 +660,35 @@ export default function SignupScreen() {
                 return member;
             });
 
+            // Normalize Head's name and address fields to lowercase for case-insensitive comparison on the backend
+            const submissionPayload = { ...payload };
+
+            submissionPayload.first_name = submissionPayload.first_name.toLowerCase();
+            if (submissionPayload.middle_name) {
+                submissionPayload.middle_name = submissionPayload.middle_name.toLowerCase();
+            } else {
+                submissionPayload.middle_name = null;
+            }
+            submissionPayload.last_name = submissionPayload.last_name.toLowerCase();
+            if (submissionPayload.suffix) {
+                submissionPayload.suffix = submissionPayload.suffix.toLowerCase();
+            } else {
+                submissionPayload.suffix = null;
+            }
+
+            submissionPayload.address_house_number = submissionPayload.address_house_number.toLowerCase();
+            if (submissionPayload.address_unit_room_apt_number) {
+                submissionPayload.address_unit_room_apt_number = submissionPayload.address_unit_room_apt_number.toLowerCase();
+            } else {
+                submissionPayload.address_unit_room_apt_number = null;
+            }
+            submissionPayload.address_street = submissionPayload.address_street.toLowerCase();
+            submissionPayload.address_subdivision_zone = submissionPayload.address_subdivision_zone.toLowerCase();
+            submissionPayload.address_city_municipality = submissionPayload.address_city_municipality.toLowerCase();
+
 
             try {
-                const response = await apiRequest('POST', '/api/residents', payload);
+                const response = await apiRequest('POST', '/api/residents', submissionPayload);
 
                 // If apiRequest returns null (e.g., due to a network error handled internally, though it now re-throws)
                 if (!response || !response.message) {
@@ -870,8 +896,10 @@ export default function SignupScreen() {
                     <Text style={styles.label}>Subdivision / Zone / Sitio / Purok*</Text>
                     <TextInput style={[styles.textInput, !!errors.address_subdivision_zone && styles.inputError]} placeholder="Subdivision / Zone / Sitio / Purok*" placeholderTextColor="#A9A9A9" value={formData.address_subdivision_zone} onChangeText={(v) => handleInputChange('address_subdivision_zone', v)} /><ErrorMessage error={errors.address_subdivision_zone} />
 
-                    {/* NEW FIELD: Type of Household - SECOND IN ADDRESS */}
+                    {/* UPDATED FIELD: Type of Household - SECOND IN ADDRESS */}
                     <Text style={styles.label}>Type of Household (Optional)</Text>
+                    {/* NEW NOTE/LABEL */}
+                    <Text style={styles.noteText}>Fill out only if you live in an apartment, boarding house, dormitory, or condominium. Leave blank if not applicable.</Text>
                     <View style={[styles.pickerWrapper, !!errors.type_of_household && styles.inputError]}>
                         <Picker
                             selectedValue={formData.type_of_household}
@@ -880,9 +908,8 @@ export default function SignupScreen() {
                             itemStyle={{ color: 'black' }}
                         >
                             <Picker.Item label="Select Type of Household (Optional)" value={null} />
-                            <Picker.Item label="Owner" value="Owner" />
-                            <Picker.Item label="Tenant/Border" value="Tenant/Border" />
-                            <Picker.Item label="Sharer" value="Sharer" />
+                            <Picker.Item label="Owner - Owns the house/lot" value="Owner" />
+                            <Picker.Item label="Tenant - Renting the house/lot" value="Tenant/Border" />
                         </Picker>
                     </View>
                     <ErrorMessage error={errors.type_of_household} />
@@ -924,7 +951,7 @@ export default function SignupScreen() {
                     {formData.authorization_letter_base64 && (
                         <View style={styles.imagePreviewContainer}>
                              <View style={styles.imagePreviewWrapper}>
-                                <Image source={{ uri: formData.authorization_letter_base64 }} style={styles.previewImageSmall} />
+                                <Image source={{ uri: formData.authorization_letter_base66 }} style={styles.previewImageSmall} />
                                 <TouchableOpacity onPress={() => handleInputChange('authorization_letter_base64', null)} style={styles.removeImageButton}>
                                     <Ionicons name="close-circle" size={24} color="#D32F2F" />
                                 ></TouchableOpacity>
@@ -1124,6 +1151,14 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F00D7', marginTop: 20, marginBottom: 15 },
     label: { fontSize: 16, color: '#333', fontWeight: '500', paddingBottom: 5 },
     labelInfo: { fontSize: 14, color: '#666', marginBottom: 10, fontStyle: 'italic' },
+    // NEW style for note text
+    noteText: {
+        fontSize: 13,
+        color: '#666',
+        marginBottom: 10,
+        fontStyle: 'italic',
+        lineHeight: 18,
+    },
     textInput: { borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, fontSize: 16, paddingHorizontal: 14, paddingVertical: Platform.OS === 'ios' ? 14 : 10, marginBottom: 15, color: '#000', backgroundColor: 'white' },
     textInputDisabled: { backgroundColor: '#EEEEEE', color: '#757575' },
     passwordContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#BDBDBD', borderRadius: 8, backgroundColor: 'white', marginBottom: 15 },

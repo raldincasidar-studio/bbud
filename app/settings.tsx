@@ -30,6 +30,7 @@ interface UserData {
     email: string;
     sex?: string;
     date_of_birth?: string;
+    age?: number; // ADDED: Age field
     civil_status?: string;
     citizenship?: string;
     occupation_status?: string;
@@ -212,9 +213,22 @@ export default function SettingsScreen() {
             if (storedData) {
                 const parsedData: UserData = JSON.parse(storedData);
                 const dob = parsedData.date_of_birth ? new Date(parsedData.date_of_birth).toISOString().split('T')[0] : '';
+                
+                let age: number | undefined;
+                if (parsedData.date_of_birth) {
+                    const birthDate = new Date(parsedData.date_of_birth);
+                    const today = new Date();
+                    age = today.getFullYear() - birthDate.getFullYear();
+                    const m = today.getMonth() - birthDate.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                }
+
                 const initialData = {
                     ...parsedData,
                     date_of_birth: dob,
+                    age: age, // ADDED: Calculate and set age
                     suffix: parsedData.suffix || null, // Ensure suffix is initialized as null if not present
                     address_unit_room_apt_number: parsedData.address_unit_room_apt_number || '', // NEW FIELD
                     type_of_household: parsedData.type_of_household || null, // NEW FIELD
@@ -299,6 +313,7 @@ export default function SettingsScreen() {
                 payload.years_at_current_address = parseInt(payload.years_at_current_address, 10);
             }
             delete payload.confirmNewPassword; // Don't send confirmNewPassword to the backend
+            delete payload.age; // Do not send age to the backend, it's a derived field
 
             const response = await apiRequest('PUT', `/api/residents/${formState._id}`, payload);
 
@@ -436,6 +451,18 @@ export default function SettingsScreen() {
                         </TouchableOpacity>
                         <ErrorMessage error={errors.date_of_birth} />
                     </View>
+
+                    {/* Age (Read-only) - NEW FIELD */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Age</Text>
+                        <TextInput
+                            style={[styles.textInput, styles.textInputDisabled]}
+                            value={formState.age ? String(formState.age) : ''}
+                            editable={false}
+                            placeholderTextColor="#A9A9A9"
+                        />
+                    </View>
+
 
                     {/* Sex (Read-only) */}
                     <View style={styles.inputGroup}>
