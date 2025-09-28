@@ -202,9 +202,9 @@ const MyRequestedDocumentsScreen = () => {
                     <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.navbarTitle}>My Requested Documents</Text>
-                <TouchableOpacity onPress={() => router.push('/portal')}>
+                {/* <TouchableOpacity onPress={() => router.push('/portal')}>
                     <MaterialCommunityIcons name="home-outline" size={28} color="white" />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
 
             <View style={styles.container}>

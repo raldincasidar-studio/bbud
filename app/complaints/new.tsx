@@ -2,10 +2,16 @@ import apiRequest from '@/plugins/axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as FileSystem from 'expo-file-system'; // <--- ADD THIS IMPORT
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+// Constants for attachment limits
+const MAX_ATTACHMENTS = 5;
+const MAX_FILE_SIZE_MB = 50; // 50MB per file (adjust as per your backend limits and mobile performance)
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 // Reusable component for displaying validation errors
 const ErrorMessage = ({ error }) => {
@@ -46,6 +52,10 @@ const NewComplaintScreen = () => {
     const proofsBase64Ref = useRef(proofsBase64); 
     useEffect(() => {
         proofsBase64Ref.current = proofsBase64;
+        console.log("proofsBase64 state updated:", proofsBase64.length, "items.");
+        if (proofsBase64.length > 0) {
+            console.log("First proof in state (first 50 chars):", proofsBase64[0].substring(0, 50) + "...");
+        }
     }, [proofsBase64]);
 
     const [errors, setErrors] = useState({});
@@ -118,7 +128,14 @@ const NewComplaintScreen = () => {
         }
     };
     
-    const formatDateForAPI = (date) => date ? date.toISOString().split('T')[0] : null;
+    const formatDateForAPI = (date) => {
+        if (!date) return null;
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     const formatTimeForAPI = (time) => time ? time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : null;
 
     const handlePersonComplainedAgainstNameChange = (text) => {
@@ -139,6 +156,13 @@ const NewComplaintScreen = () => {
     const pickProof = async () => {
         console.log("pickProof function called.");
 
+        const currentProofsCount = proofsBase64.length;
+
+        if (currentProofsCount >= MAX_ATTACHMENTS) {
+            Alert.alert('Attachment Limit Reached', `You can attach a maximum of ${MAX_ATTACHMENTS} files as proof.`);
+            return;
+        }
+
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         console.log("Permission status:", status);
 
@@ -147,71 +171,126 @@ const NewComplaintScreen = () => {
             return;
         }
 
-        console.log("Permissions granted, launching image library...");
+        console.log("Permissions granted, launching media library...");
 
         let result;
         try {
+            // FIX: Reverted to MediaTypeOptions.All to resolve 'All of undefined' error
+            // This will likely show a deprecation warning but should function.
             result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                mediaTypes: ImagePicker.MediaTypeOptions.All, 
                 allowsMultipleSelection: true,
                 quality: 0.7,
-                base64: true,
+                base64: false, // Explicitly set to false to manually handle base64 for better video support
             });
             console.log("ImagePicker Result:", JSON.stringify(result, null, 2));
         } catch (error) {
             console.error("Error launching ImagePicker:", error);
-            Alert.alert("Error", "Failed to open file picker: " + error.message);
+            Alert.alert("Error", "Failed to open file picker: " + (error as Error).message);
             return;
         }
         
         if (result.canceled) {
-            console.log("Image picker was canceled.");
+            console.log("Media picker was canceled.");
         } else if (result.assets && result.assets.length > 0) {
             console.log("Assets found:", result.assets.length);
 
-            const newProofs = await Promise.all(result.assets.map(async (asset, index) => {
+            const remainingSlots = MAX_ATTACHMENTS - currentProofsCount;
+            const selectedAssets = result.assets.slice(0, remainingSlots); 
+
+            if (result.assets.length > remainingSlots) {
+                Alert.alert(
+                    'Attachment Limit',
+                    `You selected ${result.assets.length} files, but only ${remainingSlots} more can be added. Only the first ${remainingSlots} files will be attached.`
+                );
+            }
+
+            const newProofs = await Promise.all(selectedAssets.map(async (asset, index) => {
                 console.log(`--- Processing asset ${index + 1} ---`);
                 console.log("  Asset URI:", asset.uri);
-                console.log("  Asset MediaType (from Expo):", asset.mediaType); 
+                console.log("  Asset MediaType (from Expo):", asset.mediaType); // Note: still logs deprecated value
                 console.log("  Asset MimeType (from Expo):", asset.mimeType);
-                console.log("  Is asset.base64 a string?", typeof asset.base64 === 'string');
-                console.log("  Length of asset.base64:", asset.base64 ? asset.base64.length : 'N/A');
-                console.log("  Asset Base64 (first 50 chars):", typeof asset.base64 === 'string' && asset.base64.length > 0 ? asset.base64.substring(0, 50) : asset.base64);
 
-                // **CRITICAL FIX: Explicitly check for typeof string AND ensure it's not an empty string**
-                if (asset.base64 && typeof asset.base64 === 'string' && asset.base64.length > 0) {
-                    let detectedMimeType = 'application/octet-stream'; // Default generic binary
-                    
-                    if (asset.mimeType) {
-                        detectedMimeType = asset.mimeType;
-                    } else if (asset.mediaType === ImagePicker.MediaType.Video) {
-                        detectedMimeType = 'video/mp4'; // Common video type
-                    } else { // Assume image, try to get from URI or default
-                        const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
-                        if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
-                            detectedMimeType = 'image/jpeg';
-                        } else if (fileExtension === 'png') {
-                            detectedMimeType = 'image/png';
-                        } else if (fileExtension === 'gif') {
-                            detectedMimeType = 'image/gif';
-                        } else {
-                            detectedMimeType = 'image/jpeg'; // Fallback for image
-                        }
+                let base64Data = null;
+                let detectedMimeType = asset.mimeType || 'application/octet-stream'; // Default or from asset
+
+                if (!asset.uri) {
+                    console.error(`  [LOG] ERROR: Asset URI is missing for asset ${index + 1}. Skipping.`);
+                    return null;
+                }
+
+                try {
+                    const fileInfo = await FileSystem.getInfoAsync(asset.uri);
+                    console.log(`  [LOG] FileInfo for URI: ${JSON.stringify(fileInfo)}`);
+
+                    if (!fileInfo.exists) {
+                        console.error(`  [LOG] ERROR: File does not exist at URI: ${asset.uri}`);
+                        Alert.alert("Error", `File does not exist at path: ${asset.uri}`);
+                        return null;
                     }
 
-                    const dataUri = `data:${detectedMimeType};base64,${asset.base64}`;
-                    console.log("  Generated data URI (first 50 chars):", dataUri.substring(0, 50));
-                    console.log("  Generated data URI (length):", dataUri.length);
+                    if (fileInfo.isDirectory) {
+                        console.error(`  [LOG] ERROR: URI points to a directory, not a file: ${asset.uri}`);
+                        Alert.alert("Error", `URI points to a directory: ${asset.uri}`);
+                        return null;
+                    }
+
+                    if (fileInfo.size && fileInfo.size > MAX_FILE_SIZE_BYTES) {
+                        console.warn(`  [LOG] WARNING: File size (${(fileInfo.size / (1024 * 1024)).toFixed(2)} MB) exceeds ${MAX_FILE_SIZE_MB}MB limit. Skipping.`);
+                        Alert.alert("File Too Large", `The selected file "${asset.uri.split('/').pop()}" is ${(fileInfo.size / (1024 * 1024)).toFixed(2)} MB, which exceeds the ${MAX_FILE_SIZE_MB}MB limit. Please select a smaller file.`);
+                        return null; // Skip this asset if too large
+                    }
+
+                    base64Data = await FileSystem.readAsStringAsync(asset.uri, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    });
+                    console.log(`  [LOG] Manual base64 read completed for ${asset.mediaType}. Length: ${base64Data ? base64Data.length : '0'}`);
+                    
+                    if (!base64Data || base64Data.length === 0) {
+                        console.warn("  [LOG] Manual base64 read returned null or empty string.");
+                    }
+
+                    // Refine MIME type using ImagePicker.MediaType (which should work for enum comparison)
+                    if (!asset.mimeType) { 
+                        if (asset.mediaType === ImagePicker.MediaType.Video) { 
+                            const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
+                            if (fileExtension === 'mov') detectedMimeType = 'video/quicktime';
+                            else if (fileExtension === 'avi') detectedMimeType = 'video/x-msvideo';
+                            else detectedMimeType = 'video/mp4'; // Common video type fallback
+                            console.log(`  [LOG] Detected video, setting mimeType to: ${detectedMimeType}`);
+                        } else if (asset.mediaType === ImagePicker.MediaType.Image) { 
+                            const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
+                            if (fileExtension === 'jpg' || fileExtension === 'jpeg') detectedMimeType = 'image/jpeg';
+                            else if (fileExtension === 'png') detectedMimeType = 'image/png';
+                            else if (fileExtension === 'gif') detectedMimeType = 'image/gif';
+                            else if (fileExtension === 'webp') detectedMimeType = 'image/webp';
+                            else detectedMimeType = 'image/jpeg'; // General image fallback
+                            console.log(`  [LOG] Detected image, setting mimeType to: ${detectedMimeType}`);
+                        } else {
+                            console.log("  [LOG] Unknown media type, defaulting mimeType.");
+                        }
+                    } else {
+                        console.log(`  [LOG] Using existing asset.mimeType: ${asset.mimeType}`);
+                    }
+
+                } catch (readError: any) { // Explicitly type readError as any for easier access to .message
+                    console.error(`  [LOG] ERROR: Error reading file ${asset.uri} for base64 encoding:`, readError);
+                    Alert.alert("Error", `Could not read selected file: ${(readError as Error).message}`);
+                    return null; // Skip this asset if reading fails
+                }
+                
+                if (base64Data && base64Data.length > 0) {
+                    const dataUri = `data:${detectedMimeType};base64,${base64Data}`;
+                    console.log("  [LOG] Generated data URI (first 50 chars):", dataUri.substring(0, 50));
+                    console.log("  [LOG] Generated data URI (length):", dataUri.length);
                     return dataUri;
                 } else {
-                    console.warn(`Asset ${index + 1} missing valid base64 data or empty string, skipping:`, asset.uri);
-                    // Log the problematic base64 to understand why it's failing
-                    console.warn("  Problematic asset.base64:", asset.base64);
+                    console.warn(`  [LOG] Asset ${index + 1} still missing valid base64 data after processing (base64Data was null or empty). Skipping:`, asset.uri);
                     return null;
                 }
             }));
             
-            const proofsToAdd = newProofs.filter(Boolean); // Filter out any nulls
+            const proofsToAdd = newProofs.filter(Boolean); // Filter out any nulls from failed reads
             console.log("Proofs successfully extracted and filtered (count):", proofsToAdd.length);
             if (proofsToAdd.length > 0) {
                 console.log("First filtered proof (first 50 chars):", proofsToAdd[0].substring(0, 50));
@@ -229,7 +308,21 @@ const NewComplaintScreen = () => {
     };
 
     const removeProof = (indexToRemove) => {
-        setProofsBase64(prev => prev.filter((_, index) => index !== indexToRemove));
+        Alert.alert(
+            "Remove Attachment",
+            "Are you sure you want to remove this attachment?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Remove",
+                    style: "destructive",
+                    onPress: () => {
+                        setProofsBase64(prev => prev.filter((_, index) => index !== indexToRemove));
+                        Alert.alert("Removed", "Attachment removed successfully.");
+                    },
+                },
+            ]
+        );
     };
     
     const saveComplaint = async () => {
@@ -285,6 +378,8 @@ const NewComplaintScreen = () => {
     if (isLoadingInitialData) {
         return <View style={styles.loaderContainerFullPage}><ActivityIndicator size="large" /><Text>Loading your info...</Text></View>;
     }
+
+    const isAttachButtonDisabled = proofsBase64.length >= MAX_ATTACHMENTS;
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -361,12 +456,16 @@ const NewComplaintScreen = () => {
                 <Text style={styles.sectionTitle}>Proof of Complaint</Text>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Attach Proof (Photos or Videos)</Text>
-                    <TouchableOpacity onPress={pickProof} style={styles.attachButton}>
-                        <MaterialCommunityIcons name="attachment" size={24} color="#5E76FF" />
-                        <Text style={styles.attachButtonText}>
+                    <TouchableOpacity 
+                        onPress={pickProof} 
+                        style={[styles.attachButton, isAttachButtonDisabled && styles.buttonDisabled]}
+                        disabled={isAttachButtonDisabled}
+                    >
+                        <MaterialCommunityIcons name="attachment" size={24} color={isAttachButtonDisabled ? '#A9B4FF' : '#5E76FF'} />
+                        <Text style={[styles.attachButtonText, isAttachButtonDisabled && { color: '#A9B4FF' }]}>
                             {proofsBase64.length > 0
-                                ? `${proofsBase64.length} File(s) Attached`
-                                : 'Select Files'}
+                                ? `${proofsBase64.length} / ${MAX_ATTACHMENTS} File(s) Attached`
+                                : `Select Files (Max ${MAX_ATTACHMENTS})`}
                         </Text>
                     </TouchableOpacity>
                     {proofsBase64.length > 0 && (

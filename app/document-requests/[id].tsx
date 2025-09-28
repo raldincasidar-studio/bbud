@@ -213,6 +213,19 @@ const ViewDocumentRequestScreen = () => {
                     </View>
                 </View>
 
+                {/* New Conditional Block for Declined Status Reason */}
+                {requestDetails.document_status === "Declined" && requestDetails.status_reason && (
+                    <View style={styles.detailCard}>
+                        <Text style={styles.cardTitle}>Declined Reason</Text>
+                        <View style={styles.detailRow}>
+                            <MaterialCommunityIcons name="information-outline" size={20} color="#EF5350" style={styles.detailIcon} />
+                            <Text style={styles.detailLabel}>Reason:</Text>
+                            <Text style={[styles.detailValue, { color: '#EF5350', fontWeight: 'bold' }]}>{requestDetails.status_reason}</Text>
+                        </View>
+                    </View>
+                )}
+                {/* End New Conditional Block */}
+
                 {/* {['Pending', 'Processing'].includes(requestDetails.document_status) && (
                     <TouchableOpacity 
                         style={[styles.followUpButton, isSubmitting && styles.disabledButton, { marginBottom: 16 }]} 
