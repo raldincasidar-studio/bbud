@@ -4,9 +4,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
+import { Video } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Platform, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Modal, Platform, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // Debounce utility
 function debounce(func, delay) {
@@ -69,6 +70,10 @@ const ViewComplaintScreen = () => {
     const [isLoadingPersonComplained, setIsLoadingPersonComplained] = useState(false);
     const [selectedPersonComplainedIsResident, setSelectedPersonComplainedIsResident] = useState(false);
 
+    const [isMediaViewerVisible, setIsMediaViewerVisible] = useState(false);
+    const [selectedMedia, setSelectedMedia] = useState(null);
+    const [selectedMediaType, setSelectedMediaType] = useState('image'); // 'image' or 'video'
+
     const statusOptions = [
         { label: 'New', value: 'New' }, { label: 'Under Investigation', value: 'Under Investigation' },
         { label: 'Resolved', value: 'Resolved' }, { label: 'Closed', value: 'Closed' }, { label: 'Dismissed', value: 'Dismissed' }
@@ -86,8 +91,7 @@ const ViewComplaintScreen = () => {
             return isoStr;
         } catch (e) { return (type === 'date' ? new Date().toISOString().split('T')[0] : new Date().toTimeString().slice(0,5)); }
     };
-    const formatDateForAPI = (dateStr) => { if (!dateStr) return null; return new Date(dateStr).toISOString(); };
-    const formatTimeForAPI = (timeStr) => { if (!timeStr) return null; return timeStr; };
+
     const formatDateForDisplay = (dateStr, includeTime = false) => {
         if(!dateStr)return'N/A';
         try{
@@ -133,8 +137,13 @@ const ViewComplaintScreen = () => {
         }
     }, [complaintId]);
 
-    useEffect(() => { fetchComplaintDetails(); }, [fetchComplaintDetails]);
-    useFocusEffect(fetchComplaintDetails);
+    // Corrected useFocusEffect hook
+    useFocusEffect(
+        useCallback(() => {
+            fetchComplaintDetails();
+        }, [fetchComplaintDetails])
+    );
+    
     const onRefresh = useCallback(() => { setRefreshing(true); fetchComplaintDetails(); }, [fetchComplaintDetails]);
 
     const resetEditableData = useCallback(() => {
@@ -209,15 +218,6 @@ const ViewComplaintScreen = () => {
         setComplainantSearchQuery(name);
         setComplainantSearchResults([]);
     };
-    const clearComplainantSelection = () => {
-        setComplainantSearchQuery('');
-        setEditableComplaint(prev => ({
-            ...prev,
-            complainant_resident_id: null, complainant_display_name: '',
-            complainant_address: '', contact_number: ''
-        }));
-        setComplainantSearchResults([]);
-    };
 
     // Person Complained Against Search
     useEffect(() => {
@@ -253,16 +253,6 @@ const ViewComplaintScreen = () => {
         setSelectedPersonComplainedIsResident(true);
         setPersonComplainedSearchResults([]);
     };
-    const clearPersonComplainedSelection = () => {
-        setPersonComplainedSearchQuery('');
-        setEditableComplaint(prev => ({
-            ...prev,
-            person_complained_against_resident_id: null,
-            person_complained_against_name: '',
-        }));
-        setSelectedPersonComplainedIsResident(false);
-        setPersonComplainedSearchResults([]);
-    };
 
     const saveChanges = async () => { 
         if (!editableComplaint.complainant_resident_id) { Alert.alert("Error", "Complainant info is missing."); return; }
@@ -288,8 +278,6 @@ const ViewComplaintScreen = () => {
                 person_complained_against_resident_id: selectedPersonComplainedIsResident ? editableComplaint.person_complained_against_resident_id : null,
                 status: editableComplaint.status,
                 notes_description: editableComplaint.notes_description.trim(),
-                // proofs_base64 are not updated through this screen, so we don't send them in PUT payload unless there's a specific edit functionality for them
-                // If you need to allow adding/removing proofs in edit mode, you would need to add state and logic for it.
             };
 
             const response = await apiRequest('PUT', `/api/complaints/${complaintId}`, payload);
@@ -302,15 +290,8 @@ const ViewComplaintScreen = () => {
         } finally { setIsSaving(false); }
     };
     const showDeleteConfirmation = () => {
-        Alert.alert(
-            "Delete Complaint",
-            "Are you sure you want to delete this complaint? This action cannot be undone.",
-            [
-                { text: "Cancel", style: "cancel" },
-                { text: "Delete", onPress: deleteComplaint, style: "destructive" },
-            ],
-            { cancelable: true }
-        );
+        Alert.alert( "Delete Complaint", "Are you sure you want to delete this complaint? This action cannot be undone.",
+            [ { text: "Cancel", style: "cancel" }, { text: "Delete", onPress: deleteComplaint, style: "destructive" }, ], { cancelable: true } );
     };
     const deleteComplaint = async () => {
         setIsDeleting(true);
@@ -319,17 +300,22 @@ const ViewComplaintScreen = () => {
             if (response && response.message) {
                 Alert.alert("Success", response.message || "Complaint deleted successfully!");
                 router.replace('/complaints'); // Navigate back to list
-            } else {
-                Alert.alert("Error", response?.error || response?.message || "Could not delete complaint.");
-            }
-        } catch (error) {
-            console.error("Error deleting complaint:", error);
-            Alert.alert("Error", error.response?.data?.message || error.message || "An unexpected error occurred.");
-        } finally {
-            setIsDeleting(false);
-        }
+            } else { Alert.alert("Error", response?.error || response?.message || "Could not delete complaint."); }
+        } catch (error) { console.error("Error deleting complaint:", error); Alert.alert("Error", error.response?.data?.message || error.message || "An unexpected error occurred.");
+        } finally { setIsDeleting(false); }
     };
-
+    
+    const openMediaViewer = (base64String) => {
+        setSelectedMedia(base64String);
+        if (base64String.startsWith('data:image')) { setSelectedMediaType('image');
+        } else if (base64String.startsWith('data:video')) { setSelectedMediaType('video'); }
+        setIsMediaViewerVisible(true);
+    };
+    
+    const closeMediaViewer = () => {
+        setIsMediaViewerVisible(false);
+        setSelectedMedia(null);
+    };
 
     // --- JSX for rendering ---
     if (isLoading) return <View style={styles.loaderContainerFullPage}><ActivityIndicator size="large" color="#0F00D7" /><Text style={styles.loadingText}>Loading Complaint...</Text></View>;
@@ -353,15 +339,9 @@ const ViewComplaintScreen = () => {
                                 {isSaving ? <ActivityIndicator size="small" color="white" /> : <MaterialCommunityIcons name="content-save" size={26} color="white" />}
                             </TouchableOpacity>
                         </>
-                    ) : (
-                        <>
-                            {/* uncomment to enable edit mode */}
-                            {/* <TouchableOpacity onPress={() => toggleEditMode(true)} style={{ marginRight: 15 }}>
-                                <MaterialCommunityIcons name="pencil-outline" size={26} color="white" />
-                            </TouchableOpacity> */}
-                            {/* <TouchableOpacity onPress={showDeleteConfirmation} disabled={isDeleting}>
-                                {isDeleting ? <ActivityIndicator size="small" color="white" /> : <MaterialCommunityIcons name="delete-outline" size={26} color="white" />}
-                            </TouchableOpacity> */}
+                    ) : ( <>
+                            {/* <TouchableOpacity onPress={() => toggleEditMode(true)} style={{ marginRight: 15 }}><MaterialCommunityIcons name="pencil-outline" size={26} color="white" /></TouchableOpacity> */}
+                            {/* <TouchableOpacity onPress={showDeleteConfirmation} disabled={isDeleting}>{isDeleting ? <ActivityIndicator size="small" color="white" /> : <MaterialCommunityIcons name="delete-outline" size={26} color="white" />}</TouchableOpacity> */}
                         </>
                     )}
                 </View>
@@ -409,7 +389,7 @@ const ViewComplaintScreen = () => {
                             <Text style={styles.datePickerButtonText}>{editableComplaint.time_of_complaint || new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</Text>
                         </TouchableOpacity>
                     ) : <Text style={styles.detailValueDisplay}>{editableComplaint.time_of_complaint || 'N/A'}</Text>}
-                    {showTimePicker && editMode && <DateTimePicker value={new Date(`1970-01-01T${editableComplaint.time_of_complaint || '00:00'}`)} mode="time" display="default" onChange={(e,t)=>{setShowTimePicker(Platform.OS === 'ios'); if(e.type==='set'&&t)setEditableComplaint(p=>({...p,time_of_complaint:t.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).replace(/\s(A|P)M$/,'')}));}} is24Hour={Platform.OS === 'ios' ? false : true}/>}
+                    {showTimePicker && editMode && <DateTimePicker value={new Date(`1970-01-01T${editableComplaint.time_of_complaint || '00:00'}`)} mode="time" display="default" onChange={(e,t)=>{setShowTimePicker(Platform.OS === 'ios'); if(e.type==='set'&&t)setEditableComplaint(p=>({...p,time_of_complaint:t.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).replace(/\s(A|P)M$/,'')}));}} is24Hour={Platform.OS !== 'ios'}/>}
                 </View>
 
                 <View style={styles.inputContainer}>
@@ -434,7 +414,6 @@ const ViewComplaintScreen = () => {
                 </View>
 
                 <View style={styles.inputContainer}><Text style={styles.label}>Notes / Description <Text style={editMode && styles.requiredStar}>*</Text></Text>{editMode ? <TextInput placeholder="Describe complaint..." value={editableComplaint.notes_description} onChangeText={val => setEditableComplaint(prev => ({...prev, notes_description: val}))} style={[styles.textInput, {height:120}]} multiline textAlignVertical="top"/> : <Text style={styles.detailValueDisplay}>{editableComplaint.notes_description || 'N/A'}</Text>}</View>
-
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Status <Text style={editMode && styles.requiredStar}>*</Text></Text>
                     {editMode ? (
@@ -453,38 +432,36 @@ const ViewComplaintScreen = () => {
                         <ScrollView horizontal style={styles.proofsPreviewScroll}>
                             <View style={styles.proofsPreviewContainer}>
                                 {complaintData.proofs_base64.map((base64String, index) => (
-                                    <View key={index} style={styles.proofPreviewItem}>
-                                        {base64String.startsWith('data:image') ? (
-                                            <Image source={{ uri: base64String }} style={styles.proofThumbnail} />
-                                        ) : base64String.startsWith('data:video') ? (
-                                            <MaterialCommunityIcons name="video" size={40} color="#555" />
-                                        ) : (
-                                            <MaterialCommunityIcons name="file-question" size={40} color="#555" />
-                                        )}
-                                        {/* In view mode, we don't allow removal directly */}
-                                        {/* <TouchableOpacity onPress={() => removeProof(index)} style={styles.removeProofButton}>
-                                            <MaterialCommunityIcons name="close-circle" size={20} color="red" />
-                                        </TouchableOpacity> */}
-                                    </View>
+                                    <TouchableOpacity key={index} onPress={() => openMediaViewer(base64String)}>
+                                        <View style={styles.proofPreviewItem}>
+                                            {base64String.startsWith('data:image') ? (
+                                                <Image source={{ uri: base64String }} style={styles.proofThumbnail} />
+                                            ) : base64String.startsWith('data:video') ? (
+                                                <View style={styles.videoThumbnail}><MaterialCommunityIcons name="video" size={40} color="#555" /></View>
+                                            ) : ( <MaterialCommunityIcons name="file-question" size={40} color="#555" /> )}
+                                        </View>
+                                    </TouchableOpacity>
                                 ))}
                             </View>
                         </ScrollView>
                     </>
                 )}
-                {/* End Proof of Complaint Display Section */}
+                
+                {/* Media Viewer Modal */}
+                <Modal animationType="slide" transparent={true} visible={isMediaViewerVisible} onRequestClose={closeMediaViewer}>
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            {selectedMedia && selectedMediaType === 'image' && ( <Image source={{ uri: selectedMedia }} style={styles.fullMedia} resizeMode="contain" /> )}
+                            {selectedMedia && selectedMediaType === 'video' && ( <Video source={{ uri: selectedMedia }} style={styles.fullMedia} useNativeControls resizeMode="contain" isLooping /> )}
+                            <TouchableOpacity style={styles.closeButton} onPress={closeMediaViewer}>
+                                <MaterialCommunityIcons name="close" size={30} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
 
-                 {!editMode && complaintData.created_at && (
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Filed On:</Text>
-                        <Text style={styles.detailValueDisplay}>{formatDateForDisplay(complaintData.created_at, true)}</Text>
-                    </View>
-                )}
-                 {!editMode && complaintData.updated_at && complaintData.updated_at !== complaintData.created_at && (
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Last Updated:</Text>
-                        <Text style={styles.detailValueDisplay}>{formatDateForDisplay(complaintData.updated_at, true)}</Text>
-                    </View>
-                )}
+                 {!editMode && complaintData.created_at && ( <View style={styles.inputContainer}><Text style={styles.label}>Filed On:</Text><Text style={styles.detailValueDisplay}>{formatDateForDisplay(complaintData.created_at, true)}</Text></View> )}
+                 {!editMode && complaintData.updated_at && complaintData.updated_at !== complaintData.created_at && ( <View style={styles.inputContainer}><Text style={styles.label}>Last Updated:</Text><Text style={styles.detailValueDisplay}>{formatDateForDisplay(complaintData.updated_at, true)}</Text></View> )}
             </ScrollView>
         </SafeAreaView>
     );
@@ -493,9 +470,9 @@ const ViewComplaintScreen = () => {
 // Styles
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#F4F7FC' },
-    navbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, paddingTop: Platform.OS === 'android' ? 30 : 45, backgroundColor: '#0F00D7' },
+    navbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, paddingTop: Platform.OS === 'android' ? 40 : 50, backgroundColor: '#0F00D7' },
     navbarTitle: { fontSize: 18, fontWeight: 'bold', color: 'white', flex: 1, textAlign: 'center', marginHorizontal: 10 },
-    navbarActions: { flexDirection: 'row', alignItems: 'center' }, // Added for actions on the right
+    navbarActions: { flexDirection: 'row', alignItems: 'center' },
     scrollView: { flex: 1 },
     scrollViewContent: { padding: 15, paddingBottom: 30 },
     loaderContainerFullPage: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' },
@@ -507,45 +484,28 @@ const styles = StyleSheet.create({
     label: { color: '#444', fontSize: 15, marginBottom: 7, fontWeight: '500' },
     requiredStar: { color: 'red' },
     textInput: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, fontSize: 16, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 12 : 10, color: '#333', backgroundColor: '#F9F9F9' },
-    readOnlyInput: { backgroundColor: '#ECEFF1', color: '#546E7A' },
     pickerWrapper: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, backgroundColor: '#F9F9F9' },
     picker: { height: 50, width: '100%', color: '#333' },
     datePickerButton: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, paddingVertical: 12, backgroundColor: '#F9F9F9', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 12, height: 48 },
     datePickerButtonText: { fontSize: 16, color: '#333' },
     detailValueDisplay: { fontSize: 16, color: '#333', paddingVertical: Platform.OS === 'ios' ? 13 : 11, paddingHorizontal: 12, borderWidth:1, borderColor: '#F0F0F0', borderRadius: 8, backgroundColor: '#F9F9F9', minHeight: 48, textAlignVertical: 'center'},
     sectionTitle: { fontSize: 17, fontWeight: '600', color: '#0F00D7', marginTop: 20, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#ddd', paddingBottom: 6},
-    searchResultsContainer: { marginTop: 5, borderColor: '#DDD', borderWidth: 1, borderRadius: 8, maxHeight: 150, backgroundColor: 'white', zIndex: 1000, },
+    searchResultsContainer: { position: 'absolute', top: 75, left:0, right: 0, marginTop: 5, borderColor: '#DDD', borderWidth: 1, borderRadius: 8, maxHeight: 150, backgroundColor: 'white', zIndex: 1000, },
     searchResultItem: { padding: 12, borderBottomWidth: 1, borderColor: '#EEE' },
     searchLoader: { marginVertical: 5 },
     noResultsTextSmall: { textAlign: 'center', color: '#777', padding: 8, fontSize: 13 },
     selectedNameHint: { fontSize: 13, color: 'green', marginTop: 5, marginLeft: 2 },
     // Styles for Proof of Complaint
-    proofsPreviewScroll: {
-        marginTop: 10,
-        maxHeight: 120,
-    },
-    proofsPreviewContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    proofPreviewItem: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        marginRight: 10,
-        marginBottom: 10,
-        padding: 5,
-        borderWidth: 1,
-        borderColor: '#EEE',
-        borderRadius: 8,
-        backgroundColor: '#F9F9F9',
-        position: 'relative',
-    },
-    proofThumbnail: {
-        width: 60,
-        height: 60,
-        borderRadius: 5,
-        resizeMode: 'cover',
-    },
+    proofsPreviewScroll: { marginTop: 10, maxHeight: 120, },
+    proofsPreviewContainer: { flexDirection: 'row', alignItems: 'center', },
+    proofPreviewItem: { flexDirection: 'column', alignItems: 'center', marginRight: 10, marginBottom: 10, padding: 5, borderWidth: 1, borderColor: '#EEE', borderRadius: 8, backgroundColor: '#F9F9F9', position: 'relative', width: 70, height: 70, justifyContent: 'center', },
+    proofThumbnail: { width: 60, height: 60, borderRadius: 5, resizeMode: 'cover', },
+    videoThumbnail: { width: 60, height: 60, borderRadius: 5, backgroundColor: '#E0E0E0', justifyContent: 'center', alignItems: 'center', },
+    // Styles for Media Viewer Modal
+    modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.8)', },
+    modalContent: { width: '95%', height: '80%', backgroundColor: 'black', borderRadius: 10, overflow: 'hidden', },
+    fullMedia: { flex: 1, width: '100%', height: '100%', },
+    closeButton: { position: 'absolute', top: 15, right: 15, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 20, padding: 5, zIndex: 2000, },
 });
 
 export default ViewComplaintScreen;
