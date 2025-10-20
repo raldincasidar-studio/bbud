@@ -141,8 +141,8 @@ export default function LoginScreen() { // Renamed component
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email or Contact Number</Text>
-              <TextInput placeholder='Enter your email or contact number' value={loginIdentifier} onChangeText={setLoginIdentifier} style={styles.textInput} autoCapitalize="none" />
+              <Text style={styles.label}>Email Address</Text>
+              <TextInput placeholder='Enter your email address' value={loginIdentifier} onChangeText={setLoginIdentifier} style={styles.textInput} autoCapitalize="none" />
             </View>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Password</Text>

@@ -14,7 +14,35 @@ interface Official {
   first_name: string;
   last_name: string;
   photo_url: string | null; // Based on your API and Vue component
+  status: string; // ADDED: Based on your backend, officials have a 'status' field
 }
+
+// Define STATUS constants based on backend
+// IMPORTANT: Please ensure these statuses match your actual backend implementation
+const STATUS = {
+  // For Borrowed Assets (confirmed from your backend)
+  PENDING: 'Pending',
+  APPROVED: 'Approved',
+  OVERDUE: 'Overdue',
+  DECLINED: 'Declined',
+  RETURNED: 'Returned',
+
+  // ASSUMPTION: For Document Requests (please verify with your backend)
+  DOCUMENT_PENDING: 'Pending',
+
+  // ASSUMPTION: For Complaints (please verify with your backend)
+  COMPLAINT_NEW: 'New',
+  // Add other statuses as needed for documents and complaints if they differ
+};
+
+
+// Helper component for the red dot badge indicator
+const RedDotBadge = ({ count }) => {
+  if (count === 0) return null; // Only show if count is greater than 0
+  return (
+    <View style={styles.redDotBadge} />
+  );
+};
 
 export default function Index() {
   const router = useRouter();
@@ -22,6 +50,12 @@ export default function Index() {
   const [user, setUser] = useState(null);
   const [officials, setOfficials] = useState<Official[]>([]);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0); // New state for notification count
+
+  // New states for the red dot indicators
+  const [pendingDocumentRequestsCount, setPendingDocumentRequestsCount] = useState(0);
+  const [newComplaintsCount, setNewComplaintsCount] = useState(0);
+  const [pendingBorrowedAssetsCount, setPendingBorrowedAssetsCount] = useState(0);
+
 
   const fetchNotifications = useCallback(async () => {
     if (user?._id) {
@@ -40,6 +74,67 @@ export default function Index() {
     }
   }, [user]);
 
+
+  // New fetch function for pending document requests
+  const fetchPendingDocumentRequests = useCallback(async () => {
+    if (user?._id) {
+      // NOTE: This assumes you have a backend endpoint like `/api/document-requests`
+      // that returns a `total` count for the specified resident and status.
+      const path = `/api/document-requests?byResidentId=${user._id}&status=${STATUS.DOCUMENT_PENDING}`;
+      try {
+        const data = await apiRequest('get', path, null);
+        if (data && typeof data.total === 'number') {
+          setPendingDocumentRequestsCount(data.total);
+        } else {
+          setPendingDocumentRequestsCount(0);
+        }
+      } catch (error) {
+        console.error('Error fetching pending document requests:', error);
+        setPendingDocumentRequestsCount(0);
+      }
+    }
+  }, [user]);
+
+  // New fetch function for new complaints
+  const fetchNewComplaints = useCallback(async () => {
+    if (user?._id) {
+      // NOTE: This assumes you have a backend endpoint like `/api/complaints`
+      // that returns a `total` count for the specified resident and status.
+      const path = `/api/complaints?byResidentId=${user._id}&status=${STATUS.COMPLAINT_NEW}`;
+      try {
+        const data = await apiRequest('get', path, null);
+        if (data && typeof data.total === 'number') {
+          setNewComplaintsCount(data.total);
+        } else {
+          setNewComplaintsCount(0);
+        }
+      } catch (error) {
+        console.error('Error fetching new complaints:', error);
+        setNewComplaintsCount(0);
+      }
+    }
+  }, [user]);
+
+  // New fetch function for pending borrowed assets
+  const fetchPendingBorrowedAssets = useCallback(async () => {
+    if (user?._id) {
+      // This uses your existing backend endpoint `/api/borrowed-assets` with filters.
+      const path = `/api/borrowed-assets?byResidentId=${user._id}&status=${STATUS.PENDING}`;
+      try {
+        const data = await apiRequest('get', path, null);
+        if (data && typeof data.total === 'number') {
+          setPendingBorrowedAssetsCount(data.total);
+        } else {
+          setPendingBorrowedAssetsCount(0);
+        }
+      } catch (error) {
+        console.error('Error fetching pending borrowed assets:', error);
+        setPendingBorrowedAssetsCount(0);
+      }
+    }
+  }, [user]);
+
+
   useEffect(() => {
     const getUserData = async () => {
       try {
@@ -55,14 +150,12 @@ export default function Index() {
     };
 
     const fetchOfficials = async () => {
-      // The path includes query params to limit the results for the slider
       const path = '/api/barangay-officials?itemsPerPage=15';
       const data = await apiRequest('get', path, null);
 
-      // The apiRequest function returns false on failure
       if (data && data.officials) {
-        // The API returns an object { officials: [...] }, so we extract the array
-        setOfficials(data.officials);
+        const activeOfficials = data.officials.filter((official: Official) => official.status === 'Active');
+        setOfficials(activeOfficials);
       }
     };
 
@@ -72,10 +165,14 @@ export default function Index() {
 
   useFocusEffect(
     useCallback(() => {
+      // Fetch all counts when the screen focuses
       fetchNotifications();
-    }, [fetchNotifications])
+      fetchPendingDocumentRequests();
+      fetchNewComplaints();
+      fetchPendingBorrowedAssets();
+    }, [fetchNotifications, fetchPendingDocumentRequests, fetchNewComplaints, fetchPendingBorrowedAssets])
   );
-  
+
 
   const comingSoon = () => {
     Alert.alert(
@@ -114,7 +211,7 @@ export default function Index() {
       marginTop: -40,
       paddingTop: 40
     }}>
-      
+
       {/* Navbar */}
       <View style={{
         display: 'flex',
@@ -126,7 +223,7 @@ export default function Index() {
         paddingTop: 40
       }}>
         <Image style={{ height: 50, width: 130, objectFit: 'contain' }} source={require('@/assets/images/logo-name.png')} />
-        
+
         {/* Group for Settings and Notification Icons */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}> {/* Added gap for spacing between icons */}
           {/* Settings Icon */}
@@ -153,7 +250,7 @@ export default function Index() {
         </View>
       </View>
 
-      
+
 
       {/* Content */}
       <View style={{
@@ -178,9 +275,9 @@ export default function Index() {
             color: '#7F7F7F',
           }}>{ user?.email || '...' }</Text>
         </View>
-        
+
       </View>
-      
+
 
       {/* Grid of selection */}
       <View style={styles.menuGridContainer}>
@@ -188,6 +285,7 @@ export default function Index() {
         <TouchableOpacity onPress={() => router.push('/request-document')} style={styles.menuItemWrapper}>
             <View style={styles.menuItemIconContainer}>
                 <Image style={styles.menuItemIcon} source={require('@/assets/images/request-document.png')} />
+                <RedDotBadge count={pendingDocumentRequestsCount} />
             </View>
             <Text style={styles.menuItemText}>Request Document</Text>
         </TouchableOpacity>
@@ -196,6 +294,7 @@ export default function Index() {
         <TouchableOpacity onPress={() => router.push('/complaints')} style={styles.menuItemWrapper}>
             <View style={styles.menuItemIconContainer}>
                 <Image style={styles.menuItemIcon} source={require('@/assets/images/file-a-complaint.png')} />
+                <RedDotBadge count={newComplaintsCount} />
             </View>
             <Text style={styles.menuItemText}>File Complaint</Text>
         </TouchableOpacity>
@@ -204,6 +303,7 @@ export default function Index() {
         <TouchableOpacity onPress={ () => router.push('/borrowed-assets') } style={styles.menuItemWrapper}>
             <View style={styles.menuItemIconContainer}>
                 <Image style={styles.menuItemIcon} source={require('@/assets/images/borrow-assets.png')} />
+                <RedDotBadge count={pendingBorrowedAssetsCount} />
             </View>
             <Text style={styles.menuItemText}>Borrow Assets</Text>
         </TouchableOpacity>
@@ -232,7 +332,7 @@ export default function Index() {
             <Text style={styles.menuItemText}>Budget</Text>
         </TouchableOpacity>
       </View>
-          
+
       {/* --- START: BARANGAY OFFICIALS SLIDER --- */}
       {officials.length > 0 && (
         <View style={{ marginTop: 25 }}>
@@ -310,22 +410,22 @@ const styles = StyleSheet.create({
     color: '#757575',
     textAlign: 'center',
   },
-  // New styles for the notification badge
+  // Styles for the main notification badge (top right)
   notificationBadge: {
     position: 'absolute',
-    right: -5, // Adjust this value to position the badge horizontally
-    top: -5,   // Adjust this value to position the badge vertically
+    right: -5,
+    top: -5,
     backgroundColor: 'red',
-    borderRadius: 10, // Makes it circular
-    width: 20,       // Badge width
-    height: 20,      // Badge height
+    borderRadius: 10,
+    width: 20,
+    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1, // Ensures the badge appears on top of the bell icon
+    zIndex: 1,
   },
   notificationBadgeText: {
     color: 'white',
-    fontSize: 11, // Adjust font size for better fit within the badge
+    fontSize: 11,
     fontWeight: 'bold',
   },
 
@@ -333,27 +433,28 @@ const styles = StyleSheet.create({
   menuGridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between', // Distribute items evenly
-    paddingHorizontal: 20, // Overall padding for the grid
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
     paddingBottom: 0,
-    marginTop: 10, // Add some top margin to separate from the welcome message
+    marginTop: 10,
   },
   menuItemWrapper: {
-    width: '30%', // Allows for 3 items per row with space in between
-    marginBottom: 20, // Vertical spacing between rows of items
-    alignItems: 'center', // Centers content (icon and text) horizontally
+    width: '30%',
+    marginBottom: 20,
+    alignItems: 'center',
   },
   menuItemIconContainer: {
-    width: 70, // Fixed size for the background circle/square
+    width: 70,
     height: 70,
-    borderRadius: 15, // Rounded corners for the icon background
+    borderRadius: 15,
     backgroundColor: '#D8E9FC',
-    justifyContent: 'center', // Center icon vertically
-    alignItems: 'center', // Center icon horizontally
-    marginBottom: 10, // Space between icon and text
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    position: 'relative', // IMPORTANT: Allows absolute positioning of RedDotBadge
   },
   menuItemIcon: {
-    width: 45, // Size of the actual icon image
+    width: 45,
     height: 45,
     objectFit: 'contain',
   },
@@ -361,6 +462,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     color: 'black',
-    fontWeight: '500', // Make text a bit bolder for better readability
+    fontWeight: '500',
+  },
+  // Style for the smaller red dot indicator on menu items
+  redDotBadge: {
+    position: 'absolute',
+    top: -3,   // Adjust position as needed
+    right: -3, // Adjust position as needed
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
+    zIndex: 2, // Ensure it's above the icon
   },
 });

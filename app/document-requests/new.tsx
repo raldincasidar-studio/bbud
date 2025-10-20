@@ -777,25 +777,32 @@ const NewDocumentRequestScreen = () => {
 
     const handleDetailChange = (detailField: string, value: any) => {
         setForm(prev => {
-            let updatedDetails = { ...prev.details, [detailField]: value };
+            let updatedDetails = { ...prev.details };
 
-            // Auto-fill birthdate when a partner object is selected
-            if (detailField === 'male_partner' && value && value.birthdate) {
-                updatedDetails.male_partner_birthdate = value.birthdate.split('T')[0];
-            } else if (detailField === 'male_partner' && !value) { // Clear birthdate if partner is cleared
-                updatedDetails.male_partner_birthdate = '';
-            }
-            if (detailField === 'female_partner' && value && value.birthdate) {
-                updatedDetails.female_partner_birthdate = value.birthdate.split('T')[0];
-            } else if (detailField === 'female_partner' && !value) { // Clear birthdate if partner is cleared
-                updatedDetails.female_partner_birthdate = '';
+            if (detailField === 'male_partner' || detailField === 'female_partner') {
+                let selectedResidentObject: Resident | null = null;
+                let residentBirthdate = '';
+
+                if (value && typeof value === 'string' && value !== '') { // value is the _id from PickerInput
+                    selectedResidentObject = cohabitationHouseholdMembers.find(member => member._id === value) || null;
+                    residentBirthdate = selectedResidentObject?.birthdate?.split('T')[0] || '';
+                }
+                // If value is '' (empty selection from picker), selectedResidentObject will be null and residentBirthdate will be ''
+
+                updatedDetails[detailField] = selectedResidentObject;
+                if (detailField === 'male_partner') {
+                    updatedDetails.male_partner_birthdate = residentBirthdate;
+                } else { // female_partner
+                    updatedDetails.female_partner_birthdate = residentBirthdate;
+                }
+            } else {
+                updatedDetails[detailField] = value;
             }
 
-            validateField(`details.${detailField}`, value);
+            validateField(`details.${detailField}`, updatedDetails[detailField]);
             // Re-validate associated birthdate field if partner is set/cleared
             if (detailField === 'male_partner') validateField('details.male_partner_birthdate', updatedDetails.male_partner_birthdate);
             if (detailField === 'female_partner') validateField('details.female_partner_birthdate', updatedDetails.female_partner_birthdate);
-
 
             return { ...prev, details: updatedDetails };
         });
@@ -982,13 +989,19 @@ const NewDocumentRequestScreen = () => {
 
                 {form.request_type === 'Certificate of Cohabitation' && (
                     <>
-                        <ResidentSearchAndSelectInput
+                        <PickerInput
                             label="Full Name of Male Partner"
-                            selectedResident={form.details.male_partner}
-                            onSelectResident={(resident) => handleDetailChange('male_partner', resident)}
+                            value={form.details.male_partner?._id || ''}
+                            onValueChange={(itemValue) => handleDetailChange('male_partner', itemValue)}
+                            items={[
+                                { label: 'Select Male Partner *', value: '', enabled: false },
+                                ...cohabitationHouseholdMembers.map(member => ({
+                                    label: `${member.first_name} ${member.last_name}`,
+                                    value: member._id
+                                }))
+                            ]}
                             error={errors['details.male_partner']}
-                            placeholder="Search from household..."
-                            restrictToMembersList={cohabitationHouseholdMembers} // UPDATED: Pass restricted list
+                            placeholder="Select Male Partner" // Removed asterisk as label has it
                         />
                         <DatePickerInput
                             label="Birthdate of Male Partner"
@@ -996,13 +1009,19 @@ const NewDocumentRequestScreen = () => {
                             onPress={() => openDatePicker('male_partner_birthdate')}
                             error={errors['details.male_partner_birthdate']}
                         />
-                        <ResidentSearchAndSelectInput
+                        <PickerInput
                             label="Full Name of Female Partner"
-                            selectedResident={form.details.female_partner}
-                            onSelectResident={(resident) => handleDetailChange('female_partner', resident)}
+                            value={form.details.female_partner?._id || ''}
+                            onValueChange={(itemValue) => handleDetailChange('female_partner', itemValue)}
+                            items={[
+                                { label: 'Select Female Partner *', value: '', enabled: false },
+                                ...cohabitationHouseholdMembers.map(member => ({
+                                    label: `${member.first_name} ${member.last_name}`,
+                                    value: member._id
+                                }))
+                            ]}
                             error={errors['details.female_partner']}
-                            placeholder="Search from household..."
-                            restrictToMembersList={cohabitationHouseholdMembers} // UPDATED: Pass restricted list
+                            placeholder="Select Female Partner" // Removed asterisk as label has it
                         />
                         <DatePickerInput
                             label="Birthdate of Female Partner"
@@ -1132,7 +1151,7 @@ const NewDocumentRequestScreen = () => {
                             { label: 'Financial', value: 'Financial' },
                         ]}
                         error={errors['details.medical_educational_financial']}
-                        placeholder="Select Purpose *"
+                        placeholder="Select Purpose" // Removed asterisk as label has it
                     />
                 )}
 
@@ -1150,7 +1169,7 @@ const NewDocumentRequestScreen = () => {
                             { label: 'Others', value: 'Others' },
                         ]}
                         error={errors['details.badac_certificate']}
-                        placeholder="Select BADAC Purpose *"
+                        placeholder="Select BADAC Purpose" // Removed asterisk as label has it
                     />
                 )}
 
@@ -1246,7 +1265,7 @@ const NewDocumentRequestScreen = () => {
                         }))
                     ]}
                     error={errors.requestor_resident_id}
-                    placeholder="Select Requestor *"
+                    placeholder="Select Requestor" // Removed asterisk as label has it
                     required={true}
                 />
 
@@ -1258,7 +1277,7 @@ const NewDocumentRequestScreen = () => {
                     onValueChange={(itemValue) => handleFormChange('request_type', itemValue)}
                     items={DOCUMENT_TYPES}
                     error={errors.request_type}
-                    placeholder="Select Document Type *"
+                    placeholder="Select Document Type" // Removed asterisk as label has it
                 />
 
                 {renderDynamicFields()}

@@ -1,9 +1,69 @@
 // app/forgot-password/verify.jsx
 import apiRequest from '@/plugins/axios';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import Ionicons
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+// Re-defining the password validation logic based on your PasswordChecklist component
+// This function is still used for the final submission check.
+const validatePassword = (password: string) => {
+    const minLength = password.length >= 8;
+    const hasLowercase = /[a-z]/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+    const characterTypeCount = [hasLowercase, hasUppercase, hasNumber, hasSpecialChar].filter(Boolean).length;
+    const hasThreeOfFour = characterTypeCount >= 3;
+
+    return {
+        minLength,
+        hasLowercase,
+        hasUppercase,
+        hasNumber,
+        hasSpecialChar,
+        hasThreeOfFour,
+        isValid: minLength && hasThreeOfFour
+    };
+};
+
+// NEW: Password Checklist Component (copied from your SignupScreen)
+const PasswordChecklist = ({ password }: { password: string }) => {
+    const minLength = password.length >= 8;
+    const hasLowercase = /[a-z]/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password); // Adjusted regex for common special characters
+
+    const characterTypeCount = [hasLowercase, hasUppercase, hasNumber, hasSpecialChar].filter(Boolean).length;
+    const hasThreeOfFour = characterTypeCount >= 3;
+
+    const renderCheckItem = (isValid: boolean, text: string) => (
+        <View style={styles.passwordChecklistItem}>
+            <Ionicons name={isValid ? "checkmark-circle" : "ellipse-outline"} size={16} color={isValid ? "#4CAF50" : "#A9A9A9"} style={{marginRight: 8}} />
+            <Text style={[styles.passwordChecklistText, isValid ? styles.validCheck : styles.invalidCheck]}>{text}</Text>
+        </View>
+    );
+
+    return (
+        <View style={styles.passwordChecklistContainer}>
+            <Text style={styles.passwordChecklistTitle}>Your password must contain:</Text>
+            {renderCheckItem(minLength, 'At least 8 characters')}
+            <View style={styles.passwordChecklistItem}>
+                <Ionicons name={hasThreeOfFour ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasThreeOfFour ? "#4CAF50" : "#A9A9A9"} style={{ marginRight: 8 }} />
+                <Text style={[styles.passwordChecklistText, hasThreeOfFour ? styles.validCheck : styles.invalidCheck]}>At least 3 of the following:</Text>
+            </View>
+            <View style={{ marginLeft: 30 }}> {/* Indent these items */}
+                {renderCheckItem(hasLowercase, 'Lower case letters (a-z)')}
+                {renderCheckItem(hasUppercase, 'Upper case letters (A-Z)')}
+                {renderCheckItem(hasNumber, 'Numbers (0-9)')}
+                {renderCheckItem(hasSpecialChar, 'Special characters (e.g. !@#$%^&*)')}
+            </View>
+        </View>
+    );
+};
+
 
 const ForgotPasswordVerifyScreen = () => {
     const router = useRouter();
@@ -14,6 +74,7 @@ const ForgotPasswordVerifyScreen = () => {
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [emailToVerify, setEmailToVerify] = useState('');
+    const [showNewPassword, setShowNewPassword] = useState(false); // State to toggle password visibility
 
     useEffect(() => {
         if (userEmail) {
@@ -30,10 +91,29 @@ const ForgotPasswordVerifyScreen = () => {
             Alert.alert('Invalid OTP', 'Please enter a valid 6-digit OTP.');
             return;
         }
-        if (newPassword.length < 6) {
-            Alert.alert('Invalid Password', 'New password must be at least 6 characters long.');
+
+        const passwordValidation = validatePassword(newPassword);
+
+        if (!passwordValidation.minLength) {
+            Alert.alert('Invalid Password', 'New password must be at least 8 characters long.');
             return;
         }
+
+        if (!passwordValidation.hasThreeOfFour) {
+            let requirementsMet = [];
+            if (passwordValidation.hasLowercase) requirementsMet.push('lowercase letters');
+            if (passwordValidation.hasUppercase) requirementsMet.push('uppercase letters');
+            if (passwordValidation.hasNumber) requirementsMet.push('numbers');
+            if (passwordValidation.hasSpecialChar) requirementsMet.push('special characters');
+
+            Alert.alert(
+                'Invalid Password',
+                `New password must contain at least 3 of the following: lowercase letters, uppercase letters, numbers, special characters. You currently have ${requirementsMet.length} requirement(s) met: ${requirementsMet.join(', ')}.`
+            );
+            return;
+        }
+        
+        // Original password mismatch check
         if (newPassword !== confirmNewPassword) {
             Alert.alert('Password Mismatch', 'New passwords do not match.');
             return;
@@ -95,23 +175,36 @@ const ForgotPasswordVerifyScreen = () => {
                     </View>
                     <View style={styles.inputContainer}>
                         <Text style={styles.label}>New Password</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="Enter new password"
-                            value={newPassword}
-                            onChangeText={setNewPassword}
-                            secureTextEntry
-                        />
+                        <View style={styles.passwordContainer}> {/* Use passwordContainer for eye icon */}
+                            <TextInput
+                                style={styles.passwordInput}
+                                placeholder="Enter new password"
+                                value={newPassword}
+                                onChangeText={setNewPassword}
+                                secureTextEntry={!showNewPassword}
+                            />
+                            <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)} style={styles.eyeIcon}>
+                                <Ionicons name={showNewPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#888" />
+                            </TouchableOpacity>
+                        </View>
                     </View>
+                    {/* Render PasswordChecklist here */}
+                    <PasswordChecklist password={newPassword} />
+
                     <View style={styles.inputContainer}>
                         <Text style={styles.label}>Confirm New Password</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="Confirm new password"
-                            value={confirmNewPassword}
-                            onChangeText={setConfirmNewPassword}
-                            secureTextEntry
-                        />
+                         <View style={styles.passwordContainer}> {/* Use passwordContainer for eye icon */}
+                            <TextInput
+                                style={styles.passwordInput}
+                                placeholder="Confirm new password"
+                                value={confirmNewPassword}
+                                onChangeText={setConfirmNewPassword}
+                                secureTextEntry={!showNewPassword} // Link to the same visibility state
+                            />
+                            <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)} style={styles.eyeIcon}>
+                                <Ionicons name={showNewPassword ? "eye-off-outline" : "eye-outline"} size={24} color="#888" />
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     <TouchableOpacity style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleResetPassword} disabled={isLoading}>
@@ -137,6 +230,61 @@ const styles = StyleSheet.create({
     button: { backgroundColor: '#5E76FF', paddingVertical: 15, borderRadius: 10, alignItems: 'center', width: '100%', minHeight: 50, justifyContent: 'center', marginTop: 10},
     buttonDisabled: { backgroundColor: '#A9B4FF' },
     buttonText: { color: 'white', fontSize: 17, fontWeight: 'bold' },
+
+    // NEW Styles for password input with eye icon
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#DDD',
+        borderRadius: 8,
+        backgroundColor: '#F9F9F9',
+        marginBottom: 0, // Adjusted to prevent double margin if inputContainer also has it
+    },
+    passwordInput: {
+        flex: 1,
+        fontSize: 16,
+        paddingHorizontal: 15,
+        paddingVertical: Platform.OS === 'ios' ? 14 : 12,
+        color: '#333',
+    },
+    eyeIcon: {
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+    },
+
+    // NEW Password Checklist Styles (copied from your SignupScreen styles)
+    passwordChecklistContainer: {
+        backgroundColor: '#f9f9f9',
+        borderRadius: 8,
+        padding: 15,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        width: '100%', // Ensure it takes full width within its container
+        marginTop: 10, // Add some space above the checklist
+    },
+    passwordChecklistTitle: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#333',
+        marginBottom: 10,
+    },
+    passwordChecklistItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    passwordChecklistText: {
+        fontSize: 14,
+        color: '#555',
+    },
+    validCheck: {
+        color: '#4CAF50', // Green for valid
+    },
+    invalidCheck: {
+        color: '#A9A9A9', // Gray for invalid or not yet met
+    },
 });
 
 export default ForgotPasswordVerifyScreen;

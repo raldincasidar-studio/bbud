@@ -5,8 +5,8 @@ import { Alert } from 'react-native'; // Keep Alert for unauthorized, but remove
 
 // Axios instance with base URL
 const apiClient = axios.create({
-  // baseURL: 'https://b-bud-new.vercel.app', // Your actual API URL
-  baseURL: 'https://7f286edee4f6.ngrok-free.app', // Your ngrok URL is correct here
+  baseURL: 'https://b-bud-new.vercel.app', // Your actual API URL
+  // baseURL: 'https://7f286edee4f6.ngrok-free.app', // Your ngrok URL is correct here
   timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Content-Type': 'application/json',
