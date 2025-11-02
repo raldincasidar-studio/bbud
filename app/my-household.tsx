@@ -1,4 +1,3 @@
-// app/my-household.tsx
 import apiRequest from '@/plugins/axios';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -46,6 +45,25 @@ const calculateAge = (dobString: string | null): number | null => {
     return age >= 0 ? age : null;
 };
 
+// New helper function to format date
+const formatDateForDisplay = (dateString: string | null): string => {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            return 'Invalid Date';
+        }
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+    } catch (e) {
+        console.error("Error formatting date:", e);
+        return 'N/A';
+    }
+};
+
 // --- Initial State Definitions ---
 
 const initialMemberState = {
@@ -72,7 +90,13 @@ const initialMemberState = {
     senior_citizen_card_base64: null as string | null,
 };
 
-type Member = typeof initialMemberState;
+// Define type for a member, including fields returned from the API
+type Member = typeof initialMemberState & {
+    _id?: string; // For existing members
+    proof_of_relationship_type?: string | null;
+    proof_of_relationship_base64?: string | null;
+    // Add any other fields that might be returned by the API for existing members
+};
 
 // Define all possible proof documents as per the prompt
 const ALL_POSSIBLE_PROOF_DOCUMENTS = [
@@ -156,7 +180,7 @@ const MyHouseholdScreen = () => {
     const [error, setError] = useState(null);
 
     // --- Modal and Member States ---
-    const [isModalVisible, setModalVisible] = useState(false);
+    const [isModalVisible, setModalVisible] = useState(false); // For Add Member Modal
     const [currentMember, setCurrentMember] = useState<Member>(initialMemberState);
     const [memberErrors, setMemberErrors] = useState<Partial<Record<keyof Member | 'proof_type' | 'proof_image', string>>>({});
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -166,6 +190,10 @@ const MyHouseholdScreen = () => {
     // --- State for photo and proof uploads ---
     const [proofType, setProofType] = useState<string>('');
     const [proofImageBase64, setProofImageBase64] = useState<string | null>(null);
+
+    // --- State for View Details Modal ---
+    const [isViewDetailsModalVisible, setIsViewDetailsModalVisible] = useState(false);
+    const [selectedMemberDetails, setSelectedMemberDetails] = useState<Member | null>(null);
 
 
     const resetForm = () => {
@@ -474,17 +502,20 @@ const MyHouseholdScreen = () => {
     }, [loggedInUserId, fetchHouseholdData]);
 
 
-    const renderMemberItem = (member, isCurrentUser = false) => (
+    const renderMemberItem = (member: Member, isCurrentUser = false) => (
         <View key={member._id} style={[styles.memberItem, isCurrentUser && styles.currentUserMemberItem]}>
             <MaterialCommunityIcons name="account-circle-outline" size={24} color={isCurrentUser ? "#0F00D7" : "#555"} style={styles.memberIcon} />
             <View style={styles.memberTextContainer}>
                 <Text style={[styles.memberName, isCurrentUser && styles.currentUserName]}>
                     {`${member.first_name || ''} ${member.middle_name || ''} ${member.last_name || ''}`.trim()}
                     {isCurrentUser && " (You)"}
-                    &nbsp;<Text style={{ color: "#b6b6b6ff" }}>{`#${member?._id.slice(-4)}`}</Text>
+                    &nbsp;<Text style={{ color: "#b6b6b6ff" }}>{`#${member?._id?.slice(-4)}`}</Text>
                 </Text>
                 <Text style={styles.memberDetail}>{member.relationship_to_head === 'Other' ? member.other_relationship : member.relationship_to_head || 'Head'}</Text>
             </View>
+            <TouchableOpacity onPress={() => { setSelectedMemberDetails(member); setIsViewDetailsModalVisible(true); }} style={styles.viewButton}>
+                <Ionicons name="eye-outline" size={24} color="#0F00D7" />
+            </TouchableOpacity>
         </View>
     );
 
@@ -522,6 +553,14 @@ const MyHouseholdScreen = () => {
                     <MaterialCommunityIcons name="account-details-outline" size={30} color="#0F00D7" />
                     <Text style={styles.profileName}>{`${resident.first_name || ''} ${resident.middle_name || ''} ${resident.last_name || ''}`.trim()}</Text>
                     <Text style={styles.profileEmail}>{resident.email || 'No Email'}</Text>
+                    {/* Add View Details button for the household head */}
+                    <TouchableOpacity
+                        onPress={() => { setSelectedMemberDetails(resident); setIsViewDetailsModalVisible(true); }}
+                        style={styles.viewButtonHead}
+                    >
+                        <Ionicons name="eye-outline" size={24} color="#0F00D7" />
+                        <Text style={styles.viewButtonHeadText}>View Details</Text>
+                    </TouchableOpacity>
                 </View>
 
                 {isHouseholdHead && (
@@ -544,6 +583,7 @@ const MyHouseholdScreen = () => {
                 
             </ScrollView>
 
+            {/* Add Household Member Modal */}
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -644,6 +684,122 @@ const MyHouseholdScreen = () => {
                 />
             </Modal>
 
+            {/* View Member Details Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isViewDetailsModalVisible}
+                onRequestClose={() => { setIsViewDetailsModalVisible(false); setSelectedMemberDetails(null); }}
+            >
+                <SafeAreaView style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Member Details</Text>
+                        <ScrollView contentContainerStyle={styles.viewDetailsScrollViewContent}>
+                            {selectedMemberDetails && (
+                                <>
+                                    <Text style={styles.detailLabel}>Name:</Text>
+                                    <Text style={styles.detailValue}>{`${selectedMemberDetails.first_name || ''} ${selectedMemberDetails.middle_name || ''} ${selectedMemberDetails.last_name || ''}`.trim()}</Text>
+
+                                    <Text style={styles.detailLabel}>Relationship to Head:</Text>
+                                    <Text style={styles.detailValue}>{selectedMemberDetails.relationship_to_head === 'Other' ? selectedMemberDetails.other_relationship : selectedMemberDetails.relationship_to_head || 'Head'}</Text>
+
+                                    <Text style={styles.detailLabel}>Date of Birth:</Text>
+                                    <Text style={styles.detailValue}>{formatDateForDisplay(selectedMemberDetails.date_of_birth)}</Text> {/* Applied formatting here */}
+
+                                    <Text style={styles.detailLabel}>Age:</Text>
+                                    <Text style={styles.detailValue}>{calculateAge(selectedMemberDetails.date_of_birth) || 'N/A'}</Text>
+
+                                    <Text style={styles.detailLabel}>Sex:</Text>
+                                    <Text style={styles.detailValue}>{selectedMemberDetails.sex || 'N/A'}</Text>
+
+                                    <Text style={styles.detailLabel}>Civil Status:</Text>
+                                    <Text style={styles.detailValue}>{selectedMemberDetails.civil_status || 'N/A'}</Text>
+
+                                    <Text style={styles.detailLabel}>Citizenship:</Text>
+                                    <Text style={styles.detailValue}>{selectedMemberDetails.citizenship || 'N/A'}</Text>
+
+                                    <Text style={styles.detailLabel}>Occupation Status:</Text>
+                                    <Text style={styles.detailValue}>{selectedMemberDetails.occupation_status || 'N/A'}</Text>
+
+                                    {selectedMemberDetails.email && (
+                                        <>
+                                            <Text style={styles.detailLabel}>Email:</Text>
+                                            <Text style={styles.detailValue}>{selectedMemberDetails.email}</Text>
+                                        </>
+                                    )}
+
+                                    {/* Special Classifications */}
+                                    <Text style={styles.modalSectionTitle}>Special Classifications</Text>
+                                    <View style={styles.classificationItem}>
+                                        <Text style={styles.classificationLabel}>Registered Voter:</Text>
+                                        <Text style={styles.classificationValue}>{selectedMemberDetails.is_voter ? 'Yes' : 'No'}</Text>
+                                    </View>
+                                    {selectedMemberDetails.is_voter && selectedMemberDetails.voter_id_number && (
+                                        <View style={styles.classificationItem}>
+                                            <Text style={styles.classificationLabel}>Voter ID:</Text>
+                                            <Text style={styles.classificationValue}>{selectedMemberDetails.voter_id_number}</Text>
+                                        </View>
+                                    )}
+                                    {selectedMemberDetails.is_voter && selectedMemberDetails.voter_registration_proof_base64 && (
+                                        <TouchableOpacity onPress={() => Alert.alert("View Proof", "Voter's Proof will be displayed here as an image viewer/modal.")}>
+                                            <Text style={styles.viewProofText}>View Voter's Proof</Text>
+                                        </TouchableOpacity>
+                                    )}
+
+                                    <View style={styles.classificationItem}>
+                                        <Text style={styles.classificationLabel}>PWD:</Text>
+                                        <Text style={styles.classificationValue}>{selectedMemberDetails.is_pwd ? 'Yes' : 'No'}</Text>
+                                    </View>
+                                    {selectedMemberDetails.is_pwd && selectedMemberDetails.pwd_id && (
+                                        <View style={styles.classificationItem}>
+                                            <Text style={styles.classificationLabel}>PWD ID:</Text>
+                                            <Text style={styles.classificationValue}>{selectedMemberDetails.pwd_id}</Text>
+                                        </View>
+                                    )}
+                                    {selectedMemberDetails.is_pwd && selectedMemberDetails.pwd_card_base64 && (
+                                        <TouchableOpacity onPress={() => Alert.alert("View Proof", "PWD Card will be displayed here as an image viewer/modal.")}>
+                                            <Text style={styles.viewProofText}>View PWD Card</Text>
+                                        </TouchableOpacity>
+                                    )}
+
+                                    <View style={styles.classificationItem}>
+                                        <Text style={styles.classificationLabel}>Senior Citizen:</Text>
+                                        <Text style={styles.classificationValue}>{selectedMemberDetails.is_senior_citizen ? 'Yes' : 'No'}</Text>
+                                    </View>
+                                    {selectedMemberDetails.is_senior_citizen && selectedMemberDetails.senior_citizen_id && (
+                                        <View style={styles.classificationItem}>
+                                            <Text style={styles.classificationLabel}>Senior Citizen ID:</Text>
+                                            <Text style={styles.classificationValue}>{selectedMemberDetails.senior_citizen_id}</Text>
+                                        </View>
+                                    )}
+                                    {selectedMemberDetails.is_senior_citizen && selectedMemberDetails.senior_citizen_card_base64 && (
+                                        <TouchableOpacity onPress={() => Alert.alert("View Proof", "Senior Citizen Card will be displayed here as an image viewer/modal.")}>
+                                            <Text style={styles.viewProofText}>View Senior Citizen Card</Text>
+                                        </TouchableOpacity>
+                                    )}
+
+                                    {/* Proof of Relationship (if applicable) */}
+                                    {selectedMemberDetails.proof_of_relationship_type && (
+                                        <View style={styles.proofSection}>
+                                            <Text style={styles.modalSectionTitle}>Proof of Relationship</Text>
+                                            <Text style={styles.detailLabel}>Proof Type:</Text>
+                                            <Text style={styles.detailValue}>{selectedMemberDetails.proof_of_relationship_type}</Text>
+                                            {selectedMemberDetails.proof_of_relationship_base64 && (
+                                                <TouchableOpacity onPress={() => Alert.alert("View Proof", "Proof of Relationship image will be displayed here as an image viewer/modal.")}>
+                                                    <Text style={styles.viewProofText}>View Proof Image</Text>
+                                                </TouchableOpacity>
+                                            )}
+                                        </View>
+                                    )}
+                                </>
+                            )}
+                            <TouchableOpacity style={[styles.modalButton, styles.modalButtonClose, {marginTop: 20}]} onPress={() => { setIsViewDetailsModalVisible(false); setSelectedMemberDetails(null); }}>
+                                <Text style={styles.modalButtonText}>Close</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+                    </View>
+                </SafeAreaView>
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -667,7 +823,7 @@ const styles = StyleSheet.create({
     sectionTitleCentered: { fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 10, textAlign: 'center' },
     sectionSubtitle: { fontSize: 16, fontWeight: '500', color: '#444', marginTop: 15, marginBottom: 10 },
     headInfoCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF9C4', padding: 10, borderRadius: 8, marginBottom: 15 },
-    memberItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#EEE' },
+    memberItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#EEE', justifyContent: 'space-between' }, // Added justifyContent
     currentUserMemberItem: { backgroundColor: '#E3F2FD', borderRadius: 6, paddingHorizontal: 8 },
     memberIcon: { marginRight: 12 },
     memberTextContainer: { flex: 1 },
@@ -710,6 +866,73 @@ const styles = StyleSheet.create({
     proofSection: { marginTop: 15, paddingTop: 15, borderTopWidth: 1, borderTopColor: '#E0E0E0', marginBottom: 10 },
     previewImage: { width: 100, height: 100, borderRadius: 8, alignSelf: 'center', marginVertical: 10 },
     previewImageSmall: { width: 70, height: 70, borderRadius: 4, alignSelf: 'center', marginTop: 10 },
+
+    // New styles for View Details Modal
+    viewButton: {
+        padding: 8,
+        borderRadius: 5,
+        // backgroundColor: '#E8EAF6',
+    },
+    viewButtonHead: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 15,
+        backgroundColor: '#E8EAF6',
+        paddingVertical: 8,
+        paddingHorizontal: 15,
+        borderRadius: 20,
+    },
+    viewButtonHeadText: {
+        marginLeft: 5,
+        color: '#0F00D7',
+        fontWeight: 'bold',
+        fontSize: 15,
+    },
+    viewDetailsScrollViewContent: {
+        paddingBottom: 20, // Add padding to the bottom of the scroll view
+    },
+    detailLabel: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#555',
+        marginTop: 10,
+        marginBottom: 2,
+    },
+    detailValue: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 8,
+        backgroundColor: '#F9F9F9',
+        padding: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#EEE',
+    },
+    classificationItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
+    },
+    classificationLabel: {
+        fontSize: 15,
+        color: '#555',
+        fontWeight: '500',
+    },
+    classificationValue: {
+        fontSize: 15,
+        color: '#333',
+    },
+    viewProofText: {
+        color: '#0F00D7',
+        textDecorationLine: 'underline',
+        marginTop: 5,
+        marginBottom: 10,
+        textAlign: 'right',
+        fontSize: 14,
+    }
 });
 
 export default MyHouseholdScreen;

@@ -38,6 +38,7 @@ const ViewComplaintScreen = () => {
         status: 'New',
         notes_description: '',
         proofs_base64: [], // Initialize proofs_base64 here
+        status_reason: '', // Initialize status_reason
     });
 
     const getStatusColor = (status) => {
@@ -120,6 +121,7 @@ const ViewComplaintScreen = () => {
                     complainant_display_name: fetched.complainant_display_name || `${fetched.complainant_details?.first_name || ''} ${fetched.complainant_details?.middle_name || ''} ${fetched.complainant_details?.last_name || ''}`.trim(),
                     person_complained_against_name: fetched.person_complained_against_name || `${fetched.person_complained_details?.first_name || ''} ${fetched.person_complained_details?.middle_name || ''} ${fetched.person_complained_details?.last_name || ''}`.trim(),
                     proofs_base64: fetched.proofs_base64 || [], // Ensure proofs are initialized
+                    status_reason: fetched.status_reason || '', // Ensure status_reason is initialized
                 };
                 setEditableComplaint(initialEditable);
                 setComplainantSearchQuery(initialEditable.complainant_display_name);
@@ -154,6 +156,7 @@ const ViewComplaintScreen = () => {
                 person_complained_against_name: '', person_complained_against_resident_id: null,
                 status: 'New', notes_description: '',
                 proofs_base64: [], // Reset proofs
+                status_reason: '', // Reset status_reason
             });
             setComplainantSearchQuery('');
             setPersonComplainedSearchQuery('');
@@ -167,6 +170,7 @@ const ViewComplaintScreen = () => {
             complainant_display_name: complaintData.complainant_display_name || `${complaintData.complainant_details?.first_name || ''} ${complaintData.complainant_details?.middle_name || ''} ${complaintData.complainant_details?.last_name || ''}`.trim(),
             person_complained_against_name: complaintData.person_complained_against_name || `${complaintData.person_complained_details?.first_name || ''} ${complaintData.person_complained_details?.middle_name || ''} ${complaintData.person_complained_details?.last_name || ''}`.trim(),
             proofs_base64: complaintData.proofs_base64 || [], // Keep proofs on reset
+            status_reason: complaintData.status_reason || '', // Keep status_reason on reset
         };
         setEditableComplaint(newEditable);
         setComplainantSearchQuery(newEditable.complainant_display_name);
@@ -260,6 +264,8 @@ const ViewComplaintScreen = () => {
         if (!editableComplaint.person_complained_against_name?.trim()) { Alert.alert("Validation Error", "Person Complained Against is required."); return; }
         if (!editableComplaint.status) { Alert.alert("Validation Error", "Status is required."); return; }
         if (!editableComplaint.notes_description?.trim()) { Alert.alert("Validation Error", "Notes/Description is required."); return; }
+        if (editableComplaint.status === 'Dismissed' && !editableComplaint.status_reason?.trim()) { Alert.alert("Validation Error", "Reason for dismissal is required when status is 'Dismissed'."); return; }
+
 
         setIsSaving(true);
         try {
@@ -278,6 +284,7 @@ const ViewComplaintScreen = () => {
                 person_complained_against_resident_id: selectedPersonComplainedIsResident ? editableComplaint.person_complained_against_resident_id : null,
                 status: editableComplaint.status,
                 notes_description: editableComplaint.notes_description.trim(),
+                status_reason: editableComplaint.status === 'Dismissed' ? editableComplaint.status_reason.trim() : null, // Include status_reason only if status is dismissed
             };
 
             const response = await apiRequest('PUT', `/api/complaints/${complaintId}`, payload);
@@ -425,6 +432,29 @@ const ViewComplaintScreen = () => {
                     ) : <Text style={[styles.detailValueDisplay, { color: getStatusColor(editableComplaint.status), fontWeight: 'bold'}]}>{editableComplaint.status || 'N/A'}</Text>}
                 </View>
 
+                {/* New code to display status_reason */}
+                {!editMode && complaintData?.status === 'Dismissed' && complaintData?.status_reason && (
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Reason for Dismissal:</Text>
+                        <Text style={styles.detailValueDisplay}>{complaintData.status_reason}</Text>
+                    </View>
+                )}
+                {/* New code to allow editing status_reason if in edit mode and status is dismissed */}
+                {editMode && editableComplaint.status === 'Dismissed' && (
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Reason for Dismissal <Text style={styles.requiredStar}>*</Text></Text>
+                        <TextInput
+                            placeholder="Enter reason for dismissal..."
+                            value={editableComplaint.status_reason}
+                            onChangeText={val => setEditableComplaint(prev => ({ ...prev, status_reason: val }))}
+                            style={[styles.textInput, { height: 80 }]}
+                            multiline
+                            textAlignVertical="top"
+                        />
+                    </View>
+                )}
+
+
                 {/* Proof of Complaint Display Section */}
                 {!editMode && complaintData.proofs_base64 && complaintData.proofs_base64.length > 0 && (
                     <>
@@ -507,5 +537,5 @@ const styles = StyleSheet.create({
     fullMedia: { flex: 1, width: '100%', height: '100%', },
     closeButton: { position: 'absolute', top: 15, right: 15, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 20, padding: 5, zIndex: 2000, },
 });
-
+ 
 export default ViewComplaintScreen;

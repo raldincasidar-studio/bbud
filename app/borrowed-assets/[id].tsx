@@ -31,6 +31,7 @@ interface TransactionData {
     date_returned?: string;
     status: 'Pending' | 'Processing' | 'Approved' | 'Overdue' | 'Returned' | 'Lost' | 'Damaged' | 'Resolved' | 'Rejected';
     notes?: string;
+    rejected_notes?: string;
     borrow_proof_attachments_base64?: string[];
     return_proof_attachments_base64?: string[];
     return_condition_notes?: string;
@@ -207,7 +208,14 @@ const ViewBorrowAssetScreen = () => {
                     <DetailItem icon="account-outline" label="Borrower" value={transaction.borrower_display_name} />
                     <DetailItem icon="calendar-arrow-right" label="Date Borrowed" value={formatDateTime(transaction.borrow_datetime)} />
                     <DetailItem icon="calendar-arrow-left" label="Expected Return" value={formatDateTime(transaction.expected_return_date)} />
-                    {transaction.notes && <DetailItem icon="note-text-outline" label="Notes" value={transaction.notes} />}
+                    
+                    {/* Display original notes (reason for borrowing) if available */}
+                    {transaction.notes && <DetailItem icon="note-text-outline" label="Notes / Reason for Borrowing" value={transaction.notes} />}
+
+                    {/* Display rejected_notes only if the transaction status is 'Rejected' and rejected_notes exist */}
+                    {transaction.status === 'Rejected' && transaction.rejected_notes && (
+                        <DetailItem icon="cancel" label="Reason for Rejection" value={transaction.rejected_notes} />
+                    )}
 
                     {transaction.borrow_proof_attachments_base64 && transaction.borrow_proof_attachments_base64.length > 0 && (
                         <View style={styles.inputContainer}>

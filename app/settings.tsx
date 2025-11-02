@@ -52,6 +52,10 @@ interface UserData {
     is_senior_citizen?: boolean;
     senior_citizen_id?: string | null;
     senior_citizen_card_base64?: string | null;
+    // NEW FIELDS FOR USER STATUS
+    status?: string; // e.g., 'Pending', 'Approved', 'Declined', 'Deactivated'
+    account_status?: string; // e.g., 'Active', 'Deactivated' (on-hold)
+    status_reason?: string | null; // Reason for Deactivated/Declined/On-hold
 }
 
 // Reusable component for displaying validation errors
@@ -109,7 +113,7 @@ export default function SettingsScreen() {
         const isRequired = (val: any) => !val || (typeof val === 'string' && !val.trim()) || (Array.isArray(val) && val.length === 0);
         const isInvalidName = (val: string) => !/^[a-zA-Z'.\-\s]+$/.test(val); // Re-using from signup.tsx
         // Regex for address_unit_room_apt_number: alphanumeric, spaces, hyphens, and slashes
-        const isInvalidUnitRoomApt = (val: string) => !/^[a-zA-Z0-9\s\-\/]*$/.test(val); 
+        const isInvalidUnitRoomApt = (val: string) => !/^[a-zA-Z0-9\s\-\/]*$/.test(val);
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -208,12 +212,105 @@ export default function SettingsScreen() {
 
     const loadUserData = useCallback(async () => {
         setIsLoading(true);
+        let localStoredData: string | null = null; // Keep track of locally stored data for fallback
         try {
-            const storedData = await AsyncStorage.getItem('userData');
-            if (storedData) {
-                const parsedData: UserData = JSON.parse(storedData);
+            // 1. Get user ID from AsyncStorage
+            localStoredData = await AsyncStorage.getItem('userData');
+            let userId: string | null = null;
+            if (localStoredData) {
+                const parsedStoredData: UserData = JSON.parse(localStoredData);
+                userId = parsedStoredData._id;
+            }
+
+            if (!userId) {
+                Alert.alert("Error", "User ID not found. Please log in again.");
+                router.replace('/login');
+                return;
+            }
+
+            // 2. Fetch the latest user data from the API
+            const response = await apiRequest('GET', `/api/residents/${userId}`);
+
+            if (response && response.resident) {
+                const latestUserData: UserData = response.resident;
+
+                // 3. Update AsyncStorage with the latest data from the API
+                await AsyncStorage.setItem('userData', JSON.stringify(latestUserData));
+
+                // 4. Process the latestUserData for formState
+                const dob = latestUserData.date_of_birth ? new Date(latestUserData.date_of_birth).toISOString().split('T')[0] : '';
+
+                let age: number | undefined;
+                if (latestUserData.date_of_birth) {
+                    const birthDate = new Date(latestUserData.date_of_birth);
+                    const today = new Date();
+                    age = today.getFullYear() - birthDate.getFullYear();
+                    const m = today.getMonth() - birthDate.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                }
+
+                const initialData = {
+                    ...latestUserData,
+                    date_of_birth: dob,
+                    age: age,
+                    suffix: latestUserData.suffix || null,
+                    address_unit_room_apt_number: latestUserData.address_unit_room_apt_number || '',
+                    type_of_household: latestUserData.type_of_household || null,
+                    proof_of_residency_base64: Array.isArray(latestUserData.proof_of_residency_base64)
+                        ? latestUserData.proof_of_residency_base64
+                        : (latestUserData.proof_of_residency_base64 ? [latestUserData.proof_of_residency_base64] : []),
+                    // Ensure status fields are correctly initialized from latest data
+                    status: latestUserData.status || 'Unknown',
+                    account_status: latestUserData.account_status || 'Active',
+                    status_reason: latestUserData.status_reason || null,
+                };
+                setFormState(initialData);
+                setOriginalFormState(initialData);
+            } else {
+                // If API fetch fails but we have local data, use it as a fallback
+                Alert.alert("Error", response?.message || "Could not fetch latest user data from server.");
+                if (localStoredData) {
+                    const parsedData: UserData = JSON.parse(localStoredData);
+                    const dob = parsedData.date_of_birth ? new Date(parsedData.date_of_birth).toISOString().split('T')[0] : '';
+                    let age: number | undefined;
+                    if (parsedData.date_of_birth) {
+                        const birthDate = new Date(parsedData.date_of_birth);
+                        const today = new Date();
+                        age = today.getFullYear() - birthDate.getFullYear();
+                        const m = today.getMonth() - birthDate.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                            age--;
+                        }
+                    }
+                    const initialData = {
+                        ...parsedData,
+                        date_of_birth: dob,
+                        age: age,
+                        suffix: parsedData.suffix || null,
+                        address_unit_room_apt_number: parsedData.address_unit_room_apt_number || '',
+                        type_of_household: parsedData.type_of_household || null,
+                        proof_of_residency_base64: Array.isArray(parsedData.proof_of_residency_base64)
+                            ? parsedData.proof_of_residency_base64
+                            : (parsedData.proof_of_residency_base64 ? [parsedData.proof_of_residency_base64] : []),
+                        status: parsedData.status || 'Unknown',
+                        account_status: parsedData.account_status || 'Active',
+                        status_reason: parsedData.status_reason || null,
+                    };
+                    setFormState(initialData);
+                    setOriginalFormState(initialData);
+                } else {
+                    router.replace('/login');
+                }
+            }
+        } catch (error: any) {
+            console.error("Error loading user data from API:", error.response?.data || error);
+            Alert.alert("Error", error.response?.data?.message || "An unexpected error occurred while loading your profile.");
+            // If API call completely fails, attempt to use local storage if available, otherwise redirect
+            if (localStoredData) {
+                const parsedData: UserData = JSON.parse(localStoredData);
                 const dob = parsedData.date_of_birth ? new Date(parsedData.date_of_birth).toISOString().split('T')[0] : '';
-                
                 let age: number | undefined;
                 if (parsedData.date_of_birth) {
                     const birthDate = new Date(parsedData.date_of_birth);
@@ -224,28 +321,25 @@ export default function SettingsScreen() {
                         age--;
                     }
                 }
-
                 const initialData = {
                     ...parsedData,
                     date_of_birth: dob,
-                    age: age, // ADDED: Calculate and set age
-                    suffix: parsedData.suffix || null, // Ensure suffix is initialized as null if not present
-                    address_unit_room_apt_number: parsedData.address_unit_room_apt_number || '', // NEW FIELD
-                    type_of_household: parsedData.type_of_household || null, // NEW FIELD
-                    // Ensure proof_of_residency_base64 is an array, even if empty or null from storage initially
+                    age: age,
+                    suffix: parsedData.suffix || null,
+                    address_unit_room_apt_number: parsedData.address_unit_room_apt_number || '',
+                    type_of_household: parsedData.type_of_household || null,
                     proof_of_residency_base64: Array.isArray(parsedData.proof_of_residency_base64)
                         ? parsedData.proof_of_residency_base64
                         : (parsedData.proof_of_residency_base64 ? [parsedData.proof_of_residency_base64] : []),
+                    status: parsedData.status || 'Unknown',
+                    account_status: parsedData.account_status || 'Active',
+                    status_reason: parsedData.status_reason || null,
                 };
                 setFormState(initialData);
                 setOriginalFormState(initialData);
             } else {
-                Alert.alert("Error", "User data not found. Please log in again.");
                 router.replace('/login');
             }
-        } catch (error) {
-            console.error("Error loading user data:", error);
-            Alert.alert("Error", "Could not load your profile.");
         } finally {
             setIsLoading(false);
         }
@@ -268,7 +362,6 @@ export default function SettingsScreen() {
 
         if (!result.canceled && result.assets?.[0]?.base64) {
             const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
-            // This is for single image fields. For proof_of_residency_base64, it's handled below.
             handleInputChange(field, base64Image);
         }
     };
@@ -281,13 +374,12 @@ export default function SettingsScreen() {
             'first_name', 'last_name', 'suffix',
             'email',
             'contact_number', 'date_of_birth', 'sex',
-            'civil_status', 'citizenship', 'occupation_status', 
-            'address_house_number', 'address_unit_room_apt_number', // NEW FIELD
-            'address_street', 'address_subdivision_zone', 'type_of_household', // NEW FIELD
+            'civil_status', 'citizenship', 'occupation_status',
+            'address_house_number', 'address_unit_room_apt_number',
+            'address_street', 'address_subdivision_zone', 'type_of_household',
             'years_at_current_address',
         ];
 
-        // Only validate password fields if newPassword is provided by the user
         if (formState.newPassword) {
             fieldsToValidate.push('newPassword', 'confirmNewPassword');
         }
@@ -312,16 +404,20 @@ export default function SettingsScreen() {
             if (payload.years_at_current_address) {
                 payload.years_at_current_address = parseInt(payload.years_at_current_address, 10);
             }
-            delete payload.confirmNewPassword; // Don't send confirmNewPassword to the backend
-            delete payload.age; // Do not send age to the backend, it's a derived field
+            delete payload.confirmNewPassword;
+            delete payload.age;
+            // Exclude status-related fields from user's self-update payload, as these are admin-managed
+            delete payload.status;
+            delete payload.account_status;
+            delete payload.status_reason;
+
 
             const response = await apiRequest('PUT', `/api/residents/${formState._id}`, payload);
 
             if (response && response.resident) {
-                const storedUserData = JSON.parse(await AsyncStorage.getItem('userData') || '{}');
-                const updatedUserData = { ...storedUserData, ...response.resident };
-                await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
-                loadUserData(); // Reload to refresh UI with latest data
+                // After user updates their profile, reload all user data from the server
+                // to get the most current state, including admin-managed status fields.
+                await loadUserData(); // This will fetch from API and update AsyncStorage and formState
                 Alert.alert('Success', 'Profile updated successfully!');
             } else {
                 Alert.alert('Update Failed', response?.message || 'Could not save changes.');
@@ -357,6 +453,41 @@ export default function SettingsScreen() {
 
                 <ScrollView style={styles.contentScrollView} contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="handled">
                     <Text style={styles.sectionTitle}>Personal Information</Text>
+
+                    {/* Status Display Area */}
+                    <View style={styles.statusDisplayContainer}>
+                        {formState.status === 'Pending' && (
+                            <View style={[styles.statusBadge, styles.statusPending]}>
+                                <Text style={styles.statusText}>Account Status: Pending</Text>
+                            </View>
+                        )}
+                        {formState.status === 'Approved' && formState.account_status === 'Active' && (
+                            <View style={[styles.statusBadge, styles.statusActive]}>
+                                <Text style={styles.statusText}>Account Status: Active</Text>
+                            </View>
+                        )}
+                        {(formState.status === 'Declined' || formState.status === 'Deactivated' || (formState.status === 'Approved' && formState.account_status === 'Deactivated')) && (
+                            <View style={[styles.statusBadge, styles.statusOnHoldDeactivatedDeclined]}>
+                                <Text style={styles.statusText}>
+                                    {formState.status === 'Declined' ? 'Account Status: Declined' :
+                                     formState.status === 'Deactivated' ? 'Account Status: Deactivated' :
+                                     'Account Status: On-Hold'}
+                                </Text>
+                            </View>
+                        )}
+
+                        {/* Display Reason if applicable */}
+                        {(formState.status === 'Declined' ||
+                             formState.status === 'Deactivated') && formState.status_reason && (
+                            <View style={styles.reasonContainer}>
+                                <Text style={styles.reasonText}>Reason: {formState.status_reason}</Text>
+                            </View>
+                        )}
+                        {formState.status === 'Approved' && formState.account_status === 'Deactivated' && (
+                            <View style={styles.reasonContainer}><Text style={styles.reasonText}>Reason: You have some unresolved issues. The item you borrowed might be overdue, damaged, or lost.</Text></View>
+                        )}
+                    </View>
+
                     {/* First Name (Read-only) */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>First Name *</Text>
@@ -639,7 +770,6 @@ export default function SettingsScreen() {
                                             source={{ uri }}
                                             style={styles.proofImagePreview}
                                         />
-                                        {/* If you wanted to allow removing, you'd add a button here, similar to signup.tsx */}
                                     </View>
                                 ))}
                             </View>
@@ -797,14 +927,13 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginLeft: 5,
     },
-    // --- ADDED NEW STYLES FROM signup.tsx ---
     imagePreviewContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
         marginTop: 10,
         marginBottom: 15,
-        gap: 10, // Added for spacing between images
+        gap: 10,
     },
     imagePreviewWrapper: {
         position: 'relative',
@@ -815,6 +944,45 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         marginTop: 10,
         fontSize: 14,
-    }
-    // --- END NEW STYLES ---
+    },
+    statusDisplayContainer: {
+        marginBottom: 20,
+        padding: 15,
+        borderRadius: 10,
+        backgroundColor: '#F8F8F8',
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+    },
+    statusBadge: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+        alignSelf: 'flex-start',
+        marginBottom: 8,
+    },
+    statusText: {
+        fontWeight: 'bold',
+        color: 'white',
+        fontSize: 14,
+    },
+    statusPending: {
+        backgroundColor: '#FFA000',
+    },
+    statusActive: {
+        backgroundColor: '#4CAF50',
+    },
+    statusOnHoldDeactivatedDeclined: {
+        backgroundColor: '#D32F2F',
+    },
+    reasonContainer: {
+        marginTop: 10,
+        paddingTop: 10,
+        borderTopWidth: 1,
+        borderTopColor: '#EEEEEE',
+    },
+    reasonText: {
+        fontSize: 14,
+        color: '#616161',
+        fontStyle: 'italic',
+    },
 });
